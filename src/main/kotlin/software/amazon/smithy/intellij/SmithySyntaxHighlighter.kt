@@ -41,7 +41,11 @@ class SmithySyntaxAnnotator : Annotator {
         if ((element is SmithyKey || element.elementType == SmithyTypes.TOKEN_DOLLAR_SIGN) && element.parent is SmithyControlDefinition) {
             holder.assign(SmithyColorSettingsPage.KEYWORD)
         }
-        //Reset all keywords used as normal identifiers back to the identifier color
+        //Reset all strings used as keys back to the normal text color
+        if (element is SmithyString && element.parent is SmithyKey) {
+            holder.assign(HighlighterColors.TEXT)
+        }
+        //Reset all keywords used as normal identifiers back to the normal text color
         if (element is SmithyKeyword && element.parent is SmithyId) {
             holder.assign(HighlighterColors.TEXT)
         }
