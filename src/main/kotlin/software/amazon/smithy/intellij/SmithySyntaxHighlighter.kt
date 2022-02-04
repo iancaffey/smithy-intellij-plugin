@@ -9,6 +9,7 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IElementType
 import software.amazon.smithy.intellij.psi.SmithyId
@@ -41,9 +42,12 @@ class SmithySyntaxAnnotator : Annotator {
         if (element is SmithyKeyword && element.parent is SmithyId) {
             holder.assign(SmithyColorSettingsPage.IDENTIFIER)
         }
+        if (element is PsiComment && element.text.startsWith("///")) {
+            holder.assign(SmithyColorSettingsPage.DOC_COMMENT)
+        }
     }
 
-    fun AnnotationHolder.assign(key: TextAttributesKey) =
+    private fun AnnotationHolder.assign(key: TextAttributesKey) =
         newSilentAnnotation(HighlightSeverity.INFORMATION).textAttributes(key).create()
 }
 
