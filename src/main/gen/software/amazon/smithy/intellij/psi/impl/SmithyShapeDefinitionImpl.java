@@ -1,23 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package software.amazon.smithy.intellij.psi.impl;
 
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import software.amazon.smithy.intellij.psi.SmithyListDefinition;
-import software.amazon.smithy.intellij.psi.SmithyMapDefinition;
-import software.amazon.smithy.intellij.psi.SmithyOperationDefinition;
-import software.amazon.smithy.intellij.psi.SmithyResourceDefinition;
-import software.amazon.smithy.intellij.psi.SmithyServiceDefinition;
-import software.amazon.smithy.intellij.psi.SmithySetDefinition;
-import software.amazon.smithy.intellij.psi.SmithyShapeDefinition;
-import software.amazon.smithy.intellij.psi.SmithySimpleShapeDefinition;
-import software.amazon.smithy.intellij.psi.SmithyStructureDefinition;
-import software.amazon.smithy.intellij.psi.SmithyTraits;
-import software.amazon.smithy.intellij.psi.SmithyUnionDefinition;
-import software.amazon.smithy.intellij.psi.SmithyVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import software.amazon.smithy.intellij.psi.*;
 
 public class SmithyShapeDefinitionImpl extends ASTWrapperPsiElement implements SmithyShapeDefinition {
 

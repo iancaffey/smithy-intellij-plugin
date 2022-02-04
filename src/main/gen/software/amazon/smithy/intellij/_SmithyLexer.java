@@ -32,7 +32,7 @@ public class _SmithyLexer implements FlexLexer {
    *                  at the beginning of a line
    * l is of the form l = 2*k, k a non negative integer
    */
-  private static final int[] ZZ_LEXSTATE = {
+  private static final int ZZ_LEXSTATE[] = { 
      0, 0
   };
 
@@ -46,15 +46,15 @@ public class _SmithyLexer implements FlexLexer {
   }
 
   /* The ZZ_CMAP_Z table has 68 entries */
-  static final char[] ZZ_CMAP_Z = zzUnpackCMap(
+  static final char ZZ_CMAP_Z[] = zzUnpackCMap(
     "\1\0\103\200");
 
   /* The ZZ_CMAP_Y table has 256 entries */
-  static final char[] ZZ_CMAP_Y = zzUnpackCMap(
+  static final char ZZ_CMAP_Y[] = zzUnpackCMap(
     "\1\0\1\1\53\2\1\3\22\2\1\4\37\2\1\3\237\2");
 
   /* The ZZ_CMAP_A table has 640 entries */
-  static final char[] ZZ_CMAP_A = zzUnpackCMap(
+  static final char ZZ_CMAP_A[] = zzUnpackCMap(
     "\11\0\1\4\1\2\2\1\1\3\22\0\1\46\1\45\1\41\1\63\1\61\2\45\1\43\1\50\1\51\1"+
     "\45\1\40\1\57\1\35\1\37\1\47\1\36\11\34\1\56\2\45\1\60\2\45\1\62\3\44\1\30"+
     "\2\44\2\33\1\27\21\33\1\54\1\42\1\55\1\45\1\32\1\45\1\12\1\15\1\21\1\20\1"+
@@ -391,7 +391,7 @@ public class _SmithyLexer implements FlexLexer {
   }
 
   /** the input device */
-  private final java.io.Reader zzReader;
+  private java.io.Reader zzReader;
 
   /** the current state of the DFA */
   private int zzState;
@@ -429,7 +429,7 @@ public class _SmithyLexer implements FlexLexer {
 
   /* user code: */
   public _SmithyLexer() {
-    this(null);
+    this((java.io.Reader)null);
   }
 
 

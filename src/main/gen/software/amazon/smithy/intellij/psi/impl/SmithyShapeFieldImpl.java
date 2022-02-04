@@ -1,15 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package software.amazon.smithy.intellij.psi.impl;
 
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
-import org.jetbrains.annotations.NotNull;
-import software.amazon.smithy.intellij.psi.SmithyId;
-import software.amazon.smithy.intellij.psi.SmithyShapeField;
-import software.amazon.smithy.intellij.psi.SmithyShapeId;
-import software.amazon.smithy.intellij.psi.SmithyTraits;
-import software.amazon.smithy.intellij.psi.SmithyVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import software.amazon.smithy.intellij.psi.*;
 
 public class SmithyShapeFieldImpl extends ASTWrapperPsiElement implements SmithyShapeField {
 

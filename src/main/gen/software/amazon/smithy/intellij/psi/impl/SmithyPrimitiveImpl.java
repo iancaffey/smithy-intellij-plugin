@@ -1,19 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package software.amazon.smithy.intellij.psi.impl;
 
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import software.amazon.smithy.intellij.psi.SmithyBoolean;
-import software.amazon.smithy.intellij.psi.SmithyNull;
-import software.amazon.smithy.intellij.psi.SmithyNumber;
-import software.amazon.smithy.intellij.psi.SmithyPrimitive;
-import software.amazon.smithy.intellij.psi.SmithyShapeId;
-import software.amazon.smithy.intellij.psi.SmithyString;
-import software.amazon.smithy.intellij.psi.SmithyTextBlock;
-import software.amazon.smithy.intellij.psi.SmithyVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import software.amazon.smithy.intellij.psi.*;
 
 public class SmithyPrimitiveImpl extends ASTWrapperPsiElement implements SmithyPrimitive {
 
