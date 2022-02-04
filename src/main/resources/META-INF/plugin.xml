@@ -1,0 +1,24 @@
+<idea-plugin>
+    <id>software.amazon.smithy.intellij</id>
+    <name>Smithy</name>
+    <vendor email="mail@iancaffey.com" url="https://www.iancaffey.com/">Ian Caffey</vendor>
+    <description><![CDATA[
+    <span>A language for defining services and SDKs.</span>
+    <br/>
+    <br/>
+    <a href="https://awslabs.github.io/smithy/">Homepage</a><span> | </span><a href="https://github.com/awslabs/smithy">GitHub</a>
+    ]]></description>
+    <depends>com.intellij.modules.platform</depends>
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType name="Smithy"
+                  language="Smithy"
+                  extensions="smithy"
+                  implementationClass="software.amazon.smithy.intellij.SmithyFileType"
+                  fieldName="INSTANCE"/>
+        <lang.parserDefinition language="Smithy"
+                               implementationClass="software.amazon.smithy.intellij.SmithyParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="Smithy"
+                                       implementationClass="software.amazon.smithy.intellij.SmithySyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="software.amazon.smithy.intellij.SmithyColorSettingsPage"/>
+    </extensions>
+</idea-plugin>

@@ -1,0 +1,117 @@
+{
+    parserClass="software.amazon.smithy.intellij.SmithyParser"
+    parserUtilClass="software.amazon.smithy.intellij.SmithyParserUtil"
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+    psiClassPrefix="Smithy"
+    psiImplClassSuffix="Impl"
+    psiPackage="software.amazon.smithy.intellij.psi"
+    psiImplPackage="software.amazon.smithy.intellij.psi.impl"
+    elementTypeHolderClass="software.amazon.smithy.intellij.psi.SmithyTypes"
+    elementTypeClass="software.amazon.smithy.intellij.SmithyElementType"
+    tokenTypeClass="software.amazon.smithy.intellij.SmithyTokenType"
+    //Note: some tokens have wrapper/alias rules for better AST generation, so all tokens have TOKEN_ to disambiguate within SmithyTypes
+    tokens=[
+        //Punctuation
+        TOKEN_OPEN_PAREN="("
+        TOKEN_CLOSE_PAREN=")"
+        TOKEN_OPEN_BRACE="{"
+        TOKEN_CLOSE_BRACE="}"
+        TOKEN_OPEN_BRACKET="["
+        TOKEN_CLOSE_BRACKET="]"
+        TOKEN_COLON=":"
+        TOKEN_COMMA=","
+        TOKEN_EQUALS="="
+        TOKEN_PERIOD="."
+        TOKEN_DOLLAR_SIGN="$"
+        TOKEN_AT="@"
+        TOKEN_HASH="#"
+        //Symbols (keywords (not reserved words), identifiers, object keys, etc.)
+        TOKEN_APPLY="apply"
+        TOKEN_USE="use"
+        TOKEN_LIST="list"
+        TOKEN_SET="set"
+        TOKEN_MAP="map"
+        TOKEN_METADATA="metadata"
+        TOKEN_NAMESPACE="namespace"
+        TOKEN_STRUCTURE="structure"
+        TOKEN_UNION="union"
+        TOKEN_SERVICE="service"
+        TOKEN_OPERATION="operation"
+        TOKEN_RESOURCE="resource"
+        TOKEN_NULL="null"
+        TOKEN_BOOLEAN="regexp:true|false"
+        TOKEN_SIMPLE_TYPE_NAME="regexp:blob|boolean|document|string|byte|short|integer|long|float|double|bigInteger|bigDecimal|timestamp"
+        TOKEN_SYMBOL="regexp:_*[A-Za-z][A-Za-z0-9_]*"
+        //Literals
+        TOKEN_NUMBER="regexp:-?(0|([1-9][0-9]*))(\.[0-9]+)?(e[+-]?[0-9]+)?"
+        TOKEN_STRING="regexp:\"((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|[ !#-\[\]-\U10FFFF])*\""
+        //TODO: support unescaped double-quotes within the text block (also match the regex with what the parser implements, not what the documentation indicates)
+        //Note: matching is slightly more permissive here (allowing the leading new-line to be omitted), so a more specific error can be surfaced in the editor
+        TOKEN_TEXT_BLOCK="regexp:\"\"\"((\\['bfnrt/\\])|(\\u[0-9A-Fa-f]{4})|[ !#-\[\]-\U10FFFF]|(\\[\"]{3})|(\\?\r?\n))*\"\"\""
+        //Comment (no differentiation is made at the lexer level between doc and line comments since the line comment regex matches both)
+        TOKEN_COMMENT="regexp://[\t -\U10FFFF]*\r?\n"
+    ]
+}
+//https://awslabs.github.io/smithy/1.0/spec/core/idl.html
+root ::= control_section metadata_section [shape_section]
+
+//Control
+control_section ::= control_definition*
+control_definition ::= TOKEN_DOLLAR_SIGN key TOKEN_COLON value
+
+//Metadata
+metadata_section ::= metadata_definition*
+metadata_definition ::= TOKEN_METADATA key TOKEN_EQUALS value
+
+//Shapes
+shape_section ::= namespace_definition imports shape_statements
+namespace_definition ::= TOKEN_NAMESPACE namespace
+imports ::= import*
+import ::= TOKEN_USE root_shape_id
+shape_statements ::= shape_statement*
+shape_statement ::= apply | shape_definition
+shape_definition ::= traits (simple_shape_definition | list_definition | set_definition | map_definition | structure_definition | union_definition | service_definition | operation_definition | resource_definition)
+apply ::= TOKEN_APPLY shape_id trait
+simple_shape_definition ::= simple_type_name id
+list_definition ::= TOKEN_LIST id shape_fields
+set_definition ::= TOKEN_SET id shape_fields
+map_definition ::= TOKEN_MAP id shape_fields
+structure_definition ::= TOKEN_STRUCTURE id shape_fields
+union_definition ::= TOKEN_UNION id shape_fields
+service_definition ::= TOKEN_SERVICE id structure
+operation_definition ::= TOKEN_OPERATION id structure
+resource_definition ::= TOKEN_RESOURCE id structure
+shape_fields ::= TOKEN_OPEN_BRACE [shape_field (TOKEN_COMMA shape_field)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE
+shape_field ::= traits id TOKEN_COLON shape_id
+
+//Traits
+traits ::= trait*
+trait ::= trait_name [trait_body]
+trait_name ::= TOKEN_AT shape_id
+trait_body ::= TOKEN_OPEN_PAREN (trait_values | value) TOKEN_CLOSE_PAREN
+trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA]
+
+//Node values
+key ::= id | string
+value ::= array | structure | primitive
+entry ::= key TOKEN_COLON value
+array ::= TOKEN_OPEN_BRACKET [value (TOKEN_COMMA value)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACKET
+structure ::= TOKEN_OPEN_BRACE [entry (TOKEN_COMMA entry)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE
+primitive ::= null | boolean | number | string | text_block | shape_id
+
+//Shape ID
+shape_id ::= root_shape_id [shape_id_member]
+root_shape_id ::= [namespace TOKEN_HASH] id
+namespace ::= id (TOKEN_PERIOD id)*
+shape_id_member ::= TOKEN_DOLLAR_SIGN id
+id ::= symbol | keyword
+
+//Re-declared tokens which will receive a dedicated AST node instead of raw PsiElement (since they are used in a meaningful way, like as a variant within another AST node)
+null ::= TOKEN_NULL
+boolean ::= TOKEN_BOOLEAN
+number ::= TOKEN_NUMBER
+string ::= TOKEN_STRING
+text_block ::= TOKEN_TEXT_BLOCK
+symbol ::= TOKEN_SYMBOL
+simple_type_name ::= TOKEN_SIMPLE_TYPE_NAME
+keyword ::= TOKEN_APPLY | TOKEN_USE | TOKEN_LIST | TOKEN_SET | TOKEN_MAP | TOKEN_METADATA | TOKEN_NAMESPACE | TOKEN_STRUCTURE | TOKEN_UNION | TOKEN_SERVICE | TOKEN_OPERATION | TOKEN_RESOURCE
