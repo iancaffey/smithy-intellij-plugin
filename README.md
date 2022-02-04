@@ -1,2 +1,2 @@
-# smithy-intellij-plugin
-IntelliJ plugin for the Smithy interface definition language.
+# Smithy IntelliJ Plugin
+IntelliJ plugin for the [Smithy](https://awslabs.github.io/smithy) interface definition language.
