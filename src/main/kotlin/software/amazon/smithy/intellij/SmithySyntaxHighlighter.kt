@@ -12,10 +12,8 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IElementType
-import software.amazon.smithy.intellij.psi.SmithyId
-import software.amazon.smithy.intellij.psi.SmithyKeyword
-import software.amazon.smithy.intellij.psi.SmithyTraitName
-import software.amazon.smithy.intellij.psi.SmithyTypes
+import com.intellij.psi.util.elementType
+import software.amazon.smithy.intellij.psi.*
 
 /**
  * A [SyntaxHighlighterFactory] for [SmithySyntaxHighlighter].
@@ -37,6 +35,10 @@ class SmithySyntaxAnnotator : Annotator {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
         if (element is SmithyTraitName) {
             holder.assign(SmithyColorSettingsPage.TRAIT_NAME)
+        }
+        //All control statement keys (currently only version) are colored as keywords since they are parser directives
+        if ((element is SmithyKey || element.elementType == SmithyTypes.TOKEN_DOLLAR_SIGN) && element.parent is SmithyControlDefinition) {
+            holder.assign(SmithyColorSettingsPage.KEYWORD)
         }
         //Reset all keywords used as normal identifiers back to the identifier color
         if (element is SmithyKeyword && element.parent is SmithyId) {
