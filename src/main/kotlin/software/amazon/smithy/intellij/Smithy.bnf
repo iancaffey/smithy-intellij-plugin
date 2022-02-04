@@ -6,6 +6,7 @@
     psiImplClassSuffix="Impl"
     psiPackage="software.amazon.smithy.intellij.psi"
     psiImplPackage="software.amazon.smithy.intellij.psi.impl"
+    psiImplUtilClass="software.amazon.smithy.intellij.psi.impl.SmithyPsiImplUtil"
     elementTypeHolderClass="software.amazon.smithy.intellij.psi.SmithyTypes"
     elementTypeClass="software.amazon.smithy.intellij.SmithyElementType"
     tokenTypeClass="software.amazon.smithy.intellij.SmithyTokenType"
@@ -108,8 +109,8 @@ id ::= symbol | keyword
 
 //Re-declared tokens which will receive a dedicated AST node instead of raw PsiElement (since they are used in a meaningful way, like as a variant within another AST node)
 null ::= TOKEN_NULL
-boolean ::= TOKEN_BOOLEAN
-number ::= TOKEN_NUMBER
+boolean ::= TOKEN_BOOLEAN {methods=[booleanValue]}
+number ::= TOKEN_NUMBER {methods=[byteValue shortValue intValue longValue floatValue doubleValue bigDecimalValue bigIntegerValue]}
 string ::= TOKEN_STRING
 text_block ::= TOKEN_TEXT_BLOCK
 symbol ::= TOKEN_SYMBOL

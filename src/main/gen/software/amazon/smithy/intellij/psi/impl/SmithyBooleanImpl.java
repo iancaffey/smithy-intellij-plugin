@@ -33,4 +33,9 @@ public class SmithyBooleanImpl extends ASTWrapperPsiElement implements SmithyBoo
     return findNotNullChildByType(TOKEN_BOOLEAN);
   }
 
+  @Override
+  public boolean booleanValue() {
+    return SmithyPsiImplUtil.booleanValue(this);
+  }
+
 }

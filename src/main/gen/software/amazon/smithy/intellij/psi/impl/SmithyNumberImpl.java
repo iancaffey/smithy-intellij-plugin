@@ -35,4 +35,44 @@ public class SmithyNumberImpl extends ASTWrapperPsiElement implements SmithyNumb
     return findNotNullChildByType(TOKEN_NUMBER);
   }
 
+  @Override
+  public double byteValue() {
+    return SmithyPsiImplUtil.byteValue(this);
+  }
+
+  @Override
+  public double shortValue() {
+    return SmithyPsiImplUtil.shortValue(this);
+  }
+
+  @Override
+  public double intValue() {
+    return SmithyPsiImplUtil.intValue(this);
+  }
+
+  @Override
+  public long longValue() {
+    return SmithyPsiImplUtil.longValue(this);
+  }
+
+  @Override
+  public float floatValue() {
+    return SmithyPsiImplUtil.floatValue(this);
+  }
+
+  @Override
+  public double doubleValue() {
+    return SmithyPsiImplUtil.doubleValue(this);
+  }
+
+  @Override
+  public BigDecimal bigDecimalValue() {
+    return SmithyPsiImplUtil.bigDecimalValue(this);
+  }
+
+  @Override
+  public BigInteger bigIntegerValue() {
+    return SmithyPsiImplUtil.bigIntegerValue(this);
+  }
+
 }

@@ -10,4 +10,6 @@ public interface SmithyBoolean extends PsiElement {
   @NotNull
   PsiElement getTokenBoolean();
 
+  boolean booleanValue();
+
 }
