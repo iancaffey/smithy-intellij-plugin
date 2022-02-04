@@ -35,6 +35,7 @@ class SmithyColorSettingsPage : ColorSettingsPage {
             AttributesDescriptor("Comma", COMMA),
             AttributesDescriptor("Documentation comment", DOC_COMMENT),
             AttributesDescriptor("Dot", DOT),
+            AttributesDescriptor("Identifier", IDENTIFIER),
             AttributesDescriptor("Keyword", KEYWORD),
             AttributesDescriptor("Line comment", LINE_COMMENT),
             AttributesDescriptor("Number", NUMBER),

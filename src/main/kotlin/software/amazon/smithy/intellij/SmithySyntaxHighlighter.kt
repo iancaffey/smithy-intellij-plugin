@@ -1,11 +1,19 @@
 package software.amazon.smithy.intellij
 
+import com.intellij.lang.annotation.AnnotationHolder
+import com.intellij.lang.annotation.Annotator
+import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighter
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IElementType
+import software.amazon.smithy.intellij.psi.SmithyId
+import software.amazon.smithy.intellij.psi.SmithyKeyword
+import software.amazon.smithy.intellij.psi.SmithyTraitName
 import software.amazon.smithy.intellij.psi.SmithyTypes
 
 /**
@@ -16,6 +24,27 @@ import software.amazon.smithy.intellij.psi.SmithyTypes
  */
 class SmithySyntaxHighlighterFactory : SyntaxHighlighterFactory() {
     override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?) = SmithySyntaxHighlighter()
+}
+
+/**
+ * An [Annotator] which completes the syntax highlighting which requires context provided by higher-level AST nodes not provided to [SmithySyntaxHighlighter].
+ *
+ * @author Ian Caffey
+ * @since 1.0
+ */
+class SmithySyntaxAnnotator : Annotator {
+    override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+        if (element is SmithyTraitName) {
+            holder.assign(SmithyColorSettingsPage.TRAIT_NAME)
+        }
+        //Reset all keywords used as normal identifiers back to the identifier color
+        if (element is SmithyKeyword && element.parent is SmithyId) {
+            holder.assign(SmithyColorSettingsPage.IDENTIFIER)
+        }
+    }
+
+    fun AnnotationHolder.assign(key: TextAttributesKey) =
+        newSilentAnnotation(HighlightSeverity.INFORMATION).textAttributes(key).create()
 }
 
 /**
