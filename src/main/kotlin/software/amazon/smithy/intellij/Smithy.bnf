@@ -45,10 +45,8 @@
         TOKEN_SYMBOL="regexp:_*[A-Za-z][A-Za-z0-9_]*"
         //Literals
         TOKEN_NUMBER="regexp:-?(0|([1-9][0-9]*))(\.[0-9]+)?(e[+-]?[0-9]+)?"
-        TOKEN_STRING="regexp:\"((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|[ !#-\[\]-\U10FFFF])*\""
-        //TODO: support unescaped double-quotes within the text block (also match the regex with what the parser implements, not what the documentation indicates)
-        //Note: matching is slightly more permissive here (allowing the leading new-line to be omitted), so a more specific error can be surfaced in the editor
-        TOKEN_TEXT_BLOCK="regexp:\"\"\"((\\['bfnrt/\\])|(\\u[0-9A-Fa-f]{4})|[ !#-\[\]-\U10FFFF]|(\\[\"]{3})|(\\?\r?\n))*\"\"\""
+        TOKEN_STRING="regexp:\"((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF]))*\""
+        TOKEN_TEXT_BLOCK="regexp:\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))*\"\"\""
         //Comment (no differentiation is made at the lexer level between doc and line comments since the line comment regex matches both)
         TOKEN_COMMENT="regexp://[\t -\U10FFFF]*\r?\n"
     ]

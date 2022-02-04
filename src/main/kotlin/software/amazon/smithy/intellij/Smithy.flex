@@ -29,8 +29,8 @@ TOKEN_BOOLEAN=true|false
 TOKEN_SIMPLE_TYPE_NAME=blob|boolean|document|string|byte|short|integer|long|float|double|bigInteger|bigDecimal|timestamp
 TOKEN_SYMBOL=_*[A-Za-z][A-Za-z0-9_]*
 TOKEN_NUMBER=-?(0|([1-9][0-9]*))(\.[0-9]+)?(e[+-]?[0-9]+)?
-TOKEN_STRING=\"((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|[ !#-\[\]-\U10FFFF])*\"
-TOKEN_TEXT_BLOCK=\"\"\"((\\['bfnrt/\\])|(\\u[0-9A-Fa-f]{4})|[ !#-\[\]-\U10FFFF]|(\\[\"]{3})|(\\?\r?\n))*\"\"\"
+TOKEN_STRING=\"((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF]))*\"
+TOKEN_TEXT_BLOCK=\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))*\"\"\"
 TOKEN_COMMENT="//"[\t -\U10FFFF]*\r?\n
 
 %%
