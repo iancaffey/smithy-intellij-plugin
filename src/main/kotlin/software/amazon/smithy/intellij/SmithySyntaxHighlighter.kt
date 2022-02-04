@@ -3,6 +3,7 @@ package software.amazon.smithy.intellij
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.openapi.editor.HighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighter
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
@@ -42,7 +43,7 @@ class SmithySyntaxAnnotator : Annotator {
         }
         //Reset all keywords used as normal identifiers back to the identifier color
         if (element is SmithyKeyword && element.parent is SmithyId) {
-            holder.assign(SmithyColorSettingsPage.IDENTIFIER)
+            holder.assign(HighlighterColors.TEXT)
         }
         if (element is PsiComment && element.text.startsWith("///")) {
             holder.assign(SmithyColorSettingsPage.DOC_COMMENT)

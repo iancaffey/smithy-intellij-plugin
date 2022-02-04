@@ -21,7 +21,6 @@ class SmithyColorSettingsPage : ColorSettingsPage {
         val COMMA = createTextAttributesKey("SMITHY_COMMA", DefaultLanguageHighlighterColors.COMMA)
         val DOC_COMMENT = createTextAttributesKey("SMITHY_DOC_COMMENT", DefaultLanguageHighlighterColors.DOC_COMMENT)
         val DOT = createTextAttributesKey("SMITHY_DOT", DefaultLanguageHighlighterColors.DOT)
-        val IDENTIFIER = createTextAttributesKey("SMITHY_IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER)
         val KEYWORD = createTextAttributesKey("SMITHY_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
         val LINE_COMMENT = createTextAttributesKey("SMITHY_LINE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
         val NUMBER = createTextAttributesKey("SMITHY_NUMBER", DefaultLanguageHighlighterColors.NUMBER)
@@ -35,7 +34,6 @@ class SmithyColorSettingsPage : ColorSettingsPage {
             AttributesDescriptor("Comma", COMMA),
             AttributesDescriptor("Documentation comment", DOC_COMMENT),
             AttributesDescriptor("Dot", DOT),
-            AttributesDescriptor("Identifier", IDENTIFIER),
             AttributesDescriptor("Keyword", KEYWORD),
             AttributesDescriptor("Line comment", LINE_COMMENT),
             AttributesDescriptor("Number", NUMBER),
