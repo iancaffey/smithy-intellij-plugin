@@ -12,8 +12,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.elementType
+import com.intellij.psi.util.nextLeaf
 import software.amazon.smithy.intellij.psi.*
 
 /**
@@ -33,6 +35,16 @@ class SmithySyntaxHighlighterFactory : SyntaxHighlighterFactory() {
  * @since 1.0
  */
 class SmithySyntaxAnnotator : Annotator {
+    companion object {
+        private val TOKENS_REQUIRING_TRAILING_NEW_LINE = setOf(
+            SmithyTypes.APPLY,
+            SmithyTypes.CONTROL_DEFINITION,
+            SmithyTypes.METADATA_DEFINITION,
+            SmithyTypes.NAMESPACE_DEFINITION,
+            SmithyTypes.SHAPE_DEFINITION
+        )
+    }
+
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
         if (element is SmithyTraitName) {
             holder.assign(SmithyColorSettingsPage.TRAIT_NAME)
@@ -52,10 +64,21 @@ class SmithySyntaxAnnotator : Annotator {
         if (element is PsiComment && element.text.startsWith("///")) {
             holder.assign(SmithyColorSettingsPage.DOC_COMMENT)
         }
+        //Since whitespace cannot be referenced within parsing rules, error annotations are added for all nodes which are missing a trailing new-line (or EOF)
+        if (element.elementType in TOKENS_REQUIRING_TRAILING_NEW_LINE) {
+            val next = element.nextLeaf()
+            //next == null -> EOF which is treated like a new-line
+            if (next != null && (next !is PsiWhiteSpace || !next.text.contains("\n"))) {
+                holder.highlight(HighlightSeverity.ERROR, "Missing trailing line break (\\n)")
+            }
+        }
     }
 
     private fun AnnotationHolder.assign(key: TextAttributesKey) =
         newSilentAnnotation(HighlightSeverity.INFORMATION).textAttributes(key).create()
+
+    private fun AnnotationHolder.highlight(severity: HighlightSeverity, message: String) =
+        newAnnotation(severity, message).create()
 }
 
 /**
