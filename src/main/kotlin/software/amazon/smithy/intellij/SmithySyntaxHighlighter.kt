@@ -48,28 +48,28 @@ class SmithySyntaxAnnotator : Annotator {
 
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
         if ((element is SmithyKey || element.elementType == SmithyTypes.TOKEN_DOLLAR_SIGN) && element.parent is SmithyControlDefinition) {
-            holder.assign(SmithyColorSettings.CONTROL)
+            holder.highlight(SmithyColorSettings.CONTROL)
         }
         if (element is PsiComment && element.text.startsWith("///")) {
-            holder.assign(SmithyColorSettings.DOC_COMMENT)
+            holder.highlight(SmithyColorSettings.DOC_COMMENT)
         }
         if (element is SmithyKey && element.parent !is SmithyControlDefinition) {
-            holder.assign(SmithyColorSettings.KEY)
+            holder.highlight(SmithyColorSettings.KEY)
         }
         if (element is SmithyId && (element.parent is SmithyShapeField || element.parent is SmithyShapeIdMember)) {
-            holder.assign(SmithyColorSettings.SHAPE_MEMBER)
+            holder.highlight(SmithyColorSettings.SHAPE_MEMBER)
         }
         if (element is SmithyTraitName) {
-            holder.assign(SmithyColorSettings.TRAIT_NAME)
+            holder.highlight(SmithyColorSettings.TRAIT_NAME)
         }
         //Reset all keywords/literals/types used as standalone identifiers back to the normal text color
         if ((element is SmithyBoolean || element is SmithyKeyword || element is SmithyNull || element is SmithySimpleTypeName) && element.parent is SmithyId && element.parent.parent !is SmithyKey) {
-            holder.assign(HighlighterColors.TEXT)
+            holder.highlight(HighlighterColors.TEXT)
         }
         //Highlight all escape sequences within strings and text blocks
         if ((element is SmithyString || element is SmithyTextBlock) && element.text.contains("\\")) {
-            val range = element.textRange
-            val ranges = mutableListOf<TextRange>()
+            val valid = mutableListOf<TextRange>()
+            val invalid = mutableListOf<TextRange>()
             var i = 0
             while (i < element.textLength) {
                 if (element.text[i] != '\\') {
@@ -80,10 +80,23 @@ class SmithySyntaxAnnotator : Annotator {
                         val digit = element.text[i + it]
                         (digit in '0'..'9') || (digit in 'a'..'f') || (digit in 'A'..'F')
                     }) 5 else 2
-                ranges.add(range.cutOut(TextRange.from(i, length)))
+                if (length == 2 && element.text[i + 1] !in "\"'bfnrt/\\\n") {
+                    invalid.add(TextRange.from(i, length))
+                } else {
+                    valid.add(TextRange.from(i, length))
+                }
                 i += length
             }
-            ranges.forEach { holder.assign(SmithyColorSettings.ESCAPE_SEQUENCE, it) }
+            val range = element.textRange
+            valid.forEach { holder.highlight(SmithyColorSettings.VALID_ESCAPE_SEQUENCE, range.cutOut(it)) }
+            invalid.forEach {
+                holder.highlight(
+                    HighlightSeverity.ERROR,
+                    "Invalid escape sequence: '${it.substring(element.text)}'",
+                    SmithyColorSettings.INVALID_ESCAPE_SEQUENCE,
+                    range.cutOut(it)
+                )
+            }
         }
         //Since whitespace cannot be referenced within parsing rules, error annotations are added for all nodes which are missing a trailing new-line (or EOF)
         if (element.elementType in TOKENS_REQUIRING_TRAILING_NEW_LINE) {
@@ -101,14 +114,18 @@ class SmithySyntaxAnnotator : Annotator {
         }
     }
 
-    private fun AnnotationHolder.assign(key: TextAttributesKey) =
+    private fun AnnotationHolder.highlight(key: TextAttributesKey) =
         newSilentAnnotation(HighlightSeverity.INFORMATION).textAttributes(key).create()
 
-    private fun AnnotationHolder.assign(key: TextAttributesKey, range: TextRange) =
+    private fun AnnotationHolder.highlight(key: TextAttributesKey, range: TextRange) =
         newSilentAnnotation(HighlightSeverity.INFORMATION).range(range).textAttributes(key).create()
 
     private fun AnnotationHolder.highlight(severity: HighlightSeverity, message: String) =
         newAnnotation(severity, message).create()
+
+    private fun AnnotationHolder.highlight(
+        severity: HighlightSeverity, message: String, key: TextAttributesKey, range: TextRange
+    ) = newAnnotation(severity, message).textAttributes(key).range(range).create()
 }
 
 /**

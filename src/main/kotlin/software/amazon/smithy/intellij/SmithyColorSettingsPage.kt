@@ -20,7 +20,7 @@ class SmithyColorSettingsPage : ColorSettingsPage {
             AttributesDescriptor("Control", SmithyColorSettings.CONTROL),
             AttributesDescriptor("Documentation comment", SmithyColorSettings.DOC_COMMENT),
             AttributesDescriptor("Dot", SmithyColorSettings.DOT),
-            AttributesDescriptor("Escape sequence", SmithyColorSettings.ESCAPE_SEQUENCE),
+            AttributesDescriptor("Invalid escape sequence", SmithyColorSettings.INVALID_ESCAPE_SEQUENCE),
             AttributesDescriptor("Key", SmithyColorSettings.KEY),
             AttributesDescriptor("Keyword", SmithyColorSettings.KEYWORD),
             AttributesDescriptor("Line comment", SmithyColorSettings.LINE_COMMENT),
@@ -28,7 +28,8 @@ class SmithyColorSettingsPage : ColorSettingsPage {
             AttributesDescriptor("Parenthesis", SmithyColorSettings.PARENS),
             AttributesDescriptor("Shape member", SmithyColorSettings.SHAPE_MEMBER),
             AttributesDescriptor("String", SmithyColorSettings.STRING),
-            AttributesDescriptor("Trait", SmithyColorSettings.TRAIT_NAME)
+            AttributesDescriptor("Trait", SmithyColorSettings.TRAIT_NAME),
+            AttributesDescriptor("Valid escape sequence", SmithyColorSettings.VALID_ESCAPE_SEQUENCE)
         )
     }
 

@@ -16,8 +16,8 @@ object SmithyColorSettings {
     val CONTROL = createTextAttributesKey("SMITHY_CONTROL", DefaultLanguageHighlighterColors.KEYWORD)
     val DOC_COMMENT = createTextAttributesKey("SMITHY_DOC_COMMENT", DefaultLanguageHighlighterColors.DOC_COMMENT)
     val DOT = createTextAttributesKey("SMITHY_DOT", DefaultLanguageHighlighterColors.DOT)
-    val ESCAPE_SEQUENCE = createTextAttributesKey(
-        "SMITHY_ESCAPE_SEQUENCE", DefaultLanguageHighlighterColors.VALID_STRING_ESCAPE
+    val INVALID_ESCAPE_SEQUENCE = createTextAttributesKey(
+        "SMITHY_INVALID_ESCAPE_SEQUENCE", DefaultLanguageHighlighterColors.INVALID_STRING_ESCAPE
     )
     val KEY = createTextAttributesKey(
         "SMITHY_KEY", DefaultLanguageHighlighterColors.INSTANCE_FIELD
@@ -29,4 +29,7 @@ object SmithyColorSettings {
     val SHAPE_MEMBER = createTextAttributesKey("SMITHY_SHAPE_MEMBER", DefaultLanguageHighlighterColors.INSTANCE_FIELD)
     val STRING = createTextAttributesKey("SMITHY_STRING", DefaultLanguageHighlighterColors.STRING)
     val TRAIT_NAME = createTextAttributesKey("SMITHY_TRAIT_NAME", DefaultLanguageHighlighterColors.METADATA)
+    val VALID_ESCAPE_SEQUENCE = createTextAttributesKey(
+        "SMITHY_VALID_ESCAPE_SEQUENCE", DefaultLanguageHighlighterColors.VALID_STRING_ESCAPE
+    )
 }
