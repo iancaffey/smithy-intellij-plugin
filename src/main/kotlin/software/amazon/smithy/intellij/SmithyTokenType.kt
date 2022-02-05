@@ -11,7 +11,4 @@ import com.intellij.psi.tree.IElementType
  * @since 1.0
  * @see SmithyLexer
  */
-class SmithyTokenType(debugName: String) : IElementType(debugName, SmithyLanguage) {
-    @Suppress("UnstableApiUsage")
-    override fun toString() = "SmithyTokenType.$debugName"
-}
+class SmithyTokenType(debugName: String) : IElementType(debugName, SmithyLanguage)
