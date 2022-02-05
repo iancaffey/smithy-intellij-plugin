@@ -70,6 +70,8 @@ public interface SmithyTypes {
   IElementType TOKEN_DOLLAR_SIGN = new SmithyTokenType("$");
   IElementType TOKEN_EQUALS = new SmithyTokenType("=");
   IElementType TOKEN_HASH = new SmithyTokenType("#");
+  IElementType TOKEN_INCOMPLETE_STRING = new SmithyTokenType("TOKEN_INCOMPLETE_STRING");
+  IElementType TOKEN_INCOMPLETE_TEXT_BLOCK = new SmithyTokenType("TOKEN_INCOMPLETE_TEXT_BLOCK");
   IElementType TOKEN_LIST = new SmithyTokenType("list");
   IElementType TOKEN_MAP = new SmithyTokenType("map");
   IElementType TOKEN_METADATA = new SmithyTokenType("metadata");

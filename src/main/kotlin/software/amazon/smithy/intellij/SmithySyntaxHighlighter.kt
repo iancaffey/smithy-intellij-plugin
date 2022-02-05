@@ -69,8 +69,14 @@ class SmithySyntaxAnnotator : Annotator {
             val next = element.nextLeaf()
             //next == null -> EOF which is treated like a new-line
             if (next != null && (next !is PsiWhiteSpace || !next.text.contains("\n"))) {
-                holder.highlight(HighlightSeverity.ERROR, "Missing trailing line break (\\n)")
+                holder.highlight(HighlightSeverity.ERROR, "Missing trailing line break: \\n")
             }
+        }
+        if (element.elementType == SmithyTypes.TOKEN_INCOMPLETE_STRING) {
+            holder.highlight(HighlightSeverity.ERROR, "Missing closing double-quote: \"")
+        }
+        if (element.elementType == SmithyTypes.TOKEN_INCOMPLETE_TEXT_BLOCK) {
+            holder.highlight(HighlightSeverity.ERROR, "Missing closing triple-quote: \"\"\"")
         }
     }
 
