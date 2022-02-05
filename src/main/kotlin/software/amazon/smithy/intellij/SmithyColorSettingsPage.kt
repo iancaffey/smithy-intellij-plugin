@@ -1,12 +1,9 @@
 package software.amazon.smithy.intellij
 
-import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
-import com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey
 import com.intellij.openapi.options.colors.AttributesDescriptor
 import com.intellij.openapi.options.colors.ColorDescriptor
 import com.intellij.openapi.options.colors.ColorSettingsPage
-
 
 /**
  * A [ColorSettingsPage] to configure syntax highlighting for [Smithy](https://awslabs.github.io/smithy).
