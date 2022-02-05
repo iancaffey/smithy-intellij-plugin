@@ -32,7 +32,7 @@ class SmithyCompletionContributor : CompletionContributor() {
             SmithyTypes.TOKEN_UNION,
             SmithyTypes.TOKEN_USE
         ).map { it.toString() }
-        private val PRECLUDE_TYPES = setOf(
+        private val PRELUDE_TYPES = setOf(
             "blob",
             "boolean",
             "document",
@@ -47,7 +47,7 @@ class SmithyCompletionContributor : CompletionContributor() {
             "bigDecimal",
             "timestamp"
         )
-        private val PRECLUDE_SHAPES = setOf(
+        private val PRELUDE_SHAPES = setOf(
             "Blob",
             "Boolean",
             "Document",
@@ -70,7 +70,7 @@ class SmithyCompletionContributor : CompletionContributor() {
             "PrimitiveDouble",
             "Unit"
         )
-        private val GLOBAL_SYMBOLS = arrayOf(CONTROL, KEYWORDS, PRECLUDE_SHAPES, PRECLUDE_TYPES).flatMap { it }
+        private val GLOBAL_SYMBOLS = arrayOf(CONTROL, KEYWORDS, PRELUDE_SHAPES, PRELUDE_TYPES).flatMap { it }
     }
 
     init {
