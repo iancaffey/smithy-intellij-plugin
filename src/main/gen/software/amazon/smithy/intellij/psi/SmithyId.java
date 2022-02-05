@@ -8,7 +8,16 @@ import com.intellij.psi.PsiElement;
 public interface SmithyId extends PsiElement {
 
   @Nullable
+  SmithyBoolean getBoolean();
+
+  @Nullable
   SmithyKeyword getKeyword();
+
+  @Nullable
+  SmithyNull getNull();
+
+  @Nullable
+  SmithySimpleTypeName getSimpleTypeName();
 
   @Nullable
   SmithySymbol getSymbol();

@@ -166,13 +166,16 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // symbol | keyword
+  // symbol | keyword | null | boolean | simple_type_name
   public static boolean id(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "id")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, ID, "<id>");
     r = symbol(b, l + 1);
     if (!r) r = keyword(b, l + 1);
+    if (!r) r = null_$(b, l + 1);
+    if (!r) r = boolean_$(b, l + 1);
+    if (!r) r = simple_type_name(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

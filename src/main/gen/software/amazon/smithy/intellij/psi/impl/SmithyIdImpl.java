@@ -29,8 +29,26 @@ public class SmithyIdImpl extends ASTWrapperPsiElement implements SmithyId {
 
   @Override
   @Nullable
+  public SmithyBoolean getBoolean() {
+    return findChildByClass(SmithyBoolean.class);
+  }
+
+  @Override
+  @Nullable
   public SmithyKeyword getKeyword() {
     return findChildByClass(SmithyKeyword.class);
+  }
+
+  @Override
+  @Nullable
+  public SmithyNull getNull() {
+    return findChildByClass(SmithyNull.class);
+  }
+
+  @Override
+  @Nullable
+  public SmithySimpleTypeName getSimpleTypeName() {
+    return findChildByClass(SmithySimpleTypeName.class);
   }
 
   @Override
