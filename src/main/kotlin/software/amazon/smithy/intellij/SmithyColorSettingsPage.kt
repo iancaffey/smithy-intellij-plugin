@@ -19,10 +19,14 @@ class SmithyColorSettingsPage : ColorSettingsPage {
         val BRACES = createTextAttributesKey("SMITHY_BRACES", DefaultLanguageHighlighterColors.BRACES)
         val BRACKETS = createTextAttributesKey("SMITHY_BRACKET", DefaultLanguageHighlighterColors.BRACKETS)
         val COMMA = createTextAttributesKey("SMITHY_COMMA", DefaultLanguageHighlighterColors.COMMA)
+        val CONTROL = createTextAttributesKey("SMITHY_CONTROL", DefaultLanguageHighlighterColors.KEYWORD)
         val DOC_COMMENT = createTextAttributesKey("SMITHY_DOC_COMMENT", DefaultLanguageHighlighterColors.DOC_COMMENT)
         val DOT = createTextAttributesKey("SMITHY_DOT", DefaultLanguageHighlighterColors.DOT)
         val ESCAPE_SEQUENCE = createTextAttributesKey(
             "SMITHY_ESCAPE_SEQUENCE", DefaultLanguageHighlighterColors.VALID_STRING_ESCAPE
+        )
+        val KEY = createTextAttributesKey(
+            "SMITHY_KEY", DefaultLanguageHighlighterColors.INSTANCE_FIELD
         )
         val KEYWORD = createTextAttributesKey("SMITHY_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
         val LINE_COMMENT = createTextAttributesKey("SMITHY_LINE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
@@ -37,9 +41,11 @@ class SmithyColorSettingsPage : ColorSettingsPage {
             AttributesDescriptor("Braces", BRACES),
             AttributesDescriptor("Brackets", BRACKETS),
             AttributesDescriptor("Comma", COMMA),
+            AttributesDescriptor("Control", CONTROL),
             AttributesDescriptor("Documentation comment", DOC_COMMENT),
             AttributesDescriptor("Dot", DOT),
             AttributesDescriptor("Escape sequence", ESCAPE_SEQUENCE),
+            AttributesDescriptor("Key", KEY),
             AttributesDescriptor("Keyword", KEYWORD),
             AttributesDescriptor("Line comment", LINE_COMMENT),
             AttributesDescriptor("Number", NUMBER),

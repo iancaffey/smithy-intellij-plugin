@@ -47,26 +47,24 @@ class SmithySyntaxAnnotator : Annotator {
     }
 
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-        if (element is SmithyTraitName) {
-            holder.assign(SmithyColorSettingsPage.TRAIT_NAME)
-        }
-        //All control statement keys (currently only version) are colored as keywords since they are parser directives
         if ((element is SmithyKey || element.elementType == SmithyTypes.TOKEN_DOLLAR_SIGN) && element.parent is SmithyControlDefinition) {
-            holder.assign(SmithyColorSettingsPage.KEYWORD)
-        }
-        //Reset all strings used as keys back to the normal text color
-        if (element is SmithyString && element.parent is SmithyKey) {
-            holder.assign(HighlighterColors.TEXT)
-        }
-        //Reset all keywords/literals/types used as identifiers back to the normal text color
-        if ((element is SmithyBoolean || element is SmithyKeyword || element is SmithyNull || element is SmithySimpleTypeName) && element.parent is SmithyId) {
-            holder.assign(HighlighterColors.TEXT)
-        }
-        if (element is SmithyId && element.parent is SmithyShapeIdMember) {
-            holder.assign(SmithyColorSettingsPage.SHAPE_MEMBER)
+            holder.assign(SmithyColorSettingsPage.CONTROL)
         }
         if (element is PsiComment && element.text.startsWith("///")) {
             holder.assign(SmithyColorSettingsPage.DOC_COMMENT)
+        }
+        if (element is SmithyKey && element.parent !is SmithyControlDefinition) {
+            holder.assign(SmithyColorSettingsPage.KEY)
+        }
+        if (element is SmithyId && (element.parent is SmithyShapeField || element.parent is SmithyShapeIdMember)) {
+            holder.assign(SmithyColorSettingsPage.SHAPE_MEMBER)
+        }
+        if (element is SmithyTraitName) {
+            holder.assign(SmithyColorSettingsPage.TRAIT_NAME)
+        }
+        //Reset all keywords/literals/types used as standalone identifiers back to the normal text color
+        if ((element is SmithyBoolean || element is SmithyKeyword || element is SmithyNull || element is SmithySimpleTypeName) && element.parent is SmithyId && element.parent.parent !is SmithyKey) {
+            holder.assign(HighlighterColors.TEXT)
         }
         //Highlight all escape sequences within strings and text blocks
         if ((element is SmithyString || element is SmithyTextBlock) && element.text.contains("\\")) {
