@@ -48,19 +48,19 @@ class SmithySyntaxAnnotator : Annotator {
 
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
         if ((element is SmithyKey || element.elementType == SmithyTypes.TOKEN_DOLLAR_SIGN) && element.parent is SmithyControlDefinition) {
-            holder.assign(SmithyColorSettingsPage.CONTROL)
+            holder.assign(SmithyColorSettings.CONTROL)
         }
         if (element is PsiComment && element.text.startsWith("///")) {
-            holder.assign(SmithyColorSettingsPage.DOC_COMMENT)
+            holder.assign(SmithyColorSettings.DOC_COMMENT)
         }
         if (element is SmithyKey && element.parent !is SmithyControlDefinition) {
-            holder.assign(SmithyColorSettingsPage.KEY)
+            holder.assign(SmithyColorSettings.KEY)
         }
         if (element is SmithyId && (element.parent is SmithyShapeField || element.parent is SmithyShapeIdMember)) {
-            holder.assign(SmithyColorSettingsPage.SHAPE_MEMBER)
+            holder.assign(SmithyColorSettings.SHAPE_MEMBER)
         }
         if (element is SmithyTraitName) {
-            holder.assign(SmithyColorSettingsPage.TRAIT_NAME)
+            holder.assign(SmithyColorSettings.TRAIT_NAME)
         }
         //Reset all keywords/literals/types used as standalone identifiers back to the normal text color
         if ((element is SmithyBoolean || element is SmithyKeyword || element is SmithyNull || element is SmithySimpleTypeName) && element.parent is SmithyId && element.parent.parent !is SmithyKey) {
@@ -83,7 +83,7 @@ class SmithySyntaxAnnotator : Annotator {
                 ranges.add(range.cutOut(TextRange.from(i, length)))
                 i += length
             }
-            ranges.forEach { holder.assign(SmithyColorSettingsPage.ESCAPE_SEQUENCE, it) }
+            ranges.forEach { holder.assign(SmithyColorSettings.ESCAPE_SEQUENCE, it) }
         }
         //Since whitespace cannot be referenced within parsing rules, error annotations are added for all nodes which are missing a trailing new-line (or EOF)
         if (element.elementType in TOKENS_REQUIRING_TRAILING_NEW_LINE) {
@@ -116,41 +116,41 @@ class SmithySyntaxAnnotator : Annotator {
  *
  * @author Ian Caffey
  * @since 1.0
- * @see SmithyColorSettingsPage
+ * @see SmithyColorSettings
  */
 class SmithySyntaxHighlighter : SyntaxHighlighterBase() {
     companion object {
         //Note: these can only match against tokens, SmithyAnnotator supports the contextual syntax highlighting with the higher-level AST nodes
         private val TOKEN_HIGHLIGHTS = mapOf(
-            SmithyTypes.TOKEN_NUMBER to arrayOf(SmithyColorSettingsPage.NUMBER),
-            SmithyTypes.TOKEN_STRING to arrayOf(SmithyColorSettingsPage.STRING),
-            SmithyTypes.TOKEN_TEXT_BLOCK to arrayOf(SmithyColorSettingsPage.STRING),
-            SmithyTypes.TOKEN_INCOMPLETE_STRING to arrayOf(SmithyColorSettingsPage.STRING),
-            SmithyTypes.TOKEN_INCOMPLETE_TEXT_BLOCK to arrayOf(SmithyColorSettingsPage.STRING),
-            SmithyTypes.TOKEN_COMMENT to arrayOf(SmithyColorSettingsPage.LINE_COMMENT),
-            SmithyTypes.TOKEN_OPEN_BRACE to arrayOf(SmithyColorSettingsPage.BRACES),
-            SmithyTypes.TOKEN_CLOSE_BRACE to arrayOf(SmithyColorSettingsPage.BRACES),
-            SmithyTypes.TOKEN_OPEN_BRACKET to arrayOf(SmithyColorSettingsPage.BRACKETS),
-            SmithyTypes.TOKEN_CLOSE_BRACKET to arrayOf(SmithyColorSettingsPage.BRACKETS),
-            SmithyTypes.TOKEN_OPEN_PAREN to arrayOf(SmithyColorSettingsPage.PARENS),
-            SmithyTypes.TOKEN_CLOSE_PAREN to arrayOf(SmithyColorSettingsPage.PARENS),
-            SmithyTypes.TOKEN_COMMA to arrayOf(SmithyColorSettingsPage.COMMA),
-            SmithyTypes.TOKEN_PERIOD to arrayOf(SmithyColorSettingsPage.DOT),
-            SmithyTypes.TOKEN_SIMPLE_TYPE_NAME to arrayOf(SmithyColorSettingsPage.KEYWORD),
-            SmithyTypes.TOKEN_BOOLEAN to arrayOf(SmithyColorSettingsPage.KEYWORD),
-            SmithyTypes.TOKEN_NULL to arrayOf(SmithyColorSettingsPage.KEYWORD),
-            SmithyTypes.TOKEN_APPLY to arrayOf(SmithyColorSettingsPage.KEYWORD),
-            SmithyTypes.TOKEN_LIST to arrayOf(SmithyColorSettingsPage.KEYWORD),
-            SmithyTypes.TOKEN_MAP to arrayOf(SmithyColorSettingsPage.KEYWORD),
-            SmithyTypes.TOKEN_OPERATION to arrayOf(SmithyColorSettingsPage.KEYWORD),
-            SmithyTypes.TOKEN_METADATA to arrayOf(SmithyColorSettingsPage.KEYWORD),
-            SmithyTypes.TOKEN_NAMESPACE to arrayOf(SmithyColorSettingsPage.KEYWORD),
-            SmithyTypes.TOKEN_RESOURCE to arrayOf(SmithyColorSettingsPage.KEYWORD),
-            SmithyTypes.TOKEN_SERVICE to arrayOf(SmithyColorSettingsPage.KEYWORD),
-            SmithyTypes.TOKEN_SET to arrayOf(SmithyColorSettingsPage.KEYWORD),
-            SmithyTypes.TOKEN_STRUCTURE to arrayOf(SmithyColorSettingsPage.KEYWORD),
-            SmithyTypes.TOKEN_UNION to arrayOf(SmithyColorSettingsPage.KEYWORD),
-            SmithyTypes.TOKEN_USE to arrayOf(SmithyColorSettingsPage.KEYWORD)
+            SmithyTypes.TOKEN_NUMBER to arrayOf(SmithyColorSettings.NUMBER),
+            SmithyTypes.TOKEN_STRING to arrayOf(SmithyColorSettings.STRING),
+            SmithyTypes.TOKEN_TEXT_BLOCK to arrayOf(SmithyColorSettings.STRING),
+            SmithyTypes.TOKEN_INCOMPLETE_STRING to arrayOf(SmithyColorSettings.STRING),
+            SmithyTypes.TOKEN_INCOMPLETE_TEXT_BLOCK to arrayOf(SmithyColorSettings.STRING),
+            SmithyTypes.TOKEN_COMMENT to arrayOf(SmithyColorSettings.LINE_COMMENT),
+            SmithyTypes.TOKEN_OPEN_BRACE to arrayOf(SmithyColorSettings.BRACES),
+            SmithyTypes.TOKEN_CLOSE_BRACE to arrayOf(SmithyColorSettings.BRACES),
+            SmithyTypes.TOKEN_OPEN_BRACKET to arrayOf(SmithyColorSettings.BRACKETS),
+            SmithyTypes.TOKEN_CLOSE_BRACKET to arrayOf(SmithyColorSettings.BRACKETS),
+            SmithyTypes.TOKEN_OPEN_PAREN to arrayOf(SmithyColorSettings.PARENS),
+            SmithyTypes.TOKEN_CLOSE_PAREN to arrayOf(SmithyColorSettings.PARENS),
+            SmithyTypes.TOKEN_COMMA to arrayOf(SmithyColorSettings.COMMA),
+            SmithyTypes.TOKEN_PERIOD to arrayOf(SmithyColorSettings.DOT),
+            SmithyTypes.TOKEN_SIMPLE_TYPE_NAME to arrayOf(SmithyColorSettings.KEYWORD),
+            SmithyTypes.TOKEN_BOOLEAN to arrayOf(SmithyColorSettings.KEYWORD),
+            SmithyTypes.TOKEN_NULL to arrayOf(SmithyColorSettings.KEYWORD),
+            SmithyTypes.TOKEN_APPLY to arrayOf(SmithyColorSettings.KEYWORD),
+            SmithyTypes.TOKEN_LIST to arrayOf(SmithyColorSettings.KEYWORD),
+            SmithyTypes.TOKEN_MAP to arrayOf(SmithyColorSettings.KEYWORD),
+            SmithyTypes.TOKEN_OPERATION to arrayOf(SmithyColorSettings.KEYWORD),
+            SmithyTypes.TOKEN_METADATA to arrayOf(SmithyColorSettings.KEYWORD),
+            SmithyTypes.TOKEN_NAMESPACE to arrayOf(SmithyColorSettings.KEYWORD),
+            SmithyTypes.TOKEN_RESOURCE to arrayOf(SmithyColorSettings.KEYWORD),
+            SmithyTypes.TOKEN_SERVICE to arrayOf(SmithyColorSettings.KEYWORD),
+            SmithyTypes.TOKEN_SET to arrayOf(SmithyColorSettings.KEYWORD),
+            SmithyTypes.TOKEN_STRUCTURE to arrayOf(SmithyColorSettings.KEYWORD),
+            SmithyTypes.TOKEN_UNION to arrayOf(SmithyColorSettings.KEYWORD),
+            SmithyTypes.TOKEN_USE to arrayOf(SmithyColorSettings.KEYWORD)
         )
     }
 
