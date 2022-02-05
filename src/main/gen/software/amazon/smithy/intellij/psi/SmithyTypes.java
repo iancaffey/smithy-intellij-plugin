@@ -66,12 +66,13 @@ public interface SmithyTypes {
   IElementType TOKEN_CLOSE_PAREN = new SmithyTokenType(")");
   IElementType TOKEN_COLON = new SmithyTokenType(":");
   IElementType TOKEN_COMMA = new SmithyTokenType(",");
-  IElementType TOKEN_COMMENT = new SmithyTokenType("TOKEN_COMMENT");
+  IElementType TOKEN_DOCUMENTATION_COMMENT = new SmithyTokenType("TOKEN_DOCUMENTATION_COMMENT");
   IElementType TOKEN_DOLLAR_SIGN = new SmithyTokenType("$");
   IElementType TOKEN_EQUALS = new SmithyTokenType("=");
   IElementType TOKEN_HASH = new SmithyTokenType("#");
   IElementType TOKEN_INCOMPLETE_STRING = new SmithyTokenType("TOKEN_INCOMPLETE_STRING");
   IElementType TOKEN_INCOMPLETE_TEXT_BLOCK = new SmithyTokenType("TOKEN_INCOMPLETE_TEXT_BLOCK");
+  IElementType TOKEN_LINE_COMMENT = new SmithyTokenType("TOKEN_LINE_COMMENT");
   IElementType TOKEN_LIST = new SmithyTokenType("list");
   IElementType TOKEN_MAP = new SmithyTokenType("map");
   IElementType TOKEN_METADATA = new SmithyTokenType("metadata");

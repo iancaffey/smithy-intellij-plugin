@@ -48,8 +48,8 @@
         //Note: both string and text_block regex here permit invalid escape sequences to later on annotate them as errors
         TOKEN_STRING="regexp:\"((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF]))*\""
         TOKEN_TEXT_BLOCK="regexp:\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))*\"\"\""
-        //Comment (no differentiation is made at the lexer level between doc and line comments since the line comment regex matches both)
-        TOKEN_COMMENT="regexp://[\t -\U10FFFF]*\r?\n"
+        TOKEN_DOCUMENTATION_COMMENT="regexp:(///[\t -\U10FFFF]*\r?\n)+"
+        TOKEN_LINE_COMMENT="regexp://[\t -\U10FFFF]*\r?\n"
         //Partial-match tokens for intermediate fallback states to avoid returning BAD_CHARACTER when quoted text is being typed out
         //see: https://intellij-support.jetbrains.com/hc/en-us/community/posts/360010554180--Custom-Language-Plugin-Highlighting-not-working-despite-correctly-parsed-psi-file
         TOKEN_INCOMPLETE_STRING="regexp:\"((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF]))+"

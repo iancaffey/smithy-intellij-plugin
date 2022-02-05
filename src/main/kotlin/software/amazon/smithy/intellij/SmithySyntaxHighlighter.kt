@@ -50,7 +50,7 @@ class SmithySyntaxAnnotator : Annotator {
         if ((element is SmithyKey || element.elementType == SmithyTypes.TOKEN_DOLLAR_SIGN) && element.parent is SmithyControlDefinition) {
             holder.highlight(SmithyColorSettings.CONTROL)
         }
-        if (element is PsiComment && element.text.startsWith("///")) {
+        if (element.elementType == SmithyTypes.TOKEN_DOCUMENTATION_COMMENT) {
             holder.highlight(SmithyColorSettings.DOC_COMMENT)
         }
         if (element is SmithyKey && element.parent !is SmithyControlDefinition) {
@@ -144,7 +144,8 @@ class SmithySyntaxHighlighter : SyntaxHighlighterBase() {
             SmithyTypes.TOKEN_TEXT_BLOCK to arrayOf(SmithyColorSettings.STRING),
             SmithyTypes.TOKEN_INCOMPLETE_STRING to arrayOf(SmithyColorSettings.STRING),
             SmithyTypes.TOKEN_INCOMPLETE_TEXT_BLOCK to arrayOf(SmithyColorSettings.STRING),
-            SmithyTypes.TOKEN_COMMENT to arrayOf(SmithyColorSettings.LINE_COMMENT),
+            SmithyTypes.TOKEN_LINE_COMMENT to arrayOf(SmithyColorSettings.LINE_COMMENT),
+            SmithyTypes.TOKEN_DOCUMENTATION_COMMENT to arrayOf(SmithyColorSettings.DOC_COMMENT),
             SmithyTypes.TOKEN_OPEN_BRACE to arrayOf(SmithyColorSettings.BRACES),
             SmithyTypes.TOKEN_CLOSE_BRACE to arrayOf(SmithyColorSettings.BRACES),
             SmithyTypes.TOKEN_OPEN_BRACKET to arrayOf(SmithyColorSettings.BRACKETS),
