@@ -9,6 +9,7 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighter
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
@@ -67,6 +68,25 @@ class SmithySyntaxAnnotator : Annotator {
         if (element is PsiComment && element.text.startsWith("///")) {
             holder.assign(SmithyColorSettingsPage.DOC_COMMENT)
         }
+        //Highlight all escape sequences within strings and text blocks
+        if ((element is SmithyString || element is SmithyTextBlock) && element.text.contains("\\")) {
+            val range = element.textRange
+            val ranges = mutableListOf<TextRange>()
+            var i = 0
+            while (i < element.textLength) {
+                if (element.text[i] != '\\') {
+                    i++
+                    continue
+                }
+                val length = if (i < element.textLength - 5 && element.text[i + 1] == 'u' && (2..5).all {
+                        val digit = element.text[i + it]
+                        (digit in '0'..'9') || (digit in 'a'..'f') || (digit in 'A'..'F')
+                    }) 5 else 2
+                ranges.add(range.cutOut(TextRange.from(i, length)))
+                i += length
+            }
+            ranges.forEach { holder.assign(SmithyColorSettingsPage.ESCAPE_SEQUENCE, it) }
+        }
         //Since whitespace cannot be referenced within parsing rules, error annotations are added for all nodes which are missing a trailing new-line (or EOF)
         if (element.elementType in TOKENS_REQUIRING_TRAILING_NEW_LINE) {
             val next = element.nextLeaf()
@@ -85,6 +105,9 @@ class SmithySyntaxAnnotator : Annotator {
 
     private fun AnnotationHolder.assign(key: TextAttributesKey) =
         newSilentAnnotation(HighlightSeverity.INFORMATION).textAttributes(key).create()
+
+    private fun AnnotationHolder.assign(key: TextAttributesKey, range: TextRange) =
+        newSilentAnnotation(HighlightSeverity.INFORMATION).range(range).textAttributes(key).create()
 
     private fun AnnotationHolder.highlight(severity: HighlightSeverity, message: String) =
         newAnnotation(severity, message).create()
