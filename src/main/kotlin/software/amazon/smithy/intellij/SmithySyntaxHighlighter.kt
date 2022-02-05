@@ -61,6 +61,9 @@ class SmithySyntaxAnnotator : Annotator {
         if ((element is SmithyBoolean || element is SmithyKeyword || element is SmithyNull || element is SmithySimpleTypeName) && element.parent is SmithyId) {
             holder.assign(HighlighterColors.TEXT)
         }
+        if (element is SmithyId && element.parent is SmithyShapeIdMember) {
+            holder.assign(SmithyColorSettingsPage.SHAPE_MEMBER)
+        }
         if (element is PsiComment && element.text.startsWith("///")) {
             holder.assign(SmithyColorSettingsPage.DOC_COMMENT)
         }

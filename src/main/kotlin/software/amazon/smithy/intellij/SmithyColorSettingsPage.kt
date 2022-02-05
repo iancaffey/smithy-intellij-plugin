@@ -25,7 +25,7 @@ class SmithyColorSettingsPage : ColorSettingsPage {
         val LINE_COMMENT = createTextAttributesKey("SMITHY_LINE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
         val NUMBER = createTextAttributesKey("SMITHY_NUMBER", DefaultLanguageHighlighterColors.NUMBER)
         val PARENS = createTextAttributesKey("SMITHY_PARENS", DefaultLanguageHighlighterColors.PARENTHESES)
-        val SEMICOLON = createTextAttributesKey("SMITHY_SEMICOLON", DefaultLanguageHighlighterColors.SEMICOLON)
+        val SHAPE_MEMBER = createTextAttributesKey("SMITHY_SHAPE_MEMBER", DefaultLanguageHighlighterColors.INSTANCE_FIELD)
         val STRING = createTextAttributesKey("SMITHY_STRING", DefaultLanguageHighlighterColors.STRING)
         val TRAIT_NAME = createTextAttributesKey("SMITHY_TRAIT_NAME", DefaultLanguageHighlighterColors.METADATA)
         private val DESCRIPTORS = arrayOf(
@@ -38,7 +38,7 @@ class SmithyColorSettingsPage : ColorSettingsPage {
             AttributesDescriptor("Line comment", LINE_COMMENT),
             AttributesDescriptor("Number", NUMBER),
             AttributesDescriptor("Parenthesis", PARENS),
-            AttributesDescriptor("Semicolon", SEMICOLON),
+            AttributesDescriptor("Shape member", SHAPE_MEMBER),
             AttributesDescriptor("String", STRING),
             AttributesDescriptor("Trait", TRAIT_NAME)
         )
