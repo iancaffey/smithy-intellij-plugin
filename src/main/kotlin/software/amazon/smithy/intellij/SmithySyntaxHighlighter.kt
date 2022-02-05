@@ -69,14 +69,14 @@ class SmithySyntaxAnnotator : Annotator {
             val next = element.nextLeaf()
             //next == null -> EOF which is treated like a new-line
             if (next != null && (next !is PsiWhiteSpace || !next.text.contains("\n"))) {
-                holder.highlight(HighlightSeverity.ERROR, "Missing trailing line break: \\n")
+                holder.highlight(HighlightSeverity.ERROR, "Expecting trailing line break '\\n'")
             }
         }
         if (element.elementType == SmithyTypes.TOKEN_INCOMPLETE_STRING) {
-            holder.highlight(HighlightSeverity.ERROR, "Missing closing double-quote: \"")
+            holder.highlight(HighlightSeverity.ERROR, "Expecting closing quote '\"'")
         }
         if (element.elementType == SmithyTypes.TOKEN_INCOMPLETE_TEXT_BLOCK) {
-            holder.highlight(HighlightSeverity.ERROR, "Missing closing triple-quote: \"\"\"")
+            holder.highlight(HighlightSeverity.ERROR, "Expecting closing quotes '\"\"\"'")
         }
     }
 
@@ -101,6 +101,8 @@ class SmithySyntaxHighlighter : SyntaxHighlighterBase() {
             SmithyTypes.TOKEN_NUMBER to arrayOf(SmithyColorSettingsPage.NUMBER),
             SmithyTypes.TOKEN_STRING to arrayOf(SmithyColorSettingsPage.STRING),
             SmithyTypes.TOKEN_TEXT_BLOCK to arrayOf(SmithyColorSettingsPage.STRING),
+            SmithyTypes.TOKEN_INCOMPLETE_STRING to arrayOf(SmithyColorSettingsPage.STRING),
+            SmithyTypes.TOKEN_INCOMPLETE_TEXT_BLOCK to arrayOf(SmithyColorSettingsPage.STRING),
             SmithyTypes.TOKEN_COMMENT to arrayOf(SmithyColorSettingsPage.LINE_COMMENT),
             SmithyTypes.TOKEN_OPEN_BRACE to arrayOf(SmithyColorSettingsPage.BRACES),
             SmithyTypes.TOKEN_CLOSE_BRACE to arrayOf(SmithyColorSettingsPage.BRACES),
