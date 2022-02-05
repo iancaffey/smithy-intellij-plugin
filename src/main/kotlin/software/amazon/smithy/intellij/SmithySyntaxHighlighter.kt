@@ -57,8 +57,8 @@ class SmithySyntaxAnnotator : Annotator {
         if (element is SmithyString && element.parent is SmithyKey) {
             holder.assign(HighlighterColors.TEXT)
         }
-        //Reset all keywords used as normal identifiers back to the normal text color
-        if (element is SmithyKeyword && element.parent is SmithyId) {
+        //Reset all keywords/literals/types used as identifiers back to the normal text color
+        if ((element is SmithyBoolean || element is SmithyKeyword || element is SmithyNull || element is SmithySimpleTypeName) && element.parent is SmithyId) {
             holder.assign(HighlighterColors.TEXT)
         }
         if (element is PsiComment && element.text.startsWith("///")) {
