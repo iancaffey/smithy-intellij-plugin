@@ -4,6 +4,7 @@ package software.amazon.smithy.intellij.psi;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiDocCommentBase;
 
 public class SmithyVisitor extends PsiElementVisitor {
 
@@ -25,6 +26,10 @@ public class SmithyVisitor extends PsiElementVisitor {
 
   public void visitControlSection(@NotNull SmithyControlSection o) {
     visitPsiElement(o);
+  }
+
+  public void visitDocumentation(@NotNull SmithyDocumentation o) {
+    visitPsiDocCommentBase(o);
   }
 
   public void visitEntry(@NotNull SmithyEntry o) {
@@ -193,6 +198,10 @@ public class SmithyVisitor extends PsiElementVisitor {
 
   public void visitValue(@NotNull SmithyValue o) {
     visitPsiElement(o);
+  }
+
+  public void visitPsiDocCommentBase(@NotNull PsiDocCommentBase o) {
+    visitElement(o);
   }
 
   public void visitPsiElement(@NotNull PsiElement o) {

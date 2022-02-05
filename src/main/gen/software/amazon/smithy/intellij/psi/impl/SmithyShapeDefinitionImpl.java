@@ -29,6 +29,12 @@ public class SmithyShapeDefinitionImpl extends ASTWrapperPsiElement implements S
 
   @Override
   @Nullable
+  public SmithyDocumentation getDocumentation() {
+    return findChildByClass(SmithyDocumentation.class);
+  }
+
+  @Override
+  @Nullable
   public SmithyListDefinition getListDefinition() {
     return findChildByClass(SmithyListDefinition.class);
   }

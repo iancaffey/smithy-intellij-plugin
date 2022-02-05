@@ -20,7 +20,7 @@ import software.amazon.smithy.intellij.psi.SmithyTypes
 class SmithyParserDefinition : ParserDefinition {
     companion object {
         private val FILE = IFileElementType(SmithyLanguage)
-        private val COMMENTS = TokenSet.create(SmithyTypes.TOKEN_DOCUMENTATION_COMMENT, SmithyTypes.TOKEN_LINE_COMMENT)
+        private val COMMENTS = TokenSet.create(SmithyTypes.TOKEN_LINE_COMMENT)
         private val STRING_LITERALS = TokenSet.create(SmithyTypes.TOKEN_STRING, SmithyTypes.TOKEN_TEXT_BLOCK)
     }
 

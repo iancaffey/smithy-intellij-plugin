@@ -7,6 +7,9 @@ import com.intellij.psi.PsiElement;
 
 public interface SmithyShapeField extends PsiElement {
 
+  @Nullable
+  SmithyDocumentation getDocumentation();
+
   @NotNull
   SmithyId getId();
 

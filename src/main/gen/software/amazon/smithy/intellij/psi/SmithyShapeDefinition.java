@@ -8,6 +8,9 @@ import com.intellij.psi.PsiElement;
 public interface SmithyShapeDefinition extends PsiElement {
 
   @Nullable
+  SmithyDocumentation getDocumentation();
+
+  @Nullable
   SmithyListDefinition getListDefinition();
 
   @Nullable

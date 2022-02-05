@@ -15,6 +15,7 @@ public interface SmithyTypes {
   IElementType BOOLEAN = new SmithyElementType("BOOLEAN");
   IElementType CONTROL_DEFINITION = new SmithyElementType("CONTROL_DEFINITION");
   IElementType CONTROL_SECTION = new SmithyElementType("CONTROL_SECTION");
+  IElementType DOCUMENTATION = new SmithyElementType("DOCUMENTATION");
   IElementType ENTRY = new SmithyElementType("ENTRY");
   IElementType ID = new SmithyElementType("ID");
   IElementType IMPORT = new SmithyElementType("IMPORT");
@@ -66,7 +67,7 @@ public interface SmithyTypes {
   IElementType TOKEN_CLOSE_PAREN = new SmithyTokenType(")");
   IElementType TOKEN_COLON = new SmithyTokenType(":");
   IElementType TOKEN_COMMA = new SmithyTokenType(",");
-  IElementType TOKEN_DOCUMENTATION_COMMENT = new SmithyTokenType("TOKEN_DOCUMENTATION_COMMENT");
+  IElementType TOKEN_DOCUMENTATION_LINE = new SmithyTokenType("TOKEN_DOCUMENTATION_LINE");
   IElementType TOKEN_DOLLAR_SIGN = new SmithyTokenType("$");
   IElementType TOKEN_EQUALS = new SmithyTokenType("=");
   IElementType TOKEN_HASH = new SmithyTokenType("#");
@@ -112,6 +113,9 @@ public interface SmithyTypes {
       }
       else if (type == CONTROL_SECTION) {
         return new SmithyControlSectionImpl(node);
+      }
+      else if (type == DOCUMENTATION) {
+        return new SmithyDocumentationImpl(node);
       }
       else if (type == ENTRY) {
         return new SmithyEntryImpl(node);

@@ -31,8 +31,8 @@ TOKEN_SYMBOL=_*[A-Za-z][A-Za-z0-9_]*
 TOKEN_NUMBER=-?(0|([1-9][0-9]*))(\.[0-9]+)?(e[+-]?[0-9]+)?
 TOKEN_STRING=\"((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF]))*\"
 TOKEN_TEXT_BLOCK=\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))*\"\"\"
-TOKEN_DOCUMENTATION_COMMENT=("///"[\t -\U10FFFF]*\r?\n)+
-TOKEN_LINE_COMMENT="//"[\t -\U10FFFF]*\r?\n
+TOKEN_LINE_COMMENT=(("//")|("//"[^/][\t -\U10FFFF]*))\r?\n
+TOKEN_DOCUMENTATION_LINE="///"[\t -\U10FFFF]*
 TOKEN_INCOMPLETE_STRING=\"((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF]))+
 TOKEN_INCOMPLETE_TEXT_BLOCK=\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))+
 
@@ -73,8 +73,8 @@ TOKEN_INCOMPLETE_TEXT_BLOCK=\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[
   {TOKEN_NUMBER}                     { return TOKEN_NUMBER; }
   {TOKEN_STRING}                     { return TOKEN_STRING; }
   {TOKEN_TEXT_BLOCK}                 { return TOKEN_TEXT_BLOCK; }
-  {TOKEN_DOCUMENTATION_COMMENT}      { return TOKEN_DOCUMENTATION_COMMENT; }
   {TOKEN_LINE_COMMENT}               { return TOKEN_LINE_COMMENT; }
+  {TOKEN_DOCUMENTATION_LINE}         { return TOKEN_DOCUMENTATION_LINE; }
   {TOKEN_INCOMPLETE_STRING}          { return TOKEN_INCOMPLETE_STRING; }
   {TOKEN_INCOMPLETE_TEXT_BLOCK}      { return TOKEN_INCOMPLETE_TEXT_BLOCK; }
 

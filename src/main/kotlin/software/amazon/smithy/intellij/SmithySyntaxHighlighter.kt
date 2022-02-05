@@ -11,7 +11,6 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.tree.IElementType
@@ -40,6 +39,7 @@ class SmithySyntaxAnnotator : Annotator {
         private val TOKENS_REQUIRING_TRAILING_NEW_LINE = setOf(
             SmithyTypes.APPLY,
             SmithyTypes.CONTROL_DEFINITION,
+            SmithyTypes.DOCUMENTATION,
             SmithyTypes.METADATA_DEFINITION,
             SmithyTypes.NAMESPACE_DEFINITION,
             SmithyTypes.SHAPE_DEFINITION
@@ -49,9 +49,6 @@ class SmithySyntaxAnnotator : Annotator {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
         if ((element is SmithyKey || element.elementType == SmithyTypes.TOKEN_DOLLAR_SIGN) && element.parent is SmithyControlDefinition) {
             holder.highlight(SmithyColorSettings.CONTROL)
-        }
-        if (element.elementType == SmithyTypes.TOKEN_DOCUMENTATION_COMMENT) {
-            holder.highlight(SmithyColorSettings.DOC_COMMENT)
         }
         if (element is SmithyKey && element.parent !is SmithyControlDefinition) {
             holder.highlight(SmithyColorSettings.KEY)
@@ -137,7 +134,7 @@ class SmithySyntaxAnnotator : Annotator {
  */
 class SmithySyntaxHighlighter : SyntaxHighlighterBase() {
     companion object {
-        //Note: these can only match against tokens, SmithyAnnotator supports the contextual syntax highlighting with the higher-level AST nodes
+        //Note: these can only match against tokens, SmithySyntaxAnnotator supports the contextual syntax highlighting with the higher-level AST nodes
         private val TOKEN_HIGHLIGHTS = mapOf(
             SmithyTypes.TOKEN_NUMBER to arrayOf(SmithyColorSettings.NUMBER),
             SmithyTypes.TOKEN_STRING to arrayOf(SmithyColorSettings.STRING),
@@ -145,7 +142,7 @@ class SmithySyntaxHighlighter : SyntaxHighlighterBase() {
             SmithyTypes.TOKEN_INCOMPLETE_STRING to arrayOf(SmithyColorSettings.STRING),
             SmithyTypes.TOKEN_INCOMPLETE_TEXT_BLOCK to arrayOf(SmithyColorSettings.STRING),
             SmithyTypes.TOKEN_LINE_COMMENT to arrayOf(SmithyColorSettings.LINE_COMMENT),
-            SmithyTypes.TOKEN_DOCUMENTATION_COMMENT to arrayOf(SmithyColorSettings.DOC_COMMENT),
+            SmithyTypes.TOKEN_DOCUMENTATION_LINE to arrayOf(SmithyColorSettings.DOC_COMMENT),
             SmithyTypes.TOKEN_OPEN_BRACE to arrayOf(SmithyColorSettings.BRACES),
             SmithyTypes.TOKEN_CLOSE_BRACE to arrayOf(SmithyColorSettings.BRACES),
             SmithyTypes.TOKEN_OPEN_BRACKET to arrayOf(SmithyColorSettings.BRACKETS),

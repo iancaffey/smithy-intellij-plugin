@@ -153,6 +153,35 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // documentation_lines
+  public static boolean documentation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "documentation")) return false;
+    if (!nextTokenIs(b, TOKEN_DOCUMENTATION_LINE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = documentation_lines(b, l + 1);
+    exit_section_(b, m, DOCUMENTATION, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // TOKEN_DOCUMENTATION_LINE+
+  static boolean documentation_lines(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "documentation_lines")) return false;
+    if (!nextTokenIs(b, TOKEN_DOCUMENTATION_LINE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, TOKEN_DOCUMENTATION_LINE);
+    while (r) {
+      int c = current_position_(b);
+      if (!consumeToken(b, TOKEN_DOCUMENTATION_LINE)) break;
+      if (!empty_element_parsed_guard_(b, "documentation_lines", c)) break;
+    }
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // key TOKEN_COLON value
   public static boolean entry(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "entry")) return false;
@@ -492,20 +521,28 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // traits (simple_shape_definition | list_definition | set_definition | map_definition | structure_definition | union_definition | service_definition | operation_definition | resource_definition)
+  // [documentation] traits (simple_shape_definition | list_definition | set_definition | map_definition | structure_definition | union_definition | service_definition | operation_definition | resource_definition)
   public static boolean shape_definition(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "shape_definition")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, SHAPE_DEFINITION, "<shape definition>");
-    r = traits(b, l + 1);
-    r = r && shape_definition_1(b, l + 1);
+    r = shape_definition_0(b, l + 1);
+    r = r && traits(b, l + 1);
+    r = r && shape_definition_2(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
+  // [documentation]
+  private static boolean shape_definition_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_definition_0")) return false;
+    documentation(b, l + 1);
+    return true;
+  }
+
   // simple_shape_definition | list_definition | set_definition | map_definition | structure_definition | union_definition | service_definition | operation_definition | resource_definition
-  private static boolean shape_definition_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "shape_definition_1")) return false;
+  private static boolean shape_definition_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_definition_2")) return false;
     boolean r;
     r = simple_shape_definition(b, l + 1);
     if (!r) r = list_definition(b, l + 1);
@@ -520,17 +557,25 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // traits id TOKEN_COLON shape_id
+  // [documentation] traits id TOKEN_COLON shape_id
   public static boolean shape_field(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "shape_field")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, SHAPE_FIELD, "<shape field>");
-    r = traits(b, l + 1);
+    r = shape_field_0(b, l + 1);
+    r = r && traits(b, l + 1);
     r = r && id(b, l + 1);
     r = r && consumeToken(b, TOKEN_COLON);
     r = r && shape_id(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
+  }
+
+  // [documentation]
+  private static boolean shape_field_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_field_0")) return false;
+    documentation(b, l + 1);
+    return true;
   }
 
   /* ********************************************************** */

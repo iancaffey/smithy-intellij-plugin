@@ -10,15 +10,16 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import software.amazon.smithy.intellij.psi.*;
+import com.intellij.psi.tree.IElementType;
 
-public class SmithyShapeFieldImpl extends ASTWrapperPsiElement implements SmithyShapeField {
+public class SmithyDocumentationImpl extends ASTWrapperPsiElement implements SmithyDocumentation {
 
-  public SmithyShapeFieldImpl(@NotNull ASTNode node) {
+  public SmithyDocumentationImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SmithyVisitor visitor) {
-    visitor.visitShapeField(this);
+    visitor.visitDocumentation(this);
   }
 
   @Override
@@ -28,27 +29,18 @@ public class SmithyShapeFieldImpl extends ASTWrapperPsiElement implements Smithy
   }
 
   @Override
-  @Nullable
-  public SmithyDocumentation getDocumentation() {
-    return findChildByClass(SmithyDocumentation.class);
+  public PsiElement getOwner() {
+    return SmithyPsiImplUtil.getOwner(this);
   }
 
   @Override
-  @NotNull
-  public SmithyId getId() {
-    return findNotNullChildByClass(SmithyId.class);
+  public IElementType getTokenType() {
+    return SmithyPsiImplUtil.getTokenType(this);
   }
 
   @Override
-  @NotNull
-  public SmithyShapeId getShapeId() {
-    return findNotNullChildByClass(SmithyShapeId.class);
-  }
-
-  @Override
-  @NotNull
-  public SmithyTraits getTraits() {
-    return findNotNullChildByClass(SmithyTraits.class);
+  public String toDocString() {
+    return SmithyPsiImplUtil.toDocString(this);
   }
 
 }
