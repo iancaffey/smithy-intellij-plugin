@@ -20,10 +20,18 @@ import java.util.List;
  * @see SmithyUnionDefinition
  * @since 1.0
  */
-public interface SmithyShapeDefinition extends SmithyElement {
+public interface SmithyShapeDefinition extends SmithyNamedElement {
+    @NotNull
+    SmithyId getId();
+
     @Nullable
     SmithyDocumentation getDocumentation();
 
     @NotNull
     List<SmithyTrait> getTraitList();
+
+    @Override
+    default String getName() {
+        return getId().getText();
+    }
 }
