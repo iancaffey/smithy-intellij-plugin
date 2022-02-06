@@ -28,7 +28,7 @@
                            implementationClass="software.amazon.smithy.intellij.SmithyQuoteHandler"/>
         <lang.syntaxHighlighterFactory language="Smithy"
                                        implementationClass="software.amazon.smithy.intellij.SmithySyntaxHighlighterFactory"/>
-        <annotator language="Smithy" implementationClass="software.amazon.smithy.intellij.SmithySyntaxAnnotator"/>
+        <annotator language="Smithy" implementationClass="software.amazon.smithy.intellij.SmithyAnnotator"/>
         <colorSettingsPage implementation="software.amazon.smithy.intellij.SmithyColorSettingsPage"/>
         <completion.contributor language="Smithy"
                                 implementationClass="software.amazon.smithy.intellij.SmithyCompletionContributor"/>

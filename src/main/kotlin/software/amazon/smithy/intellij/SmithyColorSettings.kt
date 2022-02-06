@@ -4,7 +4,7 @@ import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey
 
 /**
- * A collection of color settings used in [SmithySyntaxAnnotator]/[SmithySyntaxHighlighter] and customized in [SmithyColorSettingsPage].
+ * A collection of color settings used in [SmithyAnnotator]/[SmithySyntaxHighlighter] and customized in [SmithyColorSettingsPage].
  *
  * @author Ian Caffey
  * @since 1.0
