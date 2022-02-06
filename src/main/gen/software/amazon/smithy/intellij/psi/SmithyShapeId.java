@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyShapeId extends SmithyElement {
+public interface SmithyShapeId extends SmithyElement, SmithyNamedElement {
 
   @Nullable
   SmithyMemberName getMemberName();
@@ -15,5 +15,7 @@ public interface SmithyShapeId extends SmithyElement {
 
   @NotNull
   SmithyShapeName getShapeName();
+
+  String getName();
 
 }

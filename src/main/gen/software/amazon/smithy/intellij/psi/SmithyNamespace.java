@@ -5,9 +5,11 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyNamespace extends SmithyElement {
+public interface SmithyNamespace extends SmithyElement, SmithyNamedElement {
 
   @NotNull
   List<SmithyId> getIdList();
+
+  String getName();
 
 }
