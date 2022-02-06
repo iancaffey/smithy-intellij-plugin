@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyKey extends PsiElement {
+public interface SmithyKey extends SmithyElement {
 
   @Nullable
   SmithyId getId();

@@ -40,9 +40,17 @@ class SmithySyntaxAnnotator : Annotator {
             SmithyTypes.APPLY,
             SmithyTypes.CONTROL_DEFINITION,
             SmithyTypes.DOCUMENTATION,
+            SmithyTypes.LIST_DEFINITION,
+            SmithyTypes.MAP_DEFINITION,
             SmithyTypes.METADATA_DEFINITION,
             SmithyTypes.NAMESPACE_DEFINITION,
-            SmithyTypes.SHAPE_DEFINITION
+            SmithyTypes.OPERATION_DEFINITION,
+            SmithyTypes.RESOURCE_DEFINITION,
+            SmithyTypes.SERVICE_DEFINITION,
+            SmithyTypes.SET_DEFINITION,
+            SmithyTypes.SIMPLE_SHAPE_DEFINITION,
+            SmithyTypes.STRUCTURE_DEFINITION,
+            SmithyTypes.UNION_DEFINITION
         )
     }
 
@@ -53,10 +61,10 @@ class SmithySyntaxAnnotator : Annotator {
         if (element is SmithyKey && element.parent !is SmithyControlDefinition) {
             holder.highlight(SmithyColorSettings.KEY)
         }
-        if (element is SmithyId && (element.parent is SmithyShapeField || element.parent is SmithyShapeIdMember)) {
+        if (element is SmithyMemberName || element is SmithyId && element.parent is SmithyShapeField) {
             holder.highlight(SmithyColorSettings.SHAPE_MEMBER)
         }
-        if (element is SmithyTraitName) {
+        if ((element is SmithyShapeId || element.elementType == SmithyTypes.TOKEN_AT) && element.parent is SmithyTrait) {
             holder.highlight(SmithyColorSettings.TRAIT_NAME)
         }
         //Reset all keywords/literals/types used as standalone identifiers back to the normal text color

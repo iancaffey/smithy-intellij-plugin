@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyTraitBody extends PsiElement {
+public interface SmithyTraitBody extends SmithyElement {
 
   @Nullable
   SmithyTraitValues getTraitValues();

@@ -11,14 +11,14 @@ import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyTraitsImpl extends ASTWrapperPsiElement implements SmithyTraits {
+public class SmithyMemberNameImpl extends ASTWrapperPsiElement implements SmithyMemberName {
 
-  public SmithyTraitsImpl(@NotNull ASTNode node) {
+  public SmithyMemberNameImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SmithyVisitor visitor) {
-    visitor.visitTraits(this);
+    visitor.visitMemberName(this);
   }
 
   @Override
@@ -29,8 +29,8 @@ public class SmithyTraitsImpl extends ASTWrapperPsiElement implements SmithyTrai
 
   @Override
   @NotNull
-  public List<SmithyTrait> getTraitList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyTrait.class);
+  public SmithyId getId() {
+    return findNotNullChildByClass(SmithyId.class);
   }
 
 }

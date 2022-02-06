@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiDocCommentBase;
 import com.intellij.psi.tree.IElementType;
 
-public interface SmithyDocumentation extends PsiDocCommentBase {
+public interface SmithyDocumentation extends PsiDocCommentBase, SmithyElement {
 
   PsiElement getOwner();
 

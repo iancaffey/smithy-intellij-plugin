@@ -29,8 +29,8 @@ public class SmithyShapeSectionImpl extends ASTWrapperPsiElement implements Smit
 
   @Override
   @NotNull
-  public SmithyImports getImports() {
-    return findNotNullChildByClass(SmithyImports.class);
+  public List<SmithyImport> getImportList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyImport.class);
   }
 
   @Override
@@ -41,8 +41,8 @@ public class SmithyShapeSectionImpl extends ASTWrapperPsiElement implements Smit
 
   @Override
   @NotNull
-  public SmithyShapeStatements getShapeStatements() {
-    return findNotNullChildByClass(SmithyShapeStatements.class);
+  public List<SmithyShapeStatement> getShapeStatementList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyShapeStatement.class);
   }
 
 }

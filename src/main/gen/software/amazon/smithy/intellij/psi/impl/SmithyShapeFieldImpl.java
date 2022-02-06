@@ -47,8 +47,8 @@ public class SmithyShapeFieldImpl extends ASTWrapperPsiElement implements Smithy
 
   @Override
   @NotNull
-  public SmithyTraits getTraits() {
-    return findNotNullChildByClass(SmithyTraits.class);
+  public List<SmithyTrait> getTraitList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyTrait.class);
   }
 
 }

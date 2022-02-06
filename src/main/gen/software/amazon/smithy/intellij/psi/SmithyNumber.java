@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-public interface SmithyNumber extends PsiElement {
+public interface SmithyNumber extends SmithyElement {
 
   @NotNull
   PsiElement getTokenNumber();

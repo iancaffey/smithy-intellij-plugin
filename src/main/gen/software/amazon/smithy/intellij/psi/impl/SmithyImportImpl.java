@@ -29,8 +29,8 @@ public class SmithyImportImpl extends ASTWrapperPsiElement implements SmithyImpo
 
   @Override
   @NotNull
-  public SmithyRootShapeId getRootShapeId() {
-    return findNotNullChildByClass(SmithyRootShapeId.class);
+  public SmithyShapeId getShapeId() {
+    return findNotNullChildByClass(SmithyShapeId.class);
   }
 
 }

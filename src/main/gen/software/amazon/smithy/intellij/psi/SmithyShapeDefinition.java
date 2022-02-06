@@ -1,43 +1,29 @@
-// This is a generated file. Not intended for manual editing.
 package software.amazon.smithy.intellij.psi;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
-import org.jetbrains.annotations.*;
-import com.intellij.psi.PsiElement;
 
-public interface SmithyShapeDefinition extends PsiElement {
+/**
+ * A definition which introduces a new shape to the {@link SmithyModel}.
+ *
+ * @author Ian Caffey
+ * @see SmithyListDefinition
+ * @see SmithyMapDefinition
+ * @see SmithyOperationDefinition
+ * @see SmithyResourceDefinition
+ * @see SmithyServiceDefinition
+ * @see SmithySetDefinition
+ * @see SmithySimpleShapeDefinition
+ * @see SmithyStructureDefinition
+ * @see SmithyUnionDefinition
+ * @since 1.0
+ */
+public interface SmithyShapeDefinition extends SmithyElement {
+    @Nullable
+    SmithyDocumentation getDocumentation();
 
-  @Nullable
-  SmithyDocumentation getDocumentation();
-
-  @Nullable
-  SmithyListDefinition getListDefinition();
-
-  @Nullable
-  SmithyMapDefinition getMapDefinition();
-
-  @Nullable
-  SmithyOperationDefinition getOperationDefinition();
-
-  @Nullable
-  SmithyResourceDefinition getResourceDefinition();
-
-  @Nullable
-  SmithyServiceDefinition getServiceDefinition();
-
-  @Nullable
-  SmithySetDefinition getSetDefinition();
-
-  @Nullable
-  SmithySimpleShapeDefinition getSimpleShapeDefinition();
-
-  @Nullable
-  SmithyStructureDefinition getStructureDefinition();
-
-  @NotNull
-  SmithyTraits getTraits();
-
-  @Nullable
-  SmithyUnionDefinition getUnionDefinition();
-
+    @NotNull
+    List<SmithyTrait> getTraitList();
 }

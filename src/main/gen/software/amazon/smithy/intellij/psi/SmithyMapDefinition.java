@@ -5,12 +5,18 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyMapDefinition extends PsiElement {
+public interface SmithyMapDefinition extends SmithyElement, SmithyShapeDefinition {
+
+  @Nullable
+  SmithyDocumentation getDocumentation();
 
   @NotNull
   SmithyId getId();
 
   @NotNull
   SmithyShapeFields getShapeFields();
+
+  @NotNull
+  List<SmithyTrait> getTraitList();
 
 }

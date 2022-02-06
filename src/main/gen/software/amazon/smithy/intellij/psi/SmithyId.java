@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyId extends PsiElement {
+public interface SmithyId extends SmithyElement {
 
   @Nullable
   SmithyBoolean getBoolean();
@@ -21,5 +21,9 @@ public interface SmithyId extends PsiElement {
 
   @Nullable
   SmithySymbol getSymbol();
+
+  //WARNING: getName(...) is skipped
+  //matching getName(SmithyId, ...)
+  //methods are not found in SmithyPsiImplUtil
 
 }

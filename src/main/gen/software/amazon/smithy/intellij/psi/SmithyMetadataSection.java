@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyMetadataSection extends PsiElement {
+public interface SmithyMetadataSection extends SmithyElement {
 
   @NotNull
   List<SmithyMetadataDefinition> getMetadataDefinitionList();

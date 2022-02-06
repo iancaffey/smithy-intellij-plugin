@@ -9,199 +9,197 @@ import com.intellij.psi.PsiDocCommentBase;
 public class SmithyVisitor extends PsiElementVisitor {
 
   public void visitApply(@NotNull SmithyApply o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitArray(@NotNull SmithyArray o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitBoolean(@NotNull SmithyBoolean o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitControlDefinition(@NotNull SmithyControlDefinition o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitControlSection(@NotNull SmithyControlSection o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitDocumentation(@NotNull SmithyDocumentation o) {
     visitPsiDocCommentBase(o);
+    // visitElement(o);
   }
 
   public void visitEntry(@NotNull SmithyEntry o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitId(@NotNull SmithyId o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitImport(@NotNull SmithyImport o) {
-    visitPsiElement(o);
-  }
-
-  public void visitImports(@NotNull SmithyImports o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitKey(@NotNull SmithyKey o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitKeyword(@NotNull SmithyKeyword o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitListDefinition(@NotNull SmithyListDefinition o) {
-    visitPsiElement(o);
+    visitElement(o);
+    // visitShapeDefinition(o);
   }
 
   public void visitMapDefinition(@NotNull SmithyMapDefinition o) {
-    visitPsiElement(o);
+    visitElement(o);
+    // visitShapeDefinition(o);
+  }
+
+  public void visitMemberName(@NotNull SmithyMemberName o) {
+    visitElement(o);
   }
 
   public void visitMetadataDefinition(@NotNull SmithyMetadataDefinition o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitMetadataSection(@NotNull SmithyMetadataSection o) {
-    visitPsiElement(o);
+    visitElement(o);
+  }
+
+  public void visitModel(@NotNull SmithyModel o) {
+    visitElement(o);
   }
 
   public void visitNamespace(@NotNull SmithyNamespace o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitNamespaceDefinition(@NotNull SmithyNamespaceDefinition o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitNull(@NotNull SmithyNull o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitNumber(@NotNull SmithyNumber o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitOperationDefinition(@NotNull SmithyOperationDefinition o) {
-    visitPsiElement(o);
+    visitElement(o);
+    // visitShapeDefinition(o);
   }
 
   public void visitPrimitive(@NotNull SmithyPrimitive o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitResourceDefinition(@NotNull SmithyResourceDefinition o) {
-    visitPsiElement(o);
-  }
-
-  public void visitRootShapeId(@NotNull SmithyRootShapeId o) {
-    visitPsiElement(o);
+    visitElement(o);
+    // visitShapeDefinition(o);
   }
 
   public void visitServiceDefinition(@NotNull SmithyServiceDefinition o) {
-    visitPsiElement(o);
+    visitElement(o);
+    // visitShapeDefinition(o);
   }
 
   public void visitSetDefinition(@NotNull SmithySetDefinition o) {
-    visitPsiElement(o);
-  }
-
-  public void visitShapeDefinition(@NotNull SmithyShapeDefinition o) {
-    visitPsiElement(o);
+    visitElement(o);
+    // visitShapeDefinition(o);
   }
 
   public void visitShapeField(@NotNull SmithyShapeField o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitShapeFields(@NotNull SmithyShapeFields o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitShapeId(@NotNull SmithyShapeId o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
-  public void visitShapeIdMember(@NotNull SmithyShapeIdMember o) {
-    visitPsiElement(o);
+  public void visitShapeName(@NotNull SmithyShapeName o) {
+    visitElement(o);
   }
 
   public void visitShapeSection(@NotNull SmithyShapeSection o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitShapeStatement(@NotNull SmithyShapeStatement o) {
-    visitPsiElement(o);
-  }
-
-  public void visitShapeStatements(@NotNull SmithyShapeStatements o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitSimpleShapeDefinition(@NotNull SmithySimpleShapeDefinition o) {
-    visitPsiElement(o);
+    visitElement(o);
+    // visitShapeDefinition(o);
   }
 
   public void visitSimpleTypeName(@NotNull SmithySimpleTypeName o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitString(@NotNull SmithyString o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitStructure(@NotNull SmithyStructure o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitStructureDefinition(@NotNull SmithyStructureDefinition o) {
-    visitPsiElement(o);
+    visitElement(o);
+    // visitShapeDefinition(o);
   }
 
   public void visitSymbol(@NotNull SmithySymbol o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitTextBlock(@NotNull SmithyTextBlock o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitTrait(@NotNull SmithyTrait o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitTraitBody(@NotNull SmithyTraitBody o) {
-    visitPsiElement(o);
-  }
-
-  public void visitTraitName(@NotNull SmithyTraitName o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitTraitValues(@NotNull SmithyTraitValues o) {
-    visitPsiElement(o);
-  }
-
-  public void visitTraits(@NotNull SmithyTraits o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitUnionDefinition(@NotNull SmithyUnionDefinition o) {
-    visitPsiElement(o);
+    visitElement(o);
+    // visitShapeDefinition(o);
   }
 
   public void visitValue(@NotNull SmithyValue o) {
-    visitPsiElement(o);
+    visitElement(o);
   }
 
   public void visitPsiDocCommentBase(@NotNull PsiDocCommentBase o) {
     visitElement(o);
+  }
+
+  public void visitElement(@NotNull SmithyElement o) {
+    visitPsiElement(o);
   }
 
   public void visitPsiElement(@NotNull PsiElement o) {

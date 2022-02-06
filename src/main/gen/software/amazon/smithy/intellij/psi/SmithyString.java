@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyString extends PsiElement {
+public interface SmithyString extends SmithyElement {
 
   @NotNull
   PsiElement getTokenString();

@@ -11,14 +11,14 @@ import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyShapeIdMemberImpl extends ASTWrapperPsiElement implements SmithyShapeIdMember {
+public class SmithyShapeNameImpl extends ASTWrapperPsiElement implements SmithyShapeName {
 
-  public SmithyShapeIdMemberImpl(@NotNull ASTNode node) {
+  public SmithyShapeNameImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SmithyVisitor visitor) {
-    visitor.visitShapeIdMember(this);
+    visitor.visitShapeName(this);
   }
 
   @Override

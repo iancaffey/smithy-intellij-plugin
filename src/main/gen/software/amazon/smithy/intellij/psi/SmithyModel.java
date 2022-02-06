@@ -5,9 +5,15 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyShapeStatements extends PsiElement {
+public interface SmithyModel extends SmithyElement {
 
   @NotNull
-  List<SmithyShapeStatement> getShapeStatementList();
+  SmithyControlSection getControlSection();
+
+  @NotNull
+  SmithyMetadataSection getMetadataSection();
+
+  @Nullable
+  SmithyShapeSection getShapeSection();
 
 }

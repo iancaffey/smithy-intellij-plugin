@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyStructure extends PsiElement {
+public interface SmithyStructure extends SmithyElement {
 
   @NotNull
   List<SmithyEntry> getEntryList();

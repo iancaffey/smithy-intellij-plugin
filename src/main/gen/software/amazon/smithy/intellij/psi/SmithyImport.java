@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyImport extends PsiElement {
+public interface SmithyImport extends SmithyElement {
 
   @NotNull
-  SmithyRootShapeId getRootShapeId();
+  SmithyShapeId getShapeId();
 
 }

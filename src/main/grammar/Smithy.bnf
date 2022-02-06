@@ -10,6 +10,8 @@
     elementTypeHolderClass="software.amazon.smithy.intellij.psi.SmithyTypes"
     elementTypeClass="software.amazon.smithy.intellij.SmithyElementType"
     tokenTypeClass="software.amazon.smithy.intellij.SmithyTokenType"
+    implements(".*")="software.amazon.smithy.intellij.psi.SmithyElement"
+    implements("simple_shape_definition|list_definition|set_definition|map_definition|structure_definition|union_definition|service_definition|operation_definition|resource_definition")="software.amazon.smithy.intellij.psi.SmithyShapeDefinition"
     //Note: some tokens have wrapper/alias rules for better AST generation, so all tokens have TOKEN_ to disambiguate within SmithyTypes
     tokens=[
         //Punctuation
@@ -59,7 +61,8 @@
     ]
 }
 //https://awslabs.github.io/smithy/1.0/spec/core/idl.html
-root ::= control_section metadata_section [shape_section]
+root ::= model
+model ::= control_section metadata_section [shape_section]
 
 //Control
 control_section ::= control_definition*
@@ -70,30 +73,25 @@ metadata_section ::= metadata_definition*
 metadata_definition ::= TOKEN_METADATA key TOKEN_EQUALS value
 
 //Shapes
-shape_section ::= namespace_definition imports shape_statements
+shape_section ::= namespace_definition import* shape_statement*
 namespace_definition ::= TOKEN_NAMESPACE namespace
-imports ::= import*
-import ::= TOKEN_USE root_shape_id
-shape_statements ::= shape_statement*
-shape_statement ::= apply | shape_definition
-shape_definition ::= [documentation] traits (simple_shape_definition | list_definition | set_definition | map_definition | structure_definition | union_definition | service_definition | operation_definition | resource_definition)
+import ::= TOKEN_USE shape_id
+shape_statement ::= apply | simple_shape_definition | list_definition | set_definition | map_definition | structure_definition | union_definition | service_definition | operation_definition | resource_definition
 apply ::= TOKEN_APPLY shape_id trait
-simple_shape_definition ::= simple_type_name id
-list_definition ::= TOKEN_LIST id shape_fields
-set_definition ::= TOKEN_SET id shape_fields
-map_definition ::= TOKEN_MAP id shape_fields
-structure_definition ::= TOKEN_STRUCTURE id shape_fields
-union_definition ::= TOKEN_UNION id shape_fields
-service_definition ::= TOKEN_SERVICE id structure
-operation_definition ::= TOKEN_OPERATION id structure
-resource_definition ::= TOKEN_RESOURCE id structure
+simple_shape_definition ::= [documentation] trait* simple_type_name id
+list_definition ::= [documentation] trait* TOKEN_LIST id shape_fields
+set_definition ::= [documentation] trait* TOKEN_SET id shape_fields
+map_definition ::= [documentation] trait* TOKEN_MAP id shape_fields
+structure_definition ::= [documentation] trait* TOKEN_STRUCTURE id shape_fields
+union_definition ::= [documentation] trait* TOKEN_UNION id shape_fields
+service_definition ::= [documentation] trait* TOKEN_SERVICE id structure
+operation_definition ::= [documentation] trait* TOKEN_OPERATION id structure
+resource_definition ::= [documentation] trait* TOKEN_RESOURCE id structure
 shape_fields ::= TOKEN_OPEN_BRACE [shape_field (TOKEN_COMMA shape_field)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE
-shape_field ::= [documentation] traits id TOKEN_COLON shape_id
+shape_field ::= [documentation] trait* id TOKEN_COLON shape_id
 
 //Traits
-traits ::= trait*
-trait ::= trait_name [trait_body]
-trait_name ::= TOKEN_AT shape_id
+trait ::= TOKEN_AT shape_id [trait_body]
 trait_body ::= TOKEN_OPEN_PAREN (trait_values | value) TOKEN_CLOSE_PAREN
 trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA]
 
@@ -106,11 +104,11 @@ structure ::= TOKEN_OPEN_BRACE [entry (TOKEN_COMMA entry)* [TOKEN_COMMA]] TOKEN_
 primitive ::= null | boolean | number | string | text_block | shape_id
 
 //Shape ID
-shape_id ::= root_shape_id [shape_id_member]
-root_shape_id ::= [namespace TOKEN_HASH] id
+shape_id ::= [namespace TOKEN_HASH] shape_name [TOKEN_DOLLAR_SIGN member_name]
 namespace ::= id (TOKEN_PERIOD id)*
-shape_id_member ::= TOKEN_DOLLAR_SIGN id
-id ::= symbol | keyword | null | boolean | simple_type_name
+shape_name ::= id
+member_name ::= id
+id ::= symbol | keyword | null | boolean | simple_type_name {methods=[getName]}
 
 //Re-declared tokens which will receive a dedicated AST node instead of raw PsiElement (since they are used in a meaningful way, like as a variant within another AST node)
 null ::= TOKEN_NULL
@@ -121,5 +119,4 @@ text_block ::= TOKEN_TEXT_BLOCK
 symbol ::= TOKEN_SYMBOL
 simple_type_name ::= TOKEN_SIMPLE_TYPE_NAME
 keyword ::= TOKEN_APPLY | TOKEN_USE | TOKEN_LIST | TOKEN_SET | TOKEN_MAP | TOKEN_METADATA | TOKEN_NAMESPACE | TOKEN_STRUCTURE | TOKEN_UNION | TOKEN_SERVICE | TOKEN_OPERATION | TOKEN_RESOURCE
-documentation ::= documentation_lines {implements="com.intellij.psi.PsiDocCommentBase" methods=[getOwner getTokenType toDocString]}
-private documentation_lines ::= TOKEN_DOCUMENTATION_LINE+
+documentation ::= TOKEN_DOCUMENTATION_LINE+ {implements="com.intellij.psi.PsiDocCommentBase" methods=[getOwner getTokenType toDocString]}

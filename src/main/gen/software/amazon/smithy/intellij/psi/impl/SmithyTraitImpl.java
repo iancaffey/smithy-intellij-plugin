@@ -28,15 +28,15 @@ public class SmithyTraitImpl extends ASTWrapperPsiElement implements SmithyTrait
   }
 
   @Override
-  @Nullable
-  public SmithyTraitBody getTraitBody() {
-    return findChildByClass(SmithyTraitBody.class);
+  @NotNull
+  public SmithyShapeId getShapeId() {
+    return findNotNullChildByClass(SmithyShapeId.class);
   }
 
   @Override
-  @NotNull
-  public SmithyTraitName getTraitName() {
-    return findNotNullChildByClass(SmithyTraitName.class);
+  @Nullable
+  public SmithyTraitBody getTraitBody() {
+    return findChildByClass(SmithyTraitBody.class);
   }
 
 }

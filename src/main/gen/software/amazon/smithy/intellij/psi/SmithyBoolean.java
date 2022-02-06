@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyBoolean extends PsiElement {
+public interface SmithyBoolean extends SmithyElement {
 
   @NotNull
   PsiElement getTokenBoolean();

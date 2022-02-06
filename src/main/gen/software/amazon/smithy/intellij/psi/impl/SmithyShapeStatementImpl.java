@@ -35,8 +35,56 @@ public class SmithyShapeStatementImpl extends ASTWrapperPsiElement implements Sm
 
   @Override
   @Nullable
-  public SmithyShapeDefinition getShapeDefinition() {
-    return findChildByClass(SmithyShapeDefinition.class);
+  public SmithyListDefinition getListDefinition() {
+    return findChildByClass(SmithyListDefinition.class);
+  }
+
+  @Override
+  @Nullable
+  public SmithyMapDefinition getMapDefinition() {
+    return findChildByClass(SmithyMapDefinition.class);
+  }
+
+  @Override
+  @Nullable
+  public SmithyOperationDefinition getOperationDefinition() {
+    return findChildByClass(SmithyOperationDefinition.class);
+  }
+
+  @Override
+  @Nullable
+  public SmithyResourceDefinition getResourceDefinition() {
+    return findChildByClass(SmithyResourceDefinition.class);
+  }
+
+  @Override
+  @Nullable
+  public SmithyServiceDefinition getServiceDefinition() {
+    return findChildByClass(SmithyServiceDefinition.class);
+  }
+
+  @Override
+  @Nullable
+  public SmithySetDefinition getSetDefinition() {
+    return findChildByClass(SmithySetDefinition.class);
+  }
+
+  @Override
+  @Nullable
+  public SmithySimpleShapeDefinition getSimpleShapeDefinition() {
+    return findChildByClass(SmithySimpleShapeDefinition.class);
+  }
+
+  @Override
+  @Nullable
+  public SmithyStructureDefinition getStructureDefinition() {
+    return findChildByClass(SmithyStructureDefinition.class);
+  }
+
+  @Override
+  @Nullable
+  public SmithyUnionDefinition getUnionDefinition() {
+    return findChildByClass(SmithyUnionDefinition.class);
   }
 
 }

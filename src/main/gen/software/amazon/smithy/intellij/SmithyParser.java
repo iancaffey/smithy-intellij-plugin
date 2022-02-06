@@ -153,21 +153,9 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // documentation_lines
+  // TOKEN_DOCUMENTATION_LINE+
   public static boolean documentation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "documentation")) return false;
-    if (!nextTokenIs(b, TOKEN_DOCUMENTATION_LINE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = documentation_lines(b, l + 1);
-    exit_section_(b, m, DOCUMENTATION, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // TOKEN_DOCUMENTATION_LINE+
-  static boolean documentation_lines(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "documentation_lines")) return false;
     if (!nextTokenIs(b, TOKEN_DOCUMENTATION_LINE)) return false;
     boolean r;
     Marker m = enter_section_(b);
@@ -175,9 +163,9 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     while (r) {
       int c = current_position_(b);
       if (!consumeToken(b, TOKEN_DOCUMENTATION_LINE)) break;
-      if (!empty_element_parsed_guard_(b, "documentation_lines", c)) break;
+      if (!empty_element_parsed_guard_(b, "documentation", c)) break;
     }
-    exit_section_(b, m, null, r);
+    exit_section_(b, m, DOCUMENTATION, r);
     return r;
   }
 
@@ -210,30 +198,16 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TOKEN_USE root_shape_id
+  // TOKEN_USE shape_id
   public static boolean import_$(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "import_$")) return false;
     if (!nextTokenIs(b, TOKEN_USE)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, TOKEN_USE);
-    r = r && root_shape_id(b, l + 1);
+    r = r && shape_id(b, l + 1);
     exit_section_(b, m, IMPORT, r);
     return r;
-  }
-
-  /* ********************************************************** */
-  // import*
-  public static boolean imports(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "imports")) return false;
-    Marker m = enter_section_(b, l, _NONE_, IMPORTS, "<imports>");
-    while (true) {
-      int c = current_position_(b);
-      if (!import_$(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "imports", c)) break;
-    }
-    exit_section_(b, l, m, true, false, null);
-    return true;
   }
 
   /* ********************************************************** */
@@ -271,30 +245,79 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TOKEN_LIST id shape_fields
+  // [documentation] trait* TOKEN_LIST id shape_fields
   public static boolean list_definition(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "list_definition")) return false;
-    if (!nextTokenIs(b, TOKEN_LIST)) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, TOKEN_LIST);
+    Marker m = enter_section_(b, l, _NONE_, LIST_DEFINITION, "<list definition>");
+    r = list_definition_0(b, l + 1);
+    r = r && list_definition_1(b, l + 1);
+    r = r && consumeToken(b, TOKEN_LIST);
     r = r && id(b, l + 1);
     r = r && shape_fields(b, l + 1);
-    exit_section_(b, m, LIST_DEFINITION, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
+  // [documentation]
+  private static boolean list_definition_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "list_definition_0")) return false;
+    documentation(b, l + 1);
+    return true;
+  }
+
+  // trait*
+  private static boolean list_definition_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "list_definition_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!trait(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "list_definition_1", c)) break;
+    }
+    return true;
+  }
+
   /* ********************************************************** */
-  // TOKEN_MAP id shape_fields
+  // [documentation] trait* TOKEN_MAP id shape_fields
   public static boolean map_definition(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "map_definition")) return false;
-    if (!nextTokenIs(b, TOKEN_MAP)) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, TOKEN_MAP);
+    Marker m = enter_section_(b, l, _NONE_, MAP_DEFINITION, "<map definition>");
+    r = map_definition_0(b, l + 1);
+    r = r && map_definition_1(b, l + 1);
+    r = r && consumeToken(b, TOKEN_MAP);
     r = r && id(b, l + 1);
     r = r && shape_fields(b, l + 1);
-    exit_section_(b, m, MAP_DEFINITION, r);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // [documentation]
+  private static boolean map_definition_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "map_definition_0")) return false;
+    documentation(b, l + 1);
+    return true;
+  }
+
+  // trait*
+  private static boolean map_definition_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "map_definition_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!trait(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "map_definition_1", c)) break;
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // id
+  public static boolean member_name(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "member_name")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, MEMBER_NAME, "<member name>");
+    r = id(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -324,6 +347,26 @@ public class SmithyParser implements PsiParser, LightPsiParser {
       if (!empty_element_parsed_guard_(b, "metadata_section", c)) break;
     }
     exit_section_(b, l, m, true, false, null);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // control_section metadata_section [shape_section]
+  public static boolean model(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "model")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, MODEL, "<model>");
+    r = control_section(b, l + 1);
+    r = r && metadata_section(b, l + 1);
+    r = r && model_2(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // [shape_section]
+  private static boolean model_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "model_2")) return false;
+    shape_section(b, l + 1);
     return true;
   }
 
@@ -399,17 +442,36 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TOKEN_OPERATION id structure
+  // [documentation] trait* TOKEN_OPERATION id structure
   public static boolean operation_definition(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "operation_definition")) return false;
-    if (!nextTokenIs(b, TOKEN_OPERATION)) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, TOKEN_OPERATION);
+    Marker m = enter_section_(b, l, _NONE_, OPERATION_DEFINITION, "<operation definition>");
+    r = operation_definition_0(b, l + 1);
+    r = r && operation_definition_1(b, l + 1);
+    r = r && consumeToken(b, TOKEN_OPERATION);
     r = r && id(b, l + 1);
     r = r && structure(b, l + 1);
-    exit_section_(b, m, OPERATION_DEFINITION, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
+  }
+
+  // [documentation]
+  private static boolean operation_definition_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "operation_definition_0")) return false;
+    documentation(b, l + 1);
+    return true;
+  }
+
+  // trait*
+  private static boolean operation_definition_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "operation_definition_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!trait(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "operation_definition_1", c)) break;
+    }
+    return true;
   }
 
   /* ********************************************************** */
@@ -429,141 +491,118 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TOKEN_RESOURCE id structure
+  // [documentation] trait* TOKEN_RESOURCE id structure
   public static boolean resource_definition(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "resource_definition")) return false;
-    if (!nextTokenIs(b, TOKEN_RESOURCE)) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, TOKEN_RESOURCE);
+    Marker m = enter_section_(b, l, _NONE_, RESOURCE_DEFINITION, "<resource definition>");
+    r = resource_definition_0(b, l + 1);
+    r = r && resource_definition_1(b, l + 1);
+    r = r && consumeToken(b, TOKEN_RESOURCE);
     r = r && id(b, l + 1);
     r = r && structure(b, l + 1);
-    exit_section_(b, m, RESOURCE_DEFINITION, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // control_section metadata_section [shape_section]
-  static boolean root(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "root")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = control_section(b, l + 1);
-    r = r && metadata_section(b, l + 1);
-    r = r && root_2(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // [shape_section]
-  private static boolean root_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "root_2")) return false;
-    shape_section(b, l + 1);
-    return true;
-  }
-
-  /* ********************************************************** */
-  // [namespace TOKEN_HASH] id
-  public static boolean root_shape_id(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "root_shape_id")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, ROOT_SHAPE_ID, "<root shape id>");
-    r = root_shape_id_0(b, l + 1);
-    r = r && id(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // [namespace TOKEN_HASH]
-  private static boolean root_shape_id_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "root_shape_id_0")) return false;
-    root_shape_id_0_0(b, l + 1);
-    return true;
-  }
-
-  // namespace TOKEN_HASH
-  private static boolean root_shape_id_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "root_shape_id_0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = namespace(b, l + 1);
-    r = r && consumeToken(b, TOKEN_HASH);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // TOKEN_SERVICE id structure
-  public static boolean service_definition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "service_definition")) return false;
-    if (!nextTokenIs(b, TOKEN_SERVICE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, TOKEN_SERVICE);
-    r = r && id(b, l + 1);
-    r = r && structure(b, l + 1);
-    exit_section_(b, m, SERVICE_DEFINITION, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // TOKEN_SET id shape_fields
-  public static boolean set_definition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "set_definition")) return false;
-    if (!nextTokenIs(b, TOKEN_SET)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, TOKEN_SET);
-    r = r && id(b, l + 1);
-    r = r && shape_fields(b, l + 1);
-    exit_section_(b, m, SET_DEFINITION, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // [documentation] traits (simple_shape_definition | list_definition | set_definition | map_definition | structure_definition | union_definition | service_definition | operation_definition | resource_definition)
-  public static boolean shape_definition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "shape_definition")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, SHAPE_DEFINITION, "<shape definition>");
-    r = shape_definition_0(b, l + 1);
-    r = r && traits(b, l + 1);
-    r = r && shape_definition_2(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   // [documentation]
-  private static boolean shape_definition_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "shape_definition_0")) return false;
+  private static boolean resource_definition_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "resource_definition_0")) return false;
     documentation(b, l + 1);
     return true;
   }
 
-  // simple_shape_definition | list_definition | set_definition | map_definition | structure_definition | union_definition | service_definition | operation_definition | resource_definition
-  private static boolean shape_definition_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "shape_definition_2")) return false;
-    boolean r;
-    r = simple_shape_definition(b, l + 1);
-    if (!r) r = list_definition(b, l + 1);
-    if (!r) r = set_definition(b, l + 1);
-    if (!r) r = map_definition(b, l + 1);
-    if (!r) r = structure_definition(b, l + 1);
-    if (!r) r = union_definition(b, l + 1);
-    if (!r) r = service_definition(b, l + 1);
-    if (!r) r = operation_definition(b, l + 1);
-    if (!r) r = resource_definition(b, l + 1);
-    return r;
+  // trait*
+  private static boolean resource_definition_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "resource_definition_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!trait(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "resource_definition_1", c)) break;
+    }
+    return true;
   }
 
   /* ********************************************************** */
-  // [documentation] traits id TOKEN_COLON shape_id
+  // model
+  static boolean root(PsiBuilder b, int l) {
+    return model(b, l + 1);
+  }
+
+  /* ********************************************************** */
+  // [documentation] trait* TOKEN_SERVICE id structure
+  public static boolean service_definition(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "service_definition")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, SERVICE_DEFINITION, "<service definition>");
+    r = service_definition_0(b, l + 1);
+    r = r && service_definition_1(b, l + 1);
+    r = r && consumeToken(b, TOKEN_SERVICE);
+    r = r && id(b, l + 1);
+    r = r && structure(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // [documentation]
+  private static boolean service_definition_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "service_definition_0")) return false;
+    documentation(b, l + 1);
+    return true;
+  }
+
+  // trait*
+  private static boolean service_definition_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "service_definition_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!trait(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "service_definition_1", c)) break;
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // [documentation] trait* TOKEN_SET id shape_fields
+  public static boolean set_definition(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "set_definition")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, SET_DEFINITION, "<set definition>");
+    r = set_definition_0(b, l + 1);
+    r = r && set_definition_1(b, l + 1);
+    r = r && consumeToken(b, TOKEN_SET);
+    r = r && id(b, l + 1);
+    r = r && shape_fields(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // [documentation]
+  private static boolean set_definition_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "set_definition_0")) return false;
+    documentation(b, l + 1);
+    return true;
+  }
+
+  // trait*
+  private static boolean set_definition_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "set_definition_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!trait(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "set_definition_1", c)) break;
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // [documentation] trait* id TOKEN_COLON shape_id
   public static boolean shape_field(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "shape_field")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, SHAPE_FIELD, "<shape field>");
     r = shape_field_0(b, l + 1);
-    r = r && traits(b, l + 1);
+    r = r && shape_field_1(b, l + 1);
     r = r && id(b, l + 1);
     r = r && consumeToken(b, TOKEN_COLON);
     r = r && shape_id(b, l + 1);
@@ -575,6 +614,17 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   private static boolean shape_field_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "shape_field_0")) return false;
     documentation(b, l + 1);
+    return true;
+  }
+
+  // trait*
+  private static boolean shape_field_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_field_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!trait(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "shape_field_1", c)) break;
+    }
     return true;
   }
 
@@ -641,88 +691,151 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // root_shape_id [shape_id_member]
+  // [namespace TOKEN_HASH] shape_name [TOKEN_DOLLAR_SIGN member_name]
   public static boolean shape_id(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "shape_id")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, SHAPE_ID, "<shape id>");
-    r = root_shape_id(b, l + 1);
-    r = r && shape_id_1(b, l + 1);
+    r = shape_id_0(b, l + 1);
+    r = r && shape_name(b, l + 1);
+    r = r && shape_id_2(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // [shape_id_member]
-  private static boolean shape_id_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "shape_id_1")) return false;
-    shape_id_member(b, l + 1);
+  // [namespace TOKEN_HASH]
+  private static boolean shape_id_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_id_0")) return false;
+    shape_id_0_0(b, l + 1);
     return true;
   }
 
-  /* ********************************************************** */
-  // TOKEN_DOLLAR_SIGN id
-  public static boolean shape_id_member(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "shape_id_member")) return false;
-    if (!nextTokenIs(b, TOKEN_DOLLAR_SIGN)) return false;
+  // namespace TOKEN_HASH
+  private static boolean shape_id_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_id_0_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = namespace(b, l + 1);
+    r = r && consumeToken(b, TOKEN_HASH);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // [TOKEN_DOLLAR_SIGN member_name]
+  private static boolean shape_id_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_id_2")) return false;
+    shape_id_2_0(b, l + 1);
+    return true;
+  }
+
+  // TOKEN_DOLLAR_SIGN member_name
+  private static boolean shape_id_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_id_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, TOKEN_DOLLAR_SIGN);
-    r = r && id(b, l + 1);
-    exit_section_(b, m, SHAPE_ID_MEMBER, r);
+    r = r && member_name(b, l + 1);
+    exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // namespace_definition imports shape_statements
+  // id
+  public static boolean shape_name(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_name")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, SHAPE_NAME, "<shape name>");
+    r = id(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // namespace_definition import* shape_statement*
   public static boolean shape_section(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "shape_section")) return false;
     if (!nextTokenIs(b, TOKEN_NAMESPACE)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = namespace_definition(b, l + 1);
-    r = r && imports(b, l + 1);
-    r = r && shape_statements(b, l + 1);
+    r = r && shape_section_1(b, l + 1);
+    r = r && shape_section_2(b, l + 1);
     exit_section_(b, m, SHAPE_SECTION, r);
     return r;
   }
 
+  // import*
+  private static boolean shape_section_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_section_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!import_$(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "shape_section_1", c)) break;
+    }
+    return true;
+  }
+
+  // shape_statement*
+  private static boolean shape_section_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_section_2")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!shape_statement(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "shape_section_2", c)) break;
+    }
+    return true;
+  }
+
   /* ********************************************************** */
-  // apply | shape_definition
+  // apply | simple_shape_definition | list_definition | set_definition | map_definition | structure_definition | union_definition | service_definition | operation_definition | resource_definition
   public static boolean shape_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "shape_statement")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, SHAPE_STATEMENT, "<shape statement>");
     r = apply(b, l + 1);
-    if (!r) r = shape_definition(b, l + 1);
+    if (!r) r = simple_shape_definition(b, l + 1);
+    if (!r) r = list_definition(b, l + 1);
+    if (!r) r = set_definition(b, l + 1);
+    if (!r) r = map_definition(b, l + 1);
+    if (!r) r = structure_definition(b, l + 1);
+    if (!r) r = union_definition(b, l + 1);
+    if (!r) r = service_definition(b, l + 1);
+    if (!r) r = operation_definition(b, l + 1);
+    if (!r) r = resource_definition(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // shape_statement*
-  public static boolean shape_statements(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "shape_statements")) return false;
-    Marker m = enter_section_(b, l, _NONE_, SHAPE_STATEMENTS, "<shape statements>");
-    while (true) {
-      int c = current_position_(b);
-      if (!shape_statement(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "shape_statements", c)) break;
-    }
-    exit_section_(b, l, m, true, false, null);
+  // [documentation] trait* simple_type_name id
+  public static boolean simple_shape_definition(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "simple_shape_definition")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, SIMPLE_SHAPE_DEFINITION, "<simple shape definition>");
+    r = simple_shape_definition_0(b, l + 1);
+    r = r && simple_shape_definition_1(b, l + 1);
+    r = r && simple_type_name(b, l + 1);
+    r = r && id(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // [documentation]
+  private static boolean simple_shape_definition_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "simple_shape_definition_0")) return false;
+    documentation(b, l + 1);
     return true;
   }
 
-  /* ********************************************************** */
-  // simple_type_name id
-  public static boolean simple_shape_definition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "simple_shape_definition")) return false;
-    if (!nextTokenIs(b, TOKEN_SIMPLE_TYPE_NAME)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = simple_type_name(b, l + 1);
-    r = r && id(b, l + 1);
-    exit_section_(b, m, SIMPLE_SHAPE_DEFINITION, r);
-    return r;
+  // trait*
+  private static boolean simple_shape_definition_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "simple_shape_definition_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!trait(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "simple_shape_definition_1", c)) break;
+    }
+    return true;
   }
 
   /* ********************************************************** */
@@ -812,17 +925,36 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TOKEN_STRUCTURE id shape_fields
+  // [documentation] trait* TOKEN_STRUCTURE id shape_fields
   public static boolean structure_definition(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "structure_definition")) return false;
-    if (!nextTokenIs(b, TOKEN_STRUCTURE)) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, TOKEN_STRUCTURE);
+    Marker m = enter_section_(b, l, _NONE_, STRUCTURE_DEFINITION, "<structure definition>");
+    r = structure_definition_0(b, l + 1);
+    r = r && structure_definition_1(b, l + 1);
+    r = r && consumeToken(b, TOKEN_STRUCTURE);
     r = r && id(b, l + 1);
     r = r && shape_fields(b, l + 1);
-    exit_section_(b, m, STRUCTURE_DEFINITION, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
+  }
+
+  // [documentation]
+  private static boolean structure_definition_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "structure_definition_0")) return false;
+    documentation(b, l + 1);
+    return true;
+  }
+
+  // trait*
+  private static boolean structure_definition_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "structure_definition_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!trait(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "structure_definition_1", c)) break;
+    }
+    return true;
   }
 
   /* ********************************************************** */
@@ -850,21 +982,22 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // trait_name [trait_body]
+  // TOKEN_AT shape_id [trait_body]
   public static boolean trait(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "trait")) return false;
     if (!nextTokenIs(b, TOKEN_AT)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = trait_name(b, l + 1);
-    r = r && trait_1(b, l + 1);
+    r = consumeToken(b, TOKEN_AT);
+    r = r && shape_id(b, l + 1);
+    r = r && trait_2(b, l + 1);
     exit_section_(b, m, TRAIT, r);
     return r;
   }
 
   // [trait_body]
-  private static boolean trait_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "trait_1")) return false;
+  private static boolean trait_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "trait_2")) return false;
     trait_body(b, l + 1);
     return true;
   }
@@ -889,19 +1022,6 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     boolean r;
     r = trait_values(b, l + 1);
     if (!r) r = value(b, l + 1);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // TOKEN_AT shape_id
-  public static boolean trait_name(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "trait_name")) return false;
-    if (!nextTokenIs(b, TOKEN_AT)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, TOKEN_AT);
-    r = r && shape_id(b, l + 1);
-    exit_section_(b, m, TRAIT_NAME, r);
     return r;
   }
 
@@ -948,31 +1068,36 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // trait*
-  public static boolean traits(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "traits")) return false;
-    Marker m = enter_section_(b, l, _NONE_, TRAITS, "<traits>");
-    while (true) {
-      int c = current_position_(b);
-      if (!trait(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "traits", c)) break;
-    }
-    exit_section_(b, l, m, true, false, null);
+  // [documentation] trait* TOKEN_UNION id shape_fields
+  public static boolean union_definition(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "union_definition")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, UNION_DEFINITION, "<union definition>");
+    r = union_definition_0(b, l + 1);
+    r = r && union_definition_1(b, l + 1);
+    r = r && consumeToken(b, TOKEN_UNION);
+    r = r && id(b, l + 1);
+    r = r && shape_fields(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // [documentation]
+  private static boolean union_definition_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "union_definition_0")) return false;
+    documentation(b, l + 1);
     return true;
   }
 
-  /* ********************************************************** */
-  // TOKEN_UNION id shape_fields
-  public static boolean union_definition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "union_definition")) return false;
-    if (!nextTokenIs(b, TOKEN_UNION)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, TOKEN_UNION);
-    r = r && id(b, l + 1);
-    r = r && shape_fields(b, l + 1);
-    exit_section_(b, m, UNION_DEFINITION, r);
-    return r;
+  // trait*
+  private static boolean union_definition_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "union_definition_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!trait(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "union_definition_1", c)) break;
+    }
+    return true;
   }
 
   /* ********************************************************** */

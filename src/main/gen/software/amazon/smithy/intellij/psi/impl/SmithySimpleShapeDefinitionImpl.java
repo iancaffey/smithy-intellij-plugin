@@ -28,6 +28,12 @@ public class SmithySimpleShapeDefinitionImpl extends ASTWrapperPsiElement implem
   }
 
   @Override
+  @Nullable
+  public SmithyDocumentation getDocumentation() {
+    return findChildByClass(SmithyDocumentation.class);
+  }
+
+  @Override
   @NotNull
   public SmithyId getId() {
     return findNotNullChildByClass(SmithyId.class);
@@ -37,6 +43,12 @@ public class SmithySimpleShapeDefinitionImpl extends ASTWrapperPsiElement implem
   @NotNull
   public SmithySimpleTypeName getSimpleTypeName() {
     return findNotNullChildByClass(SmithySimpleTypeName.class);
+  }
+
+  @Override
+  @NotNull
+  public List<SmithyTrait> getTraitList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyTrait.class);
   }
 
 }

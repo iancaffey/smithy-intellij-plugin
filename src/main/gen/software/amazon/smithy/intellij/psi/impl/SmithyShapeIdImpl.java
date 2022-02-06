@@ -28,15 +28,21 @@ public class SmithyShapeIdImpl extends ASTWrapperPsiElement implements SmithySha
   }
 
   @Override
-  @NotNull
-  public SmithyRootShapeId getRootShapeId() {
-    return findNotNullChildByClass(SmithyRootShapeId.class);
+  @Nullable
+  public SmithyMemberName getMemberName() {
+    return findChildByClass(SmithyMemberName.class);
   }
 
   @Override
   @Nullable
-  public SmithyShapeIdMember getShapeIdMember() {
-    return findChildByClass(SmithyShapeIdMember.class);
+  public SmithyNamespace getNamespace() {
+    return findChildByClass(SmithyNamespace.class);
+  }
+
+  @Override
+  @NotNull
+  public SmithyShapeName getShapeName() {
+    return findNotNullChildByClass(SmithyShapeName.class);
   }
 
 }
