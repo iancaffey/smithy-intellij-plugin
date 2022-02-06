@@ -17,9 +17,11 @@
                   fieldName="INSTANCE"/>
         <lang.braceMatcher language="Smithy"
                            implementationClass="software.amazon.smithy.intellij.SmithyBraceMatcher"/>
+        <lang.commenter language="Smithy" implementationClass="software.amazon.smithy.intellij.SmithyCommenter"/>
         <lang.documentationProvider language="Smithy"
                                     implementationClass="software.amazon.smithy.intellij.SmithyDocumentationProvider"/>
-        <lang.foldingBuilder language="Smithy" implementationClass="software.amazon.smithy.intellij.SmithyFoldingBuilder"/>
+        <lang.foldingBuilder language="Smithy"
+                             implementationClass="software.amazon.smithy.intellij.SmithyFoldingBuilder"/>
         <lang.parserDefinition language="Smithy"
                                implementationClass="software.amazon.smithy.intellij.SmithyParserDefinition"/>
         <lang.quoteHandler language="Smithy"
@@ -30,5 +32,6 @@
         <colorSettingsPage implementation="software.amazon.smithy.intellij.SmithyColorSettingsPage"/>
         <completion.contributor language="Smithy"
                                 implementationClass="software.amazon.smithy.intellij.SmithyCompletionContributor"/>
+        <enterHandlerDelegate implementation="software.amazon.smithy.intellij.SmithyDocumentationEnterHandler"/>
     </extensions>
 </idea-plugin>
