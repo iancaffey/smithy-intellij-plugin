@@ -110,7 +110,7 @@ shape_id ::= [namespace TOKEN_HASH] shape_name [TOKEN_DOLLAR_SIGN member_name]
 namespace ::= id (TOKEN_PERIOD id)*
 shape_name ::= id
 member_name ::= id
-id ::= symbol | keyword | null | boolean | simple_type_name {methods=[getName]}
+id ::= symbol | keyword | null | boolean | simple_type_name
 
 //Re-declared tokens which will receive a dedicated AST node instead of raw PsiElement (since they are used in a meaningful way, like as a variant within another AST node)
 null ::= TOKEN_NULL

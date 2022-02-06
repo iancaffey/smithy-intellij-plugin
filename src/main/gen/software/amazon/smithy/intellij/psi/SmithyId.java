@@ -22,8 +22,4 @@ public interface SmithyId extends SmithyElement {
   @Nullable
   SmithySymbol getSymbol();
 
-  //WARNING: getName(...) is skipped
-  //matching getName(SmithyId, ...)
-  //methods are not found in SmithyPsiImplUtil
-
 }
