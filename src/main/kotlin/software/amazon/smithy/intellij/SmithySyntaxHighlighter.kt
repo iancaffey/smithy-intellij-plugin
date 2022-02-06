@@ -117,6 +117,12 @@ class SmithySyntaxAnnotator : Annotator {
         if (element.elementType == SmithyTypes.TOKEN_INCOMPLETE_TEXT_BLOCK) {
             holder.highlight(HighlightSeverity.ERROR, "Expecting closing quotes '\"\"\"'")
         }
+        if (element is SmithyShapeId && element.parent is SmithyTrait && element.memberName != null) {
+            val expected = element.namespace?.let { "${it.name}.${element.shapeName.name}" } ?: element.shapeName.text
+            holder.highlight(
+                HighlightSeverity.ERROR, "Traits cannot refer to shape members. Did you mean @$expected?"
+            )
+        }
     }
 
     private fun AnnotationHolder.highlight(key: TextAttributesKey) =
