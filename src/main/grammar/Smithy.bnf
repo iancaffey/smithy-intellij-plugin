@@ -11,8 +11,8 @@
     elementTypeClass="software.amazon.smithy.intellij.SmithyElementType"
     tokenTypeClass="software.amazon.smithy.intellij.SmithyTokenType"
     implements(".*")="software.amazon.smithy.intellij.psi.SmithyElement"
-    implements("member_name|namespace|shape_id|shape_name")="software.amazon.smithy.intellij.psi.SmithyNamedElement"
-    methods("member_name|namespace|shape_id|shape_name")=[getName]
+    implements("member_name|namespace|shape_id|shape_name|trait")="software.amazon.smithy.intellij.psi.SmithyNamedElement"
+    methods("member_name|namespace|shape_id|shape_name|trait")=[getName]
     implements("simple_shape_definition|list_definition|set_definition|map_definition|structure_definition|union_definition|service_definition|operation_definition|resource_definition")="software.amazon.smithy.intellij.psi.SmithyShapeDefinition"
     //Note: some tokens have wrapper/alias rules for better AST generation, so all tokens have TOKEN_ to disambiguate within SmithyTypes
     tokens=[

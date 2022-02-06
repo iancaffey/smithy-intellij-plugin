@@ -39,4 +39,9 @@ public class SmithyTraitImpl extends ASTWrapperPsiElement implements SmithyTrait
     return findChildByClass(SmithyTraitBody.class);
   }
 
+  @Override
+  public String getName() {
+    return SmithyPsiImplUtil.getName(this);
+  }
+
 }

@@ -12,6 +12,7 @@ import software.amazon.smithy.intellij.psi.SmithyNamespace;
 import software.amazon.smithy.intellij.psi.SmithyNumber;
 import software.amazon.smithy.intellij.psi.SmithyShapeId;
 import software.amazon.smithy.intellij.psi.SmithyShapeName;
+import software.amazon.smithy.intellij.psi.SmithyTrait;
 import software.amazon.smithy.intellij.psi.SmithyTypes;
 
 import java.math.BigDecimal;
@@ -109,5 +110,9 @@ public class SmithyPsiImplUtil {
 
     public static String getName(SmithyShapeName name) {
         return name.getId().getText();
+    }
+
+    public static String getName(SmithyTrait trait) {
+        return trait.getShapeId().getName();
     }
 }
