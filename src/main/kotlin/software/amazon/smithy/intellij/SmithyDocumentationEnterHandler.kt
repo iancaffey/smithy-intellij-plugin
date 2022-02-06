@@ -29,8 +29,9 @@ class SmithyDocumentationEnterHandler : EnterHandlerDelegateAdapter(), EnterHand
         originalHandler: EditorActionHandler?
     ): Result {
         val offset = caretOffset.get()
+        //Note: existing doc comment will be identified 1 behind the current offset to support appending more doc lines
         val doc = PsiTreeUtil.findElementOfClassAtOffset(
-            file, offset, SmithyDocumentation::class.java, false
+            file, offset - 1, SmithyDocumentation::class.java, false
         ) ?: return Result.Continue
         //Note: this will keep the same indent as the previous doc line before the caret (even if it's only whitespace)
         var indent = 0
