@@ -19,6 +19,7 @@
                            implementationClass="software.amazon.smithy.intellij.SmithyBraceMatcher"/>
         <lang.documentationProvider language="Smithy"
                                     implementationClass="software.amazon.smithy.intellij.SmithyDocumentationProvider"/>
+        <lang.foldingBuilder language="Smithy" implementationClass="software.amazon.smithy.intellij.SmithyFoldingBuilder"/>
         <lang.parserDefinition language="Smithy"
                                implementationClass="software.amazon.smithy.intellij.SmithyParserDefinition"/>
         <lang.quoteHandler language="Smithy"
