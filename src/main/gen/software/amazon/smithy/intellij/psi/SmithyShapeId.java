@@ -16,6 +16,4 @@ public interface SmithyShapeId extends SmithyElement, SmithyNamedElement {
   @NotNull
   SmithyShapeName getShapeName();
 
-  String getName();
-
 }

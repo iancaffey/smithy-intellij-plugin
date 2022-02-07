@@ -10,6 +10,4 @@ public interface SmithyMemberName extends SmithyElement, SmithyNamedElement {
   @NotNull
   SmithyId getId();
 
-  String getName();
-
 }

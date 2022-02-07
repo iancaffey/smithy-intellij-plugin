@@ -33,9 +33,4 @@ public class SmithyShapeNameImpl extends ASTWrapperPsiElement implements SmithyS
     return findNotNullChildByClass(SmithyId.class);
   }
 
-  @Override
-  public String getName() {
-    return SmithyPsiImplUtil.getName(this);
-  }
-
 }

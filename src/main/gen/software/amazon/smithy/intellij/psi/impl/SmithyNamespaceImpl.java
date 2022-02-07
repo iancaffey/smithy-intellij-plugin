@@ -33,9 +33,4 @@ public class SmithyNamespaceImpl extends ASTWrapperPsiElement implements SmithyN
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyId.class);
   }
 
-  @Override
-  public String getName() {
-    return SmithyPsiImplUtil.getName(this);
-  }
-
 }

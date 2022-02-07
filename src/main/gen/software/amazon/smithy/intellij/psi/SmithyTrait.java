@@ -13,6 +13,4 @@ public interface SmithyTrait extends SmithyElement, SmithyNamedElement {
   @Nullable
   SmithyTraitBody getTraitBody();
 
-  String getName();
-
 }

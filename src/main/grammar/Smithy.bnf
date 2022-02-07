@@ -59,7 +59,6 @@
     ]
     implements("^(?!.*element).*")=element
     implements("member_name|namespace|shape_id|shape_name|trait")=named_element
-    methods("member_name|namespace|shape_id|shape_name|trait")=[getName]
     extends("array|object|primitive")=value
     extends("apply|shape_definition")=shape_statement
     extends("symbol|keyword|null|boolean|simple_type_name")=id
