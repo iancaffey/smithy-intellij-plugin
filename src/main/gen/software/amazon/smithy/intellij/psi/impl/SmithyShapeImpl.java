@@ -27,4 +27,19 @@ public abstract class SmithyShapeImpl extends SmithyShapeStatementImpl implement
     else super.accept(visitor);
   }
 
+  @Override
+  public @Nullable SmithyDocumentation getDocumentation() {
+    return SmithyPsiImplUtil.getDocumentation(this);
+  }
+
+  @Override
+  public @NotNull SmithyShapeName getShapeName() {
+    return SmithyPsiImplUtil.getShapeName(this);
+  }
+
+  @Override
+  public @NotNull List<SmithyTrait> getTraits() {
+    return SmithyPsiImplUtil.getTraits(this);
+  }
+
 }

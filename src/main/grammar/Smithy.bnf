@@ -82,7 +82,7 @@ shape_section ::= namespace_statement import* shape_statement* {methods=[imports
 namespace_statement ::= TOKEN_NAMESPACE namespace
 import ::= TOKEN_USE shape_id
 shape_statement ::= apply | shape
-shape ::= simple_shape | list | set | map | structure | union | service | operation | resource
+shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {methods=[getDocumentation getShapeName getTraits]}
 simple_shape ::= [documentation] trait* simple_type_name shape_name {methods=[traits="trait" type_name="simple_type_name"]}
 list ::= [documentation] trait* TOKEN_LIST shape_name members {methods=[traits="trait" members="member"]}
 set ::= [documentation] trait* TOKEN_SET shape_name members {methods=[traits="trait" members="member"]}

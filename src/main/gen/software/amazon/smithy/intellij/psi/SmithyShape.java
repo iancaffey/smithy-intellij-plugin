@@ -7,4 +7,10 @@ import com.intellij.psi.PsiElement;
 
 public interface SmithyShape extends SmithyShapeStatement, SmithyElement {
 
+  @Nullable SmithyDocumentation getDocumentation();
+
+  @NotNull SmithyShapeName getShapeName();
+
+  @NotNull List<SmithyTrait> getTraits();
+
 }

@@ -4,13 +4,19 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import software.amazon.smithy.intellij.psi.SmithyBoolean;
 import software.amazon.smithy.intellij.psi.SmithyDocumentation;
 import software.amazon.smithy.intellij.psi.SmithyNumber;
+import software.amazon.smithy.intellij.psi.SmithyShape;
+import software.amazon.smithy.intellij.psi.SmithyShapeName;
+import software.amazon.smithy.intellij.psi.SmithyTrait;
 import software.amazon.smithy.intellij.psi.SmithyTypes;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.StringJoiner;
 
 /**
@@ -77,5 +83,21 @@ public class SmithyPsiImplUtil {
             joiner.add(text.substring(text.length() > 3 && text.charAt(3) == ' ' ? 4 : 3));
         }
         return joiner.toString();
+    }
+
+    //These will always be overridden, just serving as stubs to be able to add them to the base interface (to avoid a dummy interface and since mixins only get applied to the implementation)
+    @Nullable
+    public static SmithyDocumentation getDocumentation(SmithyShape shape) {
+        throw new UnsupportedOperationException();
+    }
+
+    @NotNull
+    public static SmithyShapeName getShapeName(SmithyShape shape) {
+        throw new UnsupportedOperationException();
+    }
+
+    @NotNull
+    public static List<SmithyTrait> getTraits(SmithyShape shape) {
+        throw new UnsupportedOperationException();
     }
 }
