@@ -29,7 +29,7 @@ public class SmithyArrayImpl extends ASTWrapperPsiElement implements SmithyArray
 
   @Override
   @NotNull
-  public List<SmithyValue> getValueList() {
+  public List<SmithyValue> getValues() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyValue.class);
   }
 

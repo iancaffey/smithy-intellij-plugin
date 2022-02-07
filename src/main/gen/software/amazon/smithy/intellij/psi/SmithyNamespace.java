@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 public interface SmithyNamespace extends SmithyElement, SmithyNamedElement {
 
   @NotNull
-  List<SmithyId> getIdList();
+  List<SmithyId> getParts();
 
   String getName();
 

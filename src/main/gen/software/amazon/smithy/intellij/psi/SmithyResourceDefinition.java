@@ -17,6 +17,6 @@ public interface SmithyResourceDefinition extends SmithyElement, SmithyShapeDefi
   SmithyStructure getStructure();
 
   @NotNull
-  List<SmithyTrait> getTraitList();
+  List<SmithyTrait> getTraits();
 
 }

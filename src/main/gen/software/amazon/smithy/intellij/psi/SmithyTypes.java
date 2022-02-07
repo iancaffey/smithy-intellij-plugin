@@ -13,8 +13,8 @@ public interface SmithyTypes {
   IElementType APPLY = new SmithyElementType("APPLY");
   IElementType ARRAY = new SmithyElementType("ARRAY");
   IElementType BOOLEAN = new SmithyElementType("BOOLEAN");
-  IElementType CONTROL_DEFINITION = new SmithyElementType("CONTROL_DEFINITION");
   IElementType CONTROL_SECTION = new SmithyElementType("CONTROL_SECTION");
+  IElementType CONTROL_STATEMENT = new SmithyElementType("CONTROL_STATEMENT");
   IElementType DOCUMENTATION = new SmithyElementType("DOCUMENTATION");
   IElementType ENTRY = new SmithyElementType("ENTRY");
   IElementType ID = new SmithyElementType("ID");
@@ -25,8 +25,8 @@ public interface SmithyTypes {
   IElementType MAP_DEFINITION = new SmithyElementType("MAP_DEFINITION");
   IElementType MEMBER = new SmithyElementType("MEMBER");
   IElementType MEMBER_NAME = new SmithyElementType("MEMBER_NAME");
-  IElementType METADATA_DEFINITION = new SmithyElementType("METADATA_DEFINITION");
   IElementType METADATA_SECTION = new SmithyElementType("METADATA_SECTION");
+  IElementType METADATA_STATEMENT = new SmithyElementType("METADATA_STATEMENT");
   IElementType MODEL = new SmithyElementType("MODEL");
   IElementType NAMESPACE = new SmithyElementType("NAMESPACE");
   IElementType NAMESPACE_DEFINITION = new SmithyElementType("NAMESPACE_DEFINITION");
@@ -103,11 +103,11 @@ public interface SmithyTypes {
       else if (type == BOOLEAN) {
         return new SmithyBooleanImpl(node);
       }
-      else if (type == CONTROL_DEFINITION) {
-        return new SmithyControlDefinitionImpl(node);
-      }
       else if (type == CONTROL_SECTION) {
         return new SmithyControlSectionImpl(node);
+      }
+      else if (type == CONTROL_STATEMENT) {
+        return new SmithyControlStatementImpl(node);
       }
       else if (type == DOCUMENTATION) {
         return new SmithyDocumentationImpl(node);
@@ -139,11 +139,11 @@ public interface SmithyTypes {
       else if (type == MEMBER_NAME) {
         return new SmithyMemberNameImpl(node);
       }
-      else if (type == METADATA_DEFINITION) {
-        return new SmithyMetadataDefinitionImpl(node);
-      }
       else if (type == METADATA_SECTION) {
         return new SmithyMetadataSectionImpl(node);
+      }
+      else if (type == METADATA_STATEMENT) {
+        return new SmithyMetadataStatementImpl(node);
       }
       else if (type == MODEL) {
         return new SmithyModelImpl(node);

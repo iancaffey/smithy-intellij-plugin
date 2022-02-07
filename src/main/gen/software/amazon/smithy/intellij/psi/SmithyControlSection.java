@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface SmithyControlSection extends SmithyElement {
 
   @NotNull
-  List<SmithyControlDefinition> getControlDefinitionList();
+  List<SmithyControlStatement> getStatements();
 
 }

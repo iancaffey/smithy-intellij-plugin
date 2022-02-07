@@ -8,12 +8,12 @@ import com.intellij.psi.PsiElement;
 public interface SmithyShapeSection extends SmithyElement {
 
   @NotNull
-  List<SmithyImport> getImportList();
-
-  @NotNull
   SmithyNamespaceDefinition getNamespaceDefinition();
 
   @NotNull
-  List<SmithyShapeStatement> getShapeStatementList();
+  List<SmithyImport> getImports();
+
+  @NotNull
+  List<SmithyShapeStatement> getStatements();
 
 }

@@ -29,7 +29,7 @@ public class SmithyTraitValuesImpl extends ASTWrapperPsiElement implements Smith
 
   @Override
   @NotNull
-  public List<SmithyEntry> getEntryList() {
+  public List<SmithyEntry> getEntries() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyEntry.class);
   }
 

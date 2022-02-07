@@ -47,7 +47,7 @@ public class SmithyOperationDefinitionImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public List<SmithyTrait> getTraitList() {
+  public List<SmithyTrait> getTraits() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyTrait.class);
   }
 

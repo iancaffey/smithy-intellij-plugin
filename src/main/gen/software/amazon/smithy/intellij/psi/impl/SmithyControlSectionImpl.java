@@ -29,8 +29,8 @@ public class SmithyControlSectionImpl extends ASTWrapperPsiElement implements Sm
 
   @Override
   @NotNull
-  public List<SmithyControlDefinition> getControlDefinitionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyControlDefinition.class);
+  public List<SmithyControlStatement> getStatements() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyControlStatement.class);
   }
 
 }

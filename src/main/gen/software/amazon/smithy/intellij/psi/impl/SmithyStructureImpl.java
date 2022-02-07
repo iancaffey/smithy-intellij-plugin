@@ -29,7 +29,7 @@ public class SmithyStructureImpl extends ASTWrapperPsiElement implements SmithyS
 
   @Override
   @NotNull
-  public List<SmithyEntry> getEntryList() {
+  public List<SmithyEntry> getEntries() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyEntry.class);
   }
 

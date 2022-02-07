@@ -124,9 +124,23 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // control_statement*
+  public static boolean control_section(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "control_section")) return false;
+    Marker m = enter_section_(b, l, _NONE_, CONTROL_SECTION, "<control section>");
+    while (true) {
+      int c = current_position_(b);
+      if (!control_statement(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "control_section", c)) break;
+    }
+    exit_section_(b, l, m, true, false, null);
+    return true;
+  }
+
+  /* ********************************************************** */
   // TOKEN_DOLLAR_SIGN key TOKEN_COLON value
-  public static boolean control_definition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "control_definition")) return false;
+  public static boolean control_statement(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "control_statement")) return false;
     if (!nextTokenIs(b, TOKEN_DOLLAR_SIGN)) return false;
     boolean r;
     Marker m = enter_section_(b);
@@ -134,22 +148,8 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     r = r && key(b, l + 1);
     r = r && consumeToken(b, TOKEN_COLON);
     r = r && value(b, l + 1);
-    exit_section_(b, m, CONTROL_DEFINITION, r);
+    exit_section_(b, m, CONTROL_STATEMENT, r);
     return r;
-  }
-
-  /* ********************************************************** */
-  // control_definition*
-  public static boolean control_section(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "control_section")) return false;
-    Marker m = enter_section_(b, l, _NONE_, CONTROL_SECTION, "<control section>");
-    while (true) {
-      int c = current_position_(b);
-      if (!control_definition(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "control_section", c)) break;
-    }
-    exit_section_(b, l, m, true, false, null);
-    return true;
   }
 
   /* ********************************************************** */
@@ -417,9 +417,23 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // metadata_statement*
+  public static boolean metadata_section(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "metadata_section")) return false;
+    Marker m = enter_section_(b, l, _NONE_, METADATA_SECTION, "<metadata section>");
+    while (true) {
+      int c = current_position_(b);
+      if (!metadata_statement(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "metadata_section", c)) break;
+    }
+    exit_section_(b, l, m, true, false, null);
+    return true;
+  }
+
+  /* ********************************************************** */
   // TOKEN_METADATA key TOKEN_EQUALS value
-  public static boolean metadata_definition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "metadata_definition")) return false;
+  public static boolean metadata_statement(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "metadata_statement")) return false;
     if (!nextTokenIs(b, TOKEN_METADATA)) return false;
     boolean r;
     Marker m = enter_section_(b);
@@ -427,22 +441,8 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     r = r && key(b, l + 1);
     r = r && consumeToken(b, TOKEN_EQUALS);
     r = r && value(b, l + 1);
-    exit_section_(b, m, METADATA_DEFINITION, r);
+    exit_section_(b, m, METADATA_STATEMENT, r);
     return r;
-  }
-
-  /* ********************************************************** */
-  // metadata_definition*
-  public static boolean metadata_section(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "metadata_section")) return false;
-    Marker m = enter_section_(b, l, _NONE_, METADATA_SECTION, "<metadata section>");
-    while (true) {
-      int c = current_position_(b);
-      if (!metadata_definition(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "metadata_section", c)) break;
-    }
-    exit_section_(b, l, m, true, false, null);
-    return true;
   }
 
   /* ********************************************************** */

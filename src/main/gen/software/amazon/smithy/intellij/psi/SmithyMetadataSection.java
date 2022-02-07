@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface SmithyMetadataSection extends SmithyElement {
 
   @NotNull
-  List<SmithyMetadataDefinition> getMetadataDefinitionList();
+  List<SmithyMetadataStatement> getStatements();
 
 }

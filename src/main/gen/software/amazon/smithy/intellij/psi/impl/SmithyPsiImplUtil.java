@@ -91,7 +91,7 @@ public class SmithyPsiImplUtil {
     }
 
     public static String getName(SmithyNamespace namespace) {
-        return namespace.getIdList().stream().map(SmithyId::getText).collect(Collectors.joining("."));
+        return namespace.getParts().stream().map(SmithyId::getText).collect(Collectors.joining("."));
     }
 
     public static String getName(SmithyShapeId id) {

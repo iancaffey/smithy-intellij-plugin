@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyControlDefinition extends SmithyElement {
+public interface SmithyMetadataStatement extends SmithyElement {
 
   @NotNull
   SmithyKey getKey();

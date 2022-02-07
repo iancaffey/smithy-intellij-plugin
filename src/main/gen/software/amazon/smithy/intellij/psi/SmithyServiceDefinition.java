@@ -17,6 +17,6 @@ public interface SmithyServiceDefinition extends SmithyElement, SmithyShapeDefin
   SmithyStructure getStructure();
 
   @NotNull
-  List<SmithyTrait> getTraitList();
+  List<SmithyTrait> getTraits();
 
 }

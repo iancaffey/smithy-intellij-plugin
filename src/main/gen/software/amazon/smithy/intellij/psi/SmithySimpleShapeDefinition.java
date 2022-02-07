@@ -17,6 +17,6 @@ public interface SmithySimpleShapeDefinition extends SmithyElement, SmithyShapeD
   SmithySimpleTypeName getSimpleTypeName();
 
   @NotNull
-  List<SmithyTrait> getTraitList();
+  List<SmithyTrait> getTraits();
 
 }

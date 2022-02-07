@@ -29,8 +29,8 @@ public class SmithyMetadataSectionImpl extends ASTWrapperPsiElement implements S
 
   @Override
   @NotNull
-  public List<SmithyMetadataDefinition> getMetadataDefinitionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyMetadataDefinition.class);
+  public List<SmithyMetadataStatement> getStatements() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyMetadataStatement.class);
   }
 
 }

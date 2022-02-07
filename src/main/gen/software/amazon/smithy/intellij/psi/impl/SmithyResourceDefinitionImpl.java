@@ -47,7 +47,7 @@ public class SmithyResourceDefinitionImpl extends ASTWrapperPsiElement implement
 
   @Override
   @NotNull
-  public List<SmithyTrait> getTraitList() {
+  public List<SmithyTrait> getTraits() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyTrait.class);
   }
 

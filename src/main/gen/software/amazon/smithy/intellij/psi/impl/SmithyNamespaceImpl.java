@@ -29,7 +29,7 @@ public class SmithyNamespaceImpl extends ASTWrapperPsiElement implements SmithyN
 
   @Override
   @NotNull
-  public List<SmithyId> getIdList() {
+  public List<SmithyId> getParts() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyId.class);
   }
 

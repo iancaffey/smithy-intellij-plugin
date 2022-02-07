@@ -20,11 +20,11 @@ public class SmithyVisitor extends PsiElementVisitor {
     visitElement(o);
   }
 
-  public void visitControlDefinition(@NotNull SmithyControlDefinition o) {
+  public void visitControlSection(@NotNull SmithyControlSection o) {
     visitElement(o);
   }
 
-  public void visitControlSection(@NotNull SmithyControlSection o) {
+  public void visitControlStatement(@NotNull SmithyControlStatement o) {
     visitElement(o);
   }
 
@@ -72,11 +72,11 @@ public class SmithyVisitor extends PsiElementVisitor {
     // visitNamedElement(o);
   }
 
-  public void visitMetadataDefinition(@NotNull SmithyMetadataDefinition o) {
+  public void visitMetadataSection(@NotNull SmithyMetadataSection o) {
     visitElement(o);
   }
 
-  public void visitMetadataSection(@NotNull SmithyMetadataSection o) {
+  public void visitMetadataStatement(@NotNull SmithyMetadataStatement o) {
     visitElement(o);
   }
 

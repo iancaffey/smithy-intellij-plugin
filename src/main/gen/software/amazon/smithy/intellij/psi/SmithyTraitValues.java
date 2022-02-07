@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface SmithyTraitValues extends SmithyElement {
 
   @NotNull
-  List<SmithyEntry> getEntryList();
+  List<SmithyEntry> getEntries();
 
 }

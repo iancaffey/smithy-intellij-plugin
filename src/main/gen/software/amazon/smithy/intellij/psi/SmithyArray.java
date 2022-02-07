@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface SmithyArray extends SmithyElement {
 
   @NotNull
-  List<SmithyValue> getValueList();
+  List<SmithyValue> getValues();
 
 }

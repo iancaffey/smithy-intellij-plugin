@@ -33,5 +33,5 @@ public interface SmithyShapeDefinition extends SmithyNamedElement {
     SmithyDocumentation getDocumentation();
 
     @NotNull
-    List<SmithyTrait> getTraitList();
+    List<SmithyTrait> getTraits();
 }

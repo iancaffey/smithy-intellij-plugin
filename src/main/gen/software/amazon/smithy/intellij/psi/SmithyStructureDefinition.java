@@ -11,12 +11,12 @@ public interface SmithyStructureDefinition extends SmithyElement, SmithyShapeDef
   SmithyDocumentation getDocumentation();
 
   @NotNull
-  List<SmithyMember> getMemberList();
-
-  @NotNull
   SmithyShapeName getShapeName();
 
   @NotNull
-  List<SmithyTrait> getTraitList();
+  List<SmithyTrait> getTraits();
+
+  @NotNull
+  List<SmithyMember> getMembers();
 
 }

@@ -67,47 +67,47 @@ root ::= model
 model ::= control_section metadata_section [shape_section]
 
 //Control
-control_section ::= control_definition*
-control_definition ::= TOKEN_DOLLAR_SIGN key TOKEN_COLON value
+control_section ::= control_statement* {methods=[statements="control_statement"]}
+control_statement ::= TOKEN_DOLLAR_SIGN key TOKEN_COLON value
 
 //Metadata
-metadata_section ::= metadata_definition*
-metadata_definition ::= TOKEN_METADATA key TOKEN_EQUALS value
+metadata_section ::= metadata_statement* {methods=[statements="metadata_statement"]}
+metadata_statement ::= TOKEN_METADATA key TOKEN_EQUALS value
 
 //Shapes
-shape_section ::= namespace_definition import* shape_statement*
+shape_section ::= namespace_definition import* shape_statement* {methods=[imports="import" statements="shape_statement"]}
 namespace_definition ::= TOKEN_NAMESPACE namespace
 import ::= TOKEN_USE shape_id
 shape_statement ::= apply | simple_shape_definition | list_definition | set_definition | map_definition | structure_definition | union_definition | service_definition | operation_definition | resource_definition
-simple_shape_definition ::= [documentation] trait* simple_type_name shape_name
-list_definition ::= [documentation] trait* TOKEN_LIST shape_name members
-set_definition ::= [documentation] trait* TOKEN_SET shape_name members
-map_definition ::= [documentation] trait* TOKEN_MAP shape_name members
-structure_definition ::= [documentation] trait* TOKEN_STRUCTURE shape_name members
-union_definition ::= [documentation] trait* TOKEN_UNION shape_name members
-service_definition ::= [documentation] trait* TOKEN_SERVICE shape_name structure
-operation_definition ::= [documentation] trait* TOKEN_OPERATION shape_name structure
-resource_definition ::= [documentation] trait* TOKEN_RESOURCE shape_name structure
+simple_shape_definition ::= [documentation] trait* simple_type_name shape_name {methods=[traits="trait"]}
+list_definition ::= [documentation] trait* TOKEN_LIST shape_name members {methods=[traits="trait" members="member"]}
+set_definition ::= [documentation] trait* TOKEN_SET shape_name members {methods=[traits="trait" members="member"]}
+map_definition ::= [documentation] trait* TOKEN_MAP shape_name members {methods=[traits="trait" members="member"]}
+structure_definition ::= [documentation] trait* TOKEN_STRUCTURE shape_name members {methods=[traits="trait" members="member"]}
+union_definition ::= [documentation] trait* TOKEN_UNION shape_name members {methods=[traits="trait" members="member"]}
+service_definition ::= [documentation] trait* TOKEN_SERVICE shape_name structure {methods=[traits="trait"]}
+operation_definition ::= [documentation] trait* TOKEN_OPERATION shape_name structure {methods=[traits="trait"]}
+resource_definition ::= [documentation] trait* TOKEN_RESOURCE shape_name structure {methods=[traits="trait"]}
 private members ::= TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE
-member ::= [documentation] trait* member_name TOKEN_COLON shape_id
+member ::= [documentation] trait* member_name TOKEN_COLON shape_id {methods=[traits="trait"]}
 
 //Traits
 apply ::= TOKEN_APPLY shape_id trait
 trait ::= TOKEN_AT shape_id [trait_body]
 trait_body ::= TOKEN_OPEN_PAREN (trait_values | value) TOKEN_CLOSE_PAREN
-trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA]
+trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA] {methods=[entries="entry"]}
 
 //Node values
 key ::= id | string
 value ::= array | structure | primitive
 entry ::= key TOKEN_COLON value
-array ::= TOKEN_OPEN_BRACKET [value (TOKEN_COMMA value)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACKET
-structure ::= TOKEN_OPEN_BRACE [entry (TOKEN_COMMA entry)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE
+array ::= TOKEN_OPEN_BRACKET [value (TOKEN_COMMA value)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACKET {methods=[values="value"]}
+structure ::= TOKEN_OPEN_BRACE [entry (TOKEN_COMMA entry)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE {methods=[entries="entry"]}
 primitive ::= null | boolean | number | string | text_block | shape_id
 
 //Shape ID
 shape_id ::= [namespace TOKEN_HASH] shape_name [TOKEN_DOLLAR_SIGN member_name]
-namespace ::= id (TOKEN_PERIOD id)*
+namespace ::= id (TOKEN_PERIOD id)* {methods=[parts="id"]}
 shape_name ::= id
 member_name ::= id
 id ::= symbol | keyword | null | boolean | simple_type_name
