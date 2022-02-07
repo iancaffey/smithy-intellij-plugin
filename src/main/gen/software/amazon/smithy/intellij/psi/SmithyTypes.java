@@ -50,7 +50,7 @@ public interface SmithyTypes {
   IElementType SYMBOL = new SmithyElementType("SYMBOL");
   IElementType TEXT_BLOCK = new SmithyElementType("TEXT_BLOCK");
   IElementType TRAIT = new SmithyElementType("TRAIT");
-  IElementType TRAIT_BODY = new SmithyElementType("TRAIT_BODY");
+  IElementType TRAIT_ARGUMENTS = new SmithyElementType("TRAIT_ARGUMENTS");
   IElementType TRAIT_VALUES = new SmithyElementType("TRAIT_VALUES");
   IElementType UNION_DEFINITION = new SmithyElementType("UNION_DEFINITION");
   IElementType VALUE = new SmithyElementType("VALUE");
@@ -116,6 +116,9 @@ public interface SmithyTypes {
       else if (type == ENTRY) {
         return new SmithyEntryImpl(node);
       }
+      else if (type == ID) {
+        return new SmithyIdImpl(node);
+      }
       else if (type == IMPORT) {
         return new SmithyImportImpl(node);
       }
@@ -164,9 +167,6 @@ public interface SmithyTypes {
       else if (type == OPERATION_DEFINITION) {
         return new SmithyOperationDefinitionImpl(node);
       }
-      else if (type == PRIMITIVE) {
-        return new SmithyPrimitiveImpl(node);
-      }
       else if (type == RESOURCE_DEFINITION) {
         return new SmithyResourceDefinitionImpl(node);
       }
@@ -206,8 +206,8 @@ public interface SmithyTypes {
       else if (type == TRAIT) {
         return new SmithyTraitImpl(node);
       }
-      else if (type == TRAIT_BODY) {
-        return new SmithyTraitBodyImpl(node);
+      else if (type == TRAIT_ARGUMENTS) {
+        return new SmithyTraitArgumentsImpl(node);
       }
       else if (type == TRAIT_VALUES) {
         return new SmithyTraitValuesImpl(node);

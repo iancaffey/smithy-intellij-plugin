@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyNullImpl extends SmithyIdImpl implements SmithyNull {
+public class SmithyNullImpl extends SmithyPrimitiveImpl implements SmithyNull {
 
   public SmithyNullImpl(@NotNull ASTNode node) {
     super(node);

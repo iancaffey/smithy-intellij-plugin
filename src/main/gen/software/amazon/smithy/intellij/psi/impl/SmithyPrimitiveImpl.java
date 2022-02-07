@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyPrimitiveImpl extends SmithyValueImpl implements SmithyPrimitive {
+public abstract class SmithyPrimitiveImpl extends SmithyValueImpl implements SmithyPrimitive {
 
   public SmithyPrimitiveImpl(@NotNull ASTNode node) {
     super(node);
@@ -25,36 +25,6 @@ public class SmithyPrimitiveImpl extends SmithyValueImpl implements SmithyPrimit
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SmithyVisitor) accept((SmithyVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public SmithyId getId() {
-    return findChildByClass(SmithyId.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyNumber getNumber() {
-    return findChildByClass(SmithyNumber.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyShapeId getShapeId() {
-    return findChildByClass(SmithyShapeId.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyString getString() {
-    return findChildByClass(SmithyString.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyTextBlock getTextBlock() {
-    return findChildByClass(SmithyTextBlock.class);
   }
 
 }

@@ -27,10 +27,4 @@ public class SmithyShapeNameImpl extends ASTWrapperPsiElement implements SmithyS
     else super.accept(visitor);
   }
 
-  @Override
-  @NotNull
-  public SmithyId getId() {
-    return findNotNullChildByClass(SmithyId.class);
-  }
-
 }

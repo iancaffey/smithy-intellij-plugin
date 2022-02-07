@@ -7,7 +7,4 @@ import com.intellij.psi.PsiElement;
 
 public interface SmithyShapeName extends SmithyElement, SmithyNamedElement {
 
-  @NotNull
-  SmithyId getId();
-
 }

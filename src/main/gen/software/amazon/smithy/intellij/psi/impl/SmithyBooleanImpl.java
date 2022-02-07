@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyBooleanImpl extends SmithyIdImpl implements SmithyBoolean {
+public class SmithyBooleanImpl extends SmithyPrimitiveImpl implements SmithyBoolean {
 
   public SmithyBooleanImpl(@NotNull ASTNode node) {
     super(node);

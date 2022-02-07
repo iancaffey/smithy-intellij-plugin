@@ -41,14 +41,14 @@ public class SmithySimpleShapeDefinitionImpl extends SmithyShapeDefinitionImpl i
 
   @Override
   @NotNull
-  public SmithySimpleTypeName getSimpleTypeName() {
-    return findNotNullChildByClass(SmithySimpleTypeName.class);
+  public List<SmithyTrait> getTraits() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyTrait.class);
   }
 
   @Override
   @NotNull
-  public List<SmithyTrait> getTraits() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyTrait.class);
+  public SmithySimpleTypeName getTypeName() {
+    return findNotNullChildByClass(SmithySimpleTypeName.class);
   }
 
 }

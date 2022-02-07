@@ -36,9 +36,10 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
-    create_token_set_(ARRAY, OBJECT, PRIMITIVE, VALUE),
-    create_token_set_(BOOLEAN, ID, KEYWORD, NULL,
-      SIMPLE_TYPE_NAME, SYMBOL),
+    create_token_set_(ID, KEYWORD, SIMPLE_TYPE_NAME, SYMBOL),
+    create_token_set_(ARRAY, BOOLEAN, NULL, NUMBER,
+      OBJECT, PRIMITIVE, SHAPE_ID, STRING,
+      TEXT_BLOCK, VALUE),
     create_token_set_(APPLY, LIST_DEFINITION, MAP_DEFINITION, OPERATION_DEFINITION,
       RESOURCE_DEFINITION, SERVICE_DEFINITION, SET_DEFINITION, SHAPE_DEFINITION,
       SHAPE_STATEMENT, SIMPLE_SHAPE_DEFINITION, STRUCTURE_DEFINITION, UNION_DEFINITION),
@@ -645,7 +646,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   public static boolean primitive(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "primitive")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, PRIMITIVE, "<primitive>");
+    Marker m = enter_section_(b, l, _COLLAPSE_, PRIMITIVE, "<primitive>");
     r = null_$(b, l + 1);
     if (!r) r = boolean_$(b, l + 1);
     if (!r) r = number(b, l + 1);
@@ -1002,7 +1003,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TOKEN_AT shape_id [trait_body]
+  // TOKEN_AT shape_id [trait_arguments]
   public static boolean trait(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "trait")) return false;
     if (!nextTokenIs(b, TOKEN_AT)) return false;
@@ -1015,30 +1016,30 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // [trait_body]
+  // [trait_arguments]
   private static boolean trait_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "trait_2")) return false;
-    trait_body(b, l + 1);
+    trait_arguments(b, l + 1);
     return true;
   }
 
   /* ********************************************************** */
   // TOKEN_OPEN_PAREN (trait_values | value) TOKEN_CLOSE_PAREN
-  public static boolean trait_body(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "trait_body")) return false;
+  public static boolean trait_arguments(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "trait_arguments")) return false;
     if (!nextTokenIs(b, TOKEN_OPEN_PAREN)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, TOKEN_OPEN_PAREN);
-    r = r && trait_body_1(b, l + 1);
+    r = r && trait_arguments_1(b, l + 1);
     r = r && consumeToken(b, TOKEN_CLOSE_PAREN);
-    exit_section_(b, m, TRAIT_BODY, r);
+    exit_section_(b, m, TRAIT_ARGUMENTS, r);
     return r;
   }
 
   // trait_values | value
-  private static boolean trait_body_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "trait_body_1")) return false;
+  private static boolean trait_arguments_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "trait_arguments_1")) return false;
     boolean r;
     r = trait_values(b, l + 1);
     if (!r) r = value(b, l + 1);

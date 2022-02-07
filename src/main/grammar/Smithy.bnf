@@ -60,6 +60,7 @@
     implements("^(?!.*element).*")=element
     implements("member_name|namespace|shape_id|shape_name|trait")=named_element
     extends("array|object|primitive")=value
+    extends("null|boolean|number|string|text_block|shape_id")=primitive
     extends("apply|shape_definition")=shape_statement
     extends("symbol|keyword|null|boolean|simple_type_name")=id
     extends("simple_shape_definition|list_definition|set_definition|map_definition|structure_definition|union_definition|service_definition|operation_definition|resource_definition")=shape_definition
@@ -82,7 +83,7 @@ namespace_statement ::= TOKEN_NAMESPACE namespace
 import ::= TOKEN_USE shape_id
 shape_statement ::= apply | shape_definition
 shape_definition ::= simple_shape_definition | list_definition | set_definition | map_definition | structure_definition | union_definition | service_definition | operation_definition | resource_definition
-simple_shape_definition ::= [documentation] trait* simple_type_name shape_name {methods=[traits="trait"]}
+simple_shape_definition ::= [documentation] trait* simple_type_name shape_name {methods=[traits="trait" type_name="simple_type_name"]}
 list_definition ::= [documentation] trait* TOKEN_LIST shape_name members {methods=[traits="trait" members="member"]}
 set_definition ::= [documentation] trait* TOKEN_SET shape_name members {methods=[traits="trait" members="member"]}
 map_definition ::= [documentation] trait* TOKEN_MAP shape_name members {methods=[traits="trait" members="member"]}
@@ -96,8 +97,8 @@ member ::= [documentation] trait* member_name TOKEN_COLON shape_id {methods=[tra
 
 //Traits
 apply ::= TOKEN_APPLY shape_id trait
-trait ::= TOKEN_AT shape_id [trait_body]
-trait_body ::= TOKEN_OPEN_PAREN (trait_values | value) TOKEN_CLOSE_PAREN
+trait ::= TOKEN_AT shape_id [trait_arguments] {methods=[arguments="trait_arguments"]}
+trait_arguments ::= TOKEN_OPEN_PAREN (trait_values | value) TOKEN_CLOSE_PAREN {methods=[values="trait_values"]}
 trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA] {methods=[entries="entry"]}
 
 //Node values
@@ -111,9 +112,9 @@ primitive ::= null | boolean | number | string | text_block | shape_id
 //Shape ID
 shape_id ::= [namespace TOKEN_HASH] shape_name [TOKEN_DOLLAR_SIGN member_name]
 namespace ::= id (TOKEN_PERIOD id)* {methods=[parts="id"]}
-shape_name ::= id
-member_name ::= id
-id ::= symbol | keyword | null | boolean | simple_type_name
+shape_name ::= id {methods=[id=""]}
+member_name ::= id {methods=[id=""]}
+id ::= symbol | keyword | null | boolean | simple_type_name {methods=[null="" boolean=""]}
 
 //Re-declared tokens which will receive a dedicated AST node instead of raw PsiElement (since they are used in a meaningful way, like as a variant within another AST node)
 null ::= TOKEN_NULL {methods=[TOKEN_NULL=""]}

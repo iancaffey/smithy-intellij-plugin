@@ -11,7 +11,7 @@ import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 
-public abstract class SmithyIdImpl extends ASTWrapperPsiElement implements SmithyId {
+public class SmithyIdImpl extends ASTWrapperPsiElement implements SmithyId {
 
   public SmithyIdImpl(@NotNull ASTNode node) {
     super(node);
