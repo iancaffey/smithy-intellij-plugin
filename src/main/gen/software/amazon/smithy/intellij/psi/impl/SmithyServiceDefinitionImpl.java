@@ -35,8 +35,8 @@ public class SmithyServiceDefinitionImpl extends ASTWrapperPsiElement implements
 
   @Override
   @NotNull
-  public SmithyId getId() {
-    return findNotNullChildByClass(SmithyId.class);
+  public SmithyShapeName getShapeName() {
+    return findNotNullChildByClass(SmithyShapeName.class);
   }
 
   @Override

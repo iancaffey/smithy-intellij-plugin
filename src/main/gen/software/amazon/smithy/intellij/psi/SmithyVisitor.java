@@ -63,6 +63,10 @@ public class SmithyVisitor extends PsiElementVisitor {
     // visitShapeDefinition(o);
   }
 
+  public void visitMember(@NotNull SmithyMember o) {
+    visitElement(o);
+  }
+
   public void visitMemberName(@NotNull SmithyMemberName o) {
     visitElement(o);
     // visitNamedElement(o);
@@ -119,14 +123,6 @@ public class SmithyVisitor extends PsiElementVisitor {
   public void visitSetDefinition(@NotNull SmithySetDefinition o) {
     visitElement(o);
     // visitShapeDefinition(o);
-  }
-
-  public void visitShapeField(@NotNull SmithyShapeField o) {
-    visitElement(o);
-  }
-
-  public void visitShapeFields(@NotNull SmithyShapeFields o) {
-    visitElement(o);
   }
 
   public void visitShapeId(@NotNull SmithyShapeId o) {

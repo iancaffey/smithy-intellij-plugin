@@ -21,17 +21,17 @@ import java.util.List;
  * @since 1.0
  */
 public interface SmithyShapeDefinition extends SmithyNamedElement {
+    @Override
+    default String getName() {
+        return getShapeName().getName();
+    }
+
     @NotNull
-    SmithyId getId();
+    SmithyShapeName getShapeName();
 
     @Nullable
     SmithyDocumentation getDocumentation();
 
     @NotNull
     List<SmithyTrait> getTraitList();
-
-    @Override
-    default String getName() {
-        return getId().getText();
-    }
 }

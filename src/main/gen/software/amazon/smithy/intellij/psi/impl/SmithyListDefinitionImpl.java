@@ -35,14 +35,14 @@ public class SmithyListDefinitionImpl extends ASTWrapperPsiElement implements Sm
 
   @Override
   @NotNull
-  public SmithyId getId() {
-    return findNotNullChildByClass(SmithyId.class);
+  public List<SmithyMember> getMemberList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyMember.class);
   }
 
   @Override
   @NotNull
-  public SmithyShapeFields getShapeFields() {
-    return findNotNullChildByClass(SmithyShapeFields.class);
+  public SmithyShapeName getShapeName() {
+    return findNotNullChildByClass(SmithyShapeName.class);
   }
 
   @Override

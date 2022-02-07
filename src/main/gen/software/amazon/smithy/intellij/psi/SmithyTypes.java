@@ -23,6 +23,7 @@ public interface SmithyTypes {
   IElementType KEYWORD = new SmithyElementType("KEYWORD");
   IElementType LIST_DEFINITION = new SmithyElementType("LIST_DEFINITION");
   IElementType MAP_DEFINITION = new SmithyElementType("MAP_DEFINITION");
+  IElementType MEMBER = new SmithyElementType("MEMBER");
   IElementType MEMBER_NAME = new SmithyElementType("MEMBER_NAME");
   IElementType METADATA_DEFINITION = new SmithyElementType("METADATA_DEFINITION");
   IElementType METADATA_SECTION = new SmithyElementType("METADATA_SECTION");
@@ -36,8 +37,6 @@ public interface SmithyTypes {
   IElementType RESOURCE_DEFINITION = new SmithyElementType("RESOURCE_DEFINITION");
   IElementType SERVICE_DEFINITION = new SmithyElementType("SERVICE_DEFINITION");
   IElementType SET_DEFINITION = new SmithyElementType("SET_DEFINITION");
-  IElementType SHAPE_FIELD = new SmithyElementType("SHAPE_FIELD");
-  IElementType SHAPE_FIELDS = new SmithyElementType("SHAPE_FIELDS");
   IElementType SHAPE_ID = new SmithyElementType("SHAPE_ID");
   IElementType SHAPE_NAME = new SmithyElementType("SHAPE_NAME");
   IElementType SHAPE_SECTION = new SmithyElementType("SHAPE_SECTION");
@@ -134,6 +133,9 @@ public interface SmithyTypes {
       else if (type == MAP_DEFINITION) {
         return new SmithyMapDefinitionImpl(node);
       }
+      else if (type == MEMBER) {
+        return new SmithyMemberImpl(node);
+      }
       else if (type == MEMBER_NAME) {
         return new SmithyMemberNameImpl(node);
       }
@@ -172,12 +174,6 @@ public interface SmithyTypes {
       }
       else if (type == SET_DEFINITION) {
         return new SmithySetDefinitionImpl(node);
-      }
-      else if (type == SHAPE_FIELD) {
-        return new SmithyShapeFieldImpl(node);
-      }
-      else if (type == SHAPE_FIELDS) {
-        return new SmithyShapeFieldsImpl(node);
       }
       else if (type == SHAPE_ID) {
         return new SmithyShapeIdImpl(node);

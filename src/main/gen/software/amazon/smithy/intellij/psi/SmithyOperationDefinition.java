@@ -11,7 +11,7 @@ public interface SmithyOperationDefinition extends SmithyElement, SmithyShapeDef
   SmithyDocumentation getDocumentation();
 
   @NotNull
-  SmithyId getId();
+  SmithyShapeName getShapeName();
 
   @NotNull
   SmithyStructure getStructure();

@@ -47,7 +47,7 @@ class SmithyAnnotator : Annotator {
         if (element is SmithyKey && element.parent !is SmithyControlDefinition) {
             holder.highlight(SmithyColorSettings.KEY)
         }
-        if (element is SmithyMemberName || element is SmithyId && element.parent is SmithyShapeField) {
+        if (element is SmithyMemberName) {
             holder.highlight(SmithyColorSettings.SHAPE_MEMBER)
         }
         if ((element is SmithyShapeId || element.elementType == SmithyTypes.TOKEN_AT) && element.parent is SmithyTrait) {

@@ -35,8 +35,8 @@ public class SmithySimpleShapeDefinitionImpl extends ASTWrapperPsiElement implem
 
   @Override
   @NotNull
-  public SmithyId getId() {
-    return findNotNullChildByClass(SmithyId.class);
+  public SmithyShapeName getShapeName() {
+    return findNotNullChildByClass(SmithyShapeName.class);
   }
 
   @Override
