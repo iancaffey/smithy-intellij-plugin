@@ -8,15 +8,15 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyKeywordImpl extends ASTWrapperPsiElement implements SmithyKeyword {
+public class SmithyKeywordImpl extends SmithyIdImpl implements SmithyKeyword {
 
   public SmithyKeywordImpl(@NotNull ASTNode node) {
     super(node);
   }
 
+  @Override
   public void accept(@NotNull SmithyVisitor visitor) {
     visitor.visitKeyword(this);
   }

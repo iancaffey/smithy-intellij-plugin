@@ -29,14 +29,16 @@ public interface SmithyTypes {
   IElementType METADATA_STATEMENT = new SmithyElementType("METADATA_STATEMENT");
   IElementType MODEL = new SmithyElementType("MODEL");
   IElementType NAMESPACE = new SmithyElementType("NAMESPACE");
-  IElementType NAMESPACE_DEFINITION = new SmithyElementType("NAMESPACE_DEFINITION");
+  IElementType NAMESPACE_STATEMENT = new SmithyElementType("NAMESPACE_STATEMENT");
   IElementType NULL = new SmithyElementType("NULL");
   IElementType NUMBER = new SmithyElementType("NUMBER");
+  IElementType OBJECT = new SmithyElementType("OBJECT");
   IElementType OPERATION_DEFINITION = new SmithyElementType("OPERATION_DEFINITION");
   IElementType PRIMITIVE = new SmithyElementType("PRIMITIVE");
   IElementType RESOURCE_DEFINITION = new SmithyElementType("RESOURCE_DEFINITION");
   IElementType SERVICE_DEFINITION = new SmithyElementType("SERVICE_DEFINITION");
   IElementType SET_DEFINITION = new SmithyElementType("SET_DEFINITION");
+  IElementType SHAPE_DEFINITION = new SmithyElementType("SHAPE_DEFINITION");
   IElementType SHAPE_ID = new SmithyElementType("SHAPE_ID");
   IElementType SHAPE_NAME = new SmithyElementType("SHAPE_NAME");
   IElementType SHAPE_SECTION = new SmithyElementType("SHAPE_SECTION");
@@ -44,7 +46,6 @@ public interface SmithyTypes {
   IElementType SIMPLE_SHAPE_DEFINITION = new SmithyElementType("SIMPLE_SHAPE_DEFINITION");
   IElementType SIMPLE_TYPE_NAME = new SmithyElementType("SIMPLE_TYPE_NAME");
   IElementType STRING = new SmithyElementType("STRING");
-  IElementType STRUCTURE = new SmithyElementType("STRUCTURE");
   IElementType STRUCTURE_DEFINITION = new SmithyElementType("STRUCTURE_DEFINITION");
   IElementType SYMBOL = new SmithyElementType("SYMBOL");
   IElementType TEXT_BLOCK = new SmithyElementType("TEXT_BLOCK");
@@ -115,9 +116,6 @@ public interface SmithyTypes {
       else if (type == ENTRY) {
         return new SmithyEntryImpl(node);
       }
-      else if (type == ID) {
-        return new SmithyIdImpl(node);
-      }
       else if (type == IMPORT) {
         return new SmithyImportImpl(node);
       }
@@ -151,14 +149,17 @@ public interface SmithyTypes {
       else if (type == NAMESPACE) {
         return new SmithyNamespaceImpl(node);
       }
-      else if (type == NAMESPACE_DEFINITION) {
-        return new SmithyNamespaceDefinitionImpl(node);
+      else if (type == NAMESPACE_STATEMENT) {
+        return new SmithyNamespaceStatementImpl(node);
       }
       else if (type == NULL) {
         return new SmithyNullImpl(node);
       }
       else if (type == NUMBER) {
         return new SmithyNumberImpl(node);
+      }
+      else if (type == OBJECT) {
+        return new SmithyObjectImpl(node);
       }
       else if (type == OPERATION_DEFINITION) {
         return new SmithyOperationDefinitionImpl(node);
@@ -184,9 +185,6 @@ public interface SmithyTypes {
       else if (type == SHAPE_SECTION) {
         return new SmithyShapeSectionImpl(node);
       }
-      else if (type == SHAPE_STATEMENT) {
-        return new SmithyShapeStatementImpl(node);
-      }
       else if (type == SIMPLE_SHAPE_DEFINITION) {
         return new SmithySimpleShapeDefinitionImpl(node);
       }
@@ -195,9 +193,6 @@ public interface SmithyTypes {
       }
       else if (type == STRING) {
         return new SmithyStringImpl(node);
-      }
-      else if (type == STRUCTURE) {
-        return new SmithyStructureImpl(node);
       }
       else if (type == STRUCTURE_DEFINITION) {
         return new SmithyStructureDefinitionImpl(node);
@@ -219,9 +214,6 @@ public interface SmithyTypes {
       }
       else if (type == UNION_DEFINITION) {
         return new SmithyUnionDefinitionImpl(node);
-      }
-      else if (type == VALUE) {
-        return new SmithyValueImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

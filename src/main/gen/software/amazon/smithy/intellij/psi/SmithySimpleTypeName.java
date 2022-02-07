@@ -5,9 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithySimpleTypeName extends SmithyElement {
-
-  @NotNull
-  PsiElement getTokenSimpleTypeName();
+public interface SmithySimpleTypeName extends SmithyId, SmithyElement {
 
 }

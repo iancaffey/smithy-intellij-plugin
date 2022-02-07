@@ -11,26 +11,20 @@ import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyStructureImpl extends ASTWrapperPsiElement implements SmithyStructure {
+public class SmithyElementImpl extends ASTWrapperPsiElement implements SmithyElement {
 
-  public SmithyStructureImpl(@NotNull ASTNode node) {
+  public SmithyElementImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SmithyVisitor visitor) {
-    visitor.visitStructure(this);
+    visitor.visitElement(this);
   }
 
   @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SmithyVisitor) accept((SmithyVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @NotNull
-  public List<SmithyEntry> getEntries() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyEntry.class);
   }
 
 }

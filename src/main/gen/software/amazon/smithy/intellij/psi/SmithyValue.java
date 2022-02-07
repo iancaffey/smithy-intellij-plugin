@@ -7,13 +7,4 @@ import com.intellij.psi.PsiElement;
 
 public interface SmithyValue extends SmithyElement {
 
-  @Nullable
-  SmithyArray getArray();
-
-  @Nullable
-  SmithyPrimitive getPrimitive();
-
-  @Nullable
-  SmithyStructure getStructure();
-
 }

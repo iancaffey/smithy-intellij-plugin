@@ -8,15 +8,15 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyPrimitiveImpl extends ASTWrapperPsiElement implements SmithyPrimitive {
+public class SmithyPrimitiveImpl extends SmithyValueImpl implements SmithyPrimitive {
 
   public SmithyPrimitiveImpl(@NotNull ASTNode node) {
     super(node);
   }
 
+  @Override
   public void accept(@NotNull SmithyVisitor visitor) {
     visitor.visitPrimitive(this);
   }
@@ -29,14 +29,8 @@ public class SmithyPrimitiveImpl extends ASTWrapperPsiElement implements SmithyP
 
   @Override
   @Nullable
-  public SmithyBoolean getBoolean() {
-    return findChildByClass(SmithyBoolean.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyNull getNull() {
-    return findChildByClass(SmithyNull.class);
+  public SmithyId getId() {
+    return findChildByClass(SmithyId.class);
   }
 
   @Override

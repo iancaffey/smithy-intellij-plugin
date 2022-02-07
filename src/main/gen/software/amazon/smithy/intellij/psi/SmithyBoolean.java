@@ -5,10 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyBoolean extends SmithyElement {
-
-  @NotNull
-  PsiElement getTokenBoolean();
+public interface SmithyBoolean extends SmithyId, SmithyElement {
 
   boolean booleanValue();
 

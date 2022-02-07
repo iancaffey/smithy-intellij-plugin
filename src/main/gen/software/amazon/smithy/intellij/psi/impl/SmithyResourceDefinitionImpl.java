@@ -8,15 +8,15 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyResourceDefinitionImpl extends ASTWrapperPsiElement implements SmithyResourceDefinition {
+public class SmithyResourceDefinitionImpl extends SmithyShapeDefinitionImpl implements SmithyResourceDefinition {
 
   public SmithyResourceDefinitionImpl(@NotNull ASTNode node) {
     super(node);
   }
 
+  @Override
   public void accept(@NotNull SmithyVisitor visitor) {
     visitor.visitResourceDefinition(this);
   }
@@ -41,14 +41,14 @@ public class SmithyResourceDefinitionImpl extends ASTWrapperPsiElement implement
 
   @Override
   @NotNull
-  public SmithyStructure getStructure() {
-    return findNotNullChildByClass(SmithyStructure.class);
+  public List<SmithyTrait> getTraits() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyTrait.class);
   }
 
   @Override
   @NotNull
-  public List<SmithyTrait> getTraits() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyTrait.class);
+  public SmithyObject getBody() {
+    return findNotNullChildByClass(SmithyObject.class);
   }
 
 }

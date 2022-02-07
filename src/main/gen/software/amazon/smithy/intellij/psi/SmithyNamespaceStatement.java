@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyNamespaceDefinition extends SmithyElement {
+public interface SmithyNamespaceStatement extends SmithyElement {
 
   @NotNull
   SmithyNamespace getNamespace();

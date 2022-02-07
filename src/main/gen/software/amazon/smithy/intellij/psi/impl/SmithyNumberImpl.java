@@ -30,12 +30,6 @@ public class SmithyNumberImpl extends ASTWrapperPsiElement implements SmithyNumb
   }
 
   @Override
-  @NotNull
-  public PsiElement getTokenNumber() {
-    return findNotNullChildByType(TOKEN_NUMBER);
-  }
-
-  @Override
   public double byteValue() {
     return SmithyPsiImplUtil.byteValue(this);
   }

@@ -11,7 +11,7 @@ import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyValueImpl extends ASTWrapperPsiElement implements SmithyValue {
+public abstract class SmithyValueImpl extends ASTWrapperPsiElement implements SmithyValue {
 
   public SmithyValueImpl(@NotNull ASTNode node) {
     super(node);
@@ -25,24 +25,6 @@ public class SmithyValueImpl extends ASTWrapperPsiElement implements SmithyValue
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SmithyVisitor) accept((SmithyVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public SmithyArray getArray() {
-    return findChildByClass(SmithyArray.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyPrimitive getPrimitive() {
-    return findChildByClass(SmithyPrimitive.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyStructure getStructure() {
-    return findChildByClass(SmithyStructure.class);
   }
 
 }

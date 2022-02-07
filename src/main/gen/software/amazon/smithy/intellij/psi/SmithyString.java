@@ -7,7 +7,4 @@ import com.intellij.psi.PsiElement;
 
 public interface SmithyString extends SmithyElement {
 
-  @NotNull
-  PsiElement getTokenString();
-
 }

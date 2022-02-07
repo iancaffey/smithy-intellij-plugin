@@ -29,7 +29,7 @@ class SmithyAnnotator : Annotator {
             SmithyTypes.LIST_DEFINITION,
             SmithyTypes.MAP_DEFINITION,
             SmithyTypes.METADATA_STATEMENT,
-            SmithyTypes.NAMESPACE_DEFINITION,
+            SmithyTypes.NAMESPACE_STATEMENT,
             SmithyTypes.OPERATION_DEFINITION,
             SmithyTypes.RESOURCE_DEFINITION,
             SmithyTypes.SERVICE_DEFINITION,

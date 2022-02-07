@@ -27,10 +27,4 @@ public class SmithyStringImpl extends ASTWrapperPsiElement implements SmithyStri
     else super.accept(visitor);
   }
 
-  @Override
-  @NotNull
-  public PsiElement getTokenString() {
-    return findNotNullChildByType(TOKEN_STRING);
-  }
-
 }

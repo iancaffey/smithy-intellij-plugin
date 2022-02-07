@@ -5,13 +5,10 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyPrimitive extends SmithyElement {
+public interface SmithyPrimitive extends SmithyValue, SmithyElement {
 
   @Nullable
-  SmithyBoolean getBoolean();
-
-  @Nullable
-  SmithyNull getNull();
+  SmithyId getId();
 
   @Nullable
   SmithyNumber getNumber();

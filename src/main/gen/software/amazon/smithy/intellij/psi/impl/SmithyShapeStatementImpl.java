@@ -11,7 +11,7 @@ import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyShapeStatementImpl extends ASTWrapperPsiElement implements SmithyShapeStatement {
+public abstract class SmithyShapeStatementImpl extends ASTWrapperPsiElement implements SmithyShapeStatement {
 
   public SmithyShapeStatementImpl(@NotNull ASTNode node) {
     super(node);
@@ -25,66 +25,6 @@ public class SmithyShapeStatementImpl extends ASTWrapperPsiElement implements Sm
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SmithyVisitor) accept((SmithyVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public SmithyApply getApply() {
-    return findChildByClass(SmithyApply.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyListDefinition getListDefinition() {
-    return findChildByClass(SmithyListDefinition.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyMapDefinition getMapDefinition() {
-    return findChildByClass(SmithyMapDefinition.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyOperationDefinition getOperationDefinition() {
-    return findChildByClass(SmithyOperationDefinition.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyResourceDefinition getResourceDefinition() {
-    return findChildByClass(SmithyResourceDefinition.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyServiceDefinition getServiceDefinition() {
-    return findChildByClass(SmithyServiceDefinition.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithySetDefinition getSetDefinition() {
-    return findChildByClass(SmithySetDefinition.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithySimpleShapeDefinition getSimpleShapeDefinition() {
-    return findChildByClass(SmithySimpleShapeDefinition.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyStructureDefinition getStructureDefinition() {
-    return findChildByClass(SmithyStructureDefinition.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyUnionDefinition getUnionDefinition() {
-    return findChildByClass(SmithyUnionDefinition.class);
   }
 
 }

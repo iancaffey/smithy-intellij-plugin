@@ -9,9 +9,6 @@ import java.math.BigInteger;
 
 public interface SmithyNumber extends SmithyElement {
 
-  @NotNull
-  PsiElement getTokenNumber();
-
   double byteValue();
 
   double shortValue();

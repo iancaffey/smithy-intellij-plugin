@@ -27,10 +27,4 @@ public class SmithyTextBlockImpl extends ASTWrapperPsiElement implements SmithyT
     else super.accept(visitor);
   }
 
-  @Override
-  @NotNull
-  public PsiElement getTokenTextBlock() {
-    return findNotNullChildByType(TOKEN_TEXT_BLOCK);
-  }
-
 }

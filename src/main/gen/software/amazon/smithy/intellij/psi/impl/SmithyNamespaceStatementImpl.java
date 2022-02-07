@@ -8,17 +8,17 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyOperationDefinitionImpl extends SmithyShapeDefinitionImpl implements SmithyOperationDefinition {
+public class SmithyNamespaceStatementImpl extends ASTWrapperPsiElement implements SmithyNamespaceStatement {
 
-  public SmithyOperationDefinitionImpl(@NotNull ASTNode node) {
+  public SmithyNamespaceStatementImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  @Override
   public void accept(@NotNull SmithyVisitor visitor) {
-    visitor.visitOperationDefinition(this);
+    visitor.visitNamespaceStatement(this);
   }
 
   @Override
@@ -28,27 +28,9 @@ public class SmithyOperationDefinitionImpl extends SmithyShapeDefinitionImpl imp
   }
 
   @Override
-  @Nullable
-  public SmithyDocumentation getDocumentation() {
-    return findChildByClass(SmithyDocumentation.class);
-  }
-
-  @Override
   @NotNull
-  public SmithyShapeName getShapeName() {
-    return findNotNullChildByClass(SmithyShapeName.class);
-  }
-
-  @Override
-  @NotNull
-  public List<SmithyTrait> getTraits() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyTrait.class);
-  }
-
-  @Override
-  @NotNull
-  public SmithyObject getBody() {
-    return findNotNullChildByClass(SmithyObject.class);
+  public SmithyNamespace getNamespace() {
+    return findNotNullChildByClass(SmithyNamespace.class);
   }
 
 }

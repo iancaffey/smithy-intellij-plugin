@@ -1,13 +1,10 @@
+// This is a generated file. Not intended for manual editing.
 package software.amazon.smithy.intellij.psi;
 
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-/**
- * A {@link PsiElement} within a {@link SmithyModel} which can be referred to by name.
- *
- * @author Ian Caffey
- * @since 1.0
- */
-public interface SmithyNamedElement extends SmithyElement {
-    String getName();
+public interface SmithyNamedElement extends PsiElement {
+
 }
