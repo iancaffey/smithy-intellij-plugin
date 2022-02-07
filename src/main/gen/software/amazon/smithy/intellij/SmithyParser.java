@@ -40,9 +40,9 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     create_token_set_(ARRAY, BOOLEAN, NULL, NUMBER,
       OBJECT, PRIMITIVE, SHAPE_ID, STRING,
       TEXT_BLOCK, VALUE),
-    create_token_set_(APPLY, LIST_DEFINITION, MAP_DEFINITION, OPERATION_DEFINITION,
-      RESOURCE_DEFINITION, SERVICE_DEFINITION, SET_DEFINITION, SHAPE_DEFINITION,
-      SHAPE_STATEMENT, SIMPLE_SHAPE_DEFINITION, STRUCTURE_DEFINITION, UNION_DEFINITION),
+    create_token_set_(APPLY, LIST, MAP, OPERATION,
+      RESOURCE, SERVICE, SET, SHAPE,
+      SHAPE_STATEMENT, SIMPLE_SHAPE, STRUCTURE, UNION),
   };
 
   /* ********************************************************** */
@@ -256,12 +256,12 @@ public class SmithyParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // [documentation] trait* TOKEN_LIST shape_name members
-  public static boolean list_definition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "list_definition")) return false;
+  public static boolean list(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "list")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, LIST_DEFINITION, "<list definition>");
-    r = list_definition_0(b, l + 1);
-    r = r && list_definition_1(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, LIST, "<list>");
+    r = list_0(b, l + 1);
+    r = r && list_1(b, l + 1);
     r = r && consumeToken(b, TOKEN_LIST);
     r = r && shape_name(b, l + 1);
     r = r && members(b, l + 1);
@@ -270,31 +270,31 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   // [documentation]
-  private static boolean list_definition_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "list_definition_0")) return false;
+  private static boolean list_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "list_0")) return false;
     documentation(b, l + 1);
     return true;
   }
 
   // trait*
-  private static boolean list_definition_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "list_definition_1")) return false;
+  private static boolean list_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "list_1")) return false;
     while (true) {
       int c = current_position_(b);
       if (!trait(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "list_definition_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "list_1", c)) break;
     }
     return true;
   }
 
   /* ********************************************************** */
   // [documentation] trait* TOKEN_MAP shape_name members
-  public static boolean map_definition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "map_definition")) return false;
+  public static boolean map(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "map")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, MAP_DEFINITION, "<map definition>");
-    r = map_definition_0(b, l + 1);
-    r = r && map_definition_1(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, MAP, "<map>");
+    r = map_0(b, l + 1);
+    r = r && map_1(b, l + 1);
     r = r && consumeToken(b, TOKEN_MAP);
     r = r && shape_name(b, l + 1);
     r = r && members(b, l + 1);
@@ -303,19 +303,19 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   // [documentation]
-  private static boolean map_definition_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "map_definition_0")) return false;
+  private static boolean map_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "map_0")) return false;
     documentation(b, l + 1);
     return true;
   }
 
   // trait*
-  private static boolean map_definition_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "map_definition_1")) return false;
+  private static boolean map_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "map_1")) return false;
     while (true) {
       int c = current_position_(b);
       if (!trait(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "map_definition_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "map_1", c)) break;
     }
     return true;
   }
@@ -610,12 +610,12 @@ public class SmithyParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // [documentation] trait* TOKEN_OPERATION shape_name object
-  public static boolean operation_definition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "operation_definition")) return false;
+  public static boolean operation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "operation")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, OPERATION_DEFINITION, "<operation definition>");
-    r = operation_definition_0(b, l + 1);
-    r = r && operation_definition_1(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, OPERATION, "<operation>");
+    r = operation_0(b, l + 1);
+    r = r && operation_1(b, l + 1);
     r = r && consumeToken(b, TOKEN_OPERATION);
     r = r && shape_name(b, l + 1);
     r = r && object(b, l + 1);
@@ -624,19 +624,19 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   // [documentation]
-  private static boolean operation_definition_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "operation_definition_0")) return false;
+  private static boolean operation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "operation_0")) return false;
     documentation(b, l + 1);
     return true;
   }
 
   // trait*
-  private static boolean operation_definition_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "operation_definition_1")) return false;
+  private static boolean operation_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "operation_1")) return false;
     while (true) {
       int c = current_position_(b);
       if (!trait(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "operation_definition_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "operation_1", c)) break;
     }
     return true;
   }
@@ -659,12 +659,12 @@ public class SmithyParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // [documentation] trait* TOKEN_RESOURCE shape_name object
-  public static boolean resource_definition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "resource_definition")) return false;
+  public static boolean resource(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "resource")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, RESOURCE_DEFINITION, "<resource definition>");
-    r = resource_definition_0(b, l + 1);
-    r = r && resource_definition_1(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, RESOURCE, "<resource>");
+    r = resource_0(b, l + 1);
+    r = r && resource_1(b, l + 1);
     r = r && consumeToken(b, TOKEN_RESOURCE);
     r = r && shape_name(b, l + 1);
     r = r && object(b, l + 1);
@@ -673,19 +673,19 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   // [documentation]
-  private static boolean resource_definition_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "resource_definition_0")) return false;
+  private static boolean resource_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "resource_0")) return false;
     documentation(b, l + 1);
     return true;
   }
 
   // trait*
-  private static boolean resource_definition_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "resource_definition_1")) return false;
+  private static boolean resource_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "resource_1")) return false;
     while (true) {
       int c = current_position_(b);
       if (!trait(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "resource_definition_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "resource_1", c)) break;
     }
     return true;
   }
@@ -698,12 +698,12 @@ public class SmithyParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // [documentation] trait* TOKEN_SERVICE shape_name object
-  public static boolean service_definition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "service_definition")) return false;
+  public static boolean service(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "service")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, SERVICE_DEFINITION, "<service definition>");
-    r = service_definition_0(b, l + 1);
-    r = r && service_definition_1(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, SERVICE, "<service>");
+    r = service_0(b, l + 1);
+    r = r && service_1(b, l + 1);
     r = r && consumeToken(b, TOKEN_SERVICE);
     r = r && shape_name(b, l + 1);
     r = r && object(b, l + 1);
@@ -712,31 +712,31 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   // [documentation]
-  private static boolean service_definition_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "service_definition_0")) return false;
+  private static boolean service_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "service_0")) return false;
     documentation(b, l + 1);
     return true;
   }
 
   // trait*
-  private static boolean service_definition_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "service_definition_1")) return false;
+  private static boolean service_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "service_1")) return false;
     while (true) {
       int c = current_position_(b);
       if (!trait(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "service_definition_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "service_1", c)) break;
     }
     return true;
   }
 
   /* ********************************************************** */
   // [documentation] trait* TOKEN_SET shape_name members
-  public static boolean set_definition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "set_definition")) return false;
+  public static boolean set(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "set")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, SET_DEFINITION, "<set definition>");
-    r = set_definition_0(b, l + 1);
-    r = r && set_definition_1(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, SET, "<set>");
+    r = set_0(b, l + 1);
+    r = r && set_1(b, l + 1);
     r = r && consumeToken(b, TOKEN_SET);
     r = r && shape_name(b, l + 1);
     r = r && members(b, l + 1);
@@ -745,38 +745,38 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   // [documentation]
-  private static boolean set_definition_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "set_definition_0")) return false;
+  private static boolean set_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "set_0")) return false;
     documentation(b, l + 1);
     return true;
   }
 
   // trait*
-  private static boolean set_definition_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "set_definition_1")) return false;
+  private static boolean set_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "set_1")) return false;
     while (true) {
       int c = current_position_(b);
       if (!trait(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "set_definition_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "set_1", c)) break;
     }
     return true;
   }
 
   /* ********************************************************** */
-  // simple_shape_definition | list_definition | set_definition | map_definition | structure_definition | union_definition | service_definition | operation_definition | resource_definition
-  public static boolean shape_definition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "shape_definition")) return false;
+  // simple_shape | list | set | map | structure | union | service | operation | resource
+  public static boolean shape(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _COLLAPSE_, SHAPE_DEFINITION, "<shape definition>");
-    r = simple_shape_definition(b, l + 1);
-    if (!r) r = list_definition(b, l + 1);
-    if (!r) r = set_definition(b, l + 1);
-    if (!r) r = map_definition(b, l + 1);
-    if (!r) r = structure_definition(b, l + 1);
-    if (!r) r = union_definition(b, l + 1);
-    if (!r) r = service_definition(b, l + 1);
-    if (!r) r = operation_definition(b, l + 1);
-    if (!r) r = resource_definition(b, l + 1);
+    Marker m = enter_section_(b, l, _COLLAPSE_, SHAPE, "<shape>");
+    r = simple_shape(b, l + 1);
+    if (!r) r = list(b, l + 1);
+    if (!r) r = set(b, l + 1);
+    if (!r) r = map(b, l + 1);
+    if (!r) r = structure(b, l + 1);
+    if (!r) r = union(b, l + 1);
+    if (!r) r = service(b, l + 1);
+    if (!r) r = operation(b, l + 1);
+    if (!r) r = resource(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -878,25 +878,25 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // apply | shape_definition
+  // apply | shape
   public static boolean shape_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "shape_statement")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _COLLAPSE_, SHAPE_STATEMENT, "<shape statement>");
     r = apply(b, l + 1);
-    if (!r) r = shape_definition(b, l + 1);
+    if (!r) r = shape(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
   // [documentation] trait* simple_type_name shape_name
-  public static boolean simple_shape_definition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "simple_shape_definition")) return false;
+  public static boolean simple_shape(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "simple_shape")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, SIMPLE_SHAPE_DEFINITION, "<simple shape definition>");
-    r = simple_shape_definition_0(b, l + 1);
-    r = r && simple_shape_definition_1(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, SIMPLE_SHAPE, "<simple shape>");
+    r = simple_shape_0(b, l + 1);
+    r = r && simple_shape_1(b, l + 1);
     r = r && simple_type_name(b, l + 1);
     r = r && shape_name(b, l + 1);
     exit_section_(b, l, m, r, false, null);
@@ -904,19 +904,19 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   // [documentation]
-  private static boolean simple_shape_definition_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "simple_shape_definition_0")) return false;
+  private static boolean simple_shape_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "simple_shape_0")) return false;
     documentation(b, l + 1);
     return true;
   }
 
   // trait*
-  private static boolean simple_shape_definition_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "simple_shape_definition_1")) return false;
+  private static boolean simple_shape_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "simple_shape_1")) return false;
     while (true) {
       int c = current_position_(b);
       if (!trait(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "simple_shape_definition_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "simple_shape_1", c)) break;
     }
     return true;
   }
@@ -947,12 +947,12 @@ public class SmithyParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // [documentation] trait* TOKEN_STRUCTURE shape_name members
-  public static boolean structure_definition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "structure_definition")) return false;
+  public static boolean structure(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "structure")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, STRUCTURE_DEFINITION, "<structure definition>");
-    r = structure_definition_0(b, l + 1);
-    r = r && structure_definition_1(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, STRUCTURE, "<structure>");
+    r = structure_0(b, l + 1);
+    r = r && structure_1(b, l + 1);
     r = r && consumeToken(b, TOKEN_STRUCTURE);
     r = r && shape_name(b, l + 1);
     r = r && members(b, l + 1);
@@ -961,19 +961,19 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   // [documentation]
-  private static boolean structure_definition_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "structure_definition_0")) return false;
+  private static boolean structure_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "structure_0")) return false;
     documentation(b, l + 1);
     return true;
   }
 
   // trait*
-  private static boolean structure_definition_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "structure_definition_1")) return false;
+  private static boolean structure_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "structure_1")) return false;
     while (true) {
       int c = current_position_(b);
       if (!trait(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "structure_definition_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "structure_1", c)) break;
     }
     return true;
   }
@@ -1090,12 +1090,12 @@ public class SmithyParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // [documentation] trait* TOKEN_UNION shape_name members
-  public static boolean union_definition(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "union_definition")) return false;
+  public static boolean union(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "union")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, UNION_DEFINITION, "<union definition>");
-    r = union_definition_0(b, l + 1);
-    r = r && union_definition_1(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, UNION, "<union>");
+    r = union_0(b, l + 1);
+    r = r && union_1(b, l + 1);
     r = r && consumeToken(b, TOKEN_UNION);
     r = r && shape_name(b, l + 1);
     r = r && members(b, l + 1);
@@ -1104,19 +1104,19 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   // [documentation]
-  private static boolean union_definition_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "union_definition_0")) return false;
+  private static boolean union_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "union_0")) return false;
     documentation(b, l + 1);
     return true;
   }
 
   // trait*
-  private static boolean union_definition_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "union_definition_1")) return false;
+  private static boolean union_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "union_1")) return false;
     while (true) {
       int c = current_position_(b);
       if (!trait(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "union_definition_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "union_1", c)) break;
     }
     return true;
   }

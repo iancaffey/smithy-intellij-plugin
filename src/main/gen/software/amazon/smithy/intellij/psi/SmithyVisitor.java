@@ -61,13 +61,13 @@ public class SmithyVisitor extends PsiElementVisitor {
     // visitElement(o);
   }
 
-  public void visitListDefinition(@NotNull SmithyListDefinition o) {
-    visitShapeDefinition(o);
+  public void visitList(@NotNull SmithyList o) {
+    visitShape(o);
     // visitElement(o);
   }
 
-  public void visitMapDefinition(@NotNull SmithyMapDefinition o) {
-    visitShapeDefinition(o);
+  public void visitMap(@NotNull SmithyMap o) {
+    visitShape(o);
     // visitElement(o);
   }
 
@@ -120,8 +120,8 @@ public class SmithyVisitor extends PsiElementVisitor {
     // visitElement(o);
   }
 
-  public void visitOperationDefinition(@NotNull SmithyOperationDefinition o) {
-    visitShapeDefinition(o);
+  public void visitOperation(@NotNull SmithyOperation o) {
+    visitShape(o);
     // visitElement(o);
   }
 
@@ -130,22 +130,22 @@ public class SmithyVisitor extends PsiElementVisitor {
     // visitElement(o);
   }
 
-  public void visitResourceDefinition(@NotNull SmithyResourceDefinition o) {
-    visitShapeDefinition(o);
+  public void visitResource(@NotNull SmithyResource o) {
+    visitShape(o);
     // visitElement(o);
   }
 
-  public void visitServiceDefinition(@NotNull SmithyServiceDefinition o) {
-    visitShapeDefinition(o);
+  public void visitService(@NotNull SmithyService o) {
+    visitShape(o);
     // visitElement(o);
   }
 
-  public void visitSetDefinition(@NotNull SmithySetDefinition o) {
-    visitShapeDefinition(o);
+  public void visitSet(@NotNull SmithySet o) {
+    visitShape(o);
     // visitElement(o);
   }
 
-  public void visitShapeDefinition(@NotNull SmithyShapeDefinition o) {
+  public void visitShape(@NotNull SmithyShape o) {
     visitShapeStatement(o);
     // visitElement(o);
   }
@@ -169,8 +169,8 @@ public class SmithyVisitor extends PsiElementVisitor {
     visitElement(o);
   }
 
-  public void visitSimpleShapeDefinition(@NotNull SmithySimpleShapeDefinition o) {
-    visitShapeDefinition(o);
+  public void visitSimpleShape(@NotNull SmithySimpleShape o) {
+    visitShape(o);
     // visitElement(o);
   }
 
@@ -184,8 +184,8 @@ public class SmithyVisitor extends PsiElementVisitor {
     // visitElement(o);
   }
 
-  public void visitStructureDefinition(@NotNull SmithyStructureDefinition o) {
-    visitShapeDefinition(o);
+  public void visitStructure(@NotNull SmithyStructure o) {
+    visitShape(o);
     // visitElement(o);
   }
 
@@ -212,8 +212,8 @@ public class SmithyVisitor extends PsiElementVisitor {
     visitElement(o);
   }
 
-  public void visitUnionDefinition(@NotNull SmithyUnionDefinition o) {
-    visitShapeDefinition(o);
+  public void visitUnion(@NotNull SmithyUnion o) {
+    visitShape(o);
     // visitElement(o);
   }
 

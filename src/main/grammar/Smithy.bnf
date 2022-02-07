@@ -61,9 +61,9 @@
     implements("member_name|namespace|shape_id|shape_name|trait")=named_element
     extends("array|object|primitive")=value
     extends("null|boolean|number|string|text_block|shape_id")=primitive
-    extends("apply|shape_definition")=shape_statement
+    extends("apply|shape")=shape_statement
     extends("symbol|keyword|null|boolean|simple_type_name")=id
-    extends("simple_shape_definition|list_definition|set_definition|map_definition|structure_definition|union_definition|service_definition|operation_definition|resource_definition")=shape_definition
+    extends("simple_shape|list|set|map|structure|union|service|operation|resource")=shape
 }
 //https://awslabs.github.io/smithy/1.0/spec/core/idl.html
 root ::= model
@@ -81,17 +81,17 @@ metadata_statement ::= TOKEN_METADATA key TOKEN_EQUALS value
 shape_section ::= namespace_statement import* shape_statement* {methods=[imports="import" statements="shape_statement"]}
 namespace_statement ::= TOKEN_NAMESPACE namespace
 import ::= TOKEN_USE shape_id
-shape_statement ::= apply | shape_definition
-shape_definition ::= simple_shape_definition | list_definition | set_definition | map_definition | structure_definition | union_definition | service_definition | operation_definition | resource_definition
-simple_shape_definition ::= [documentation] trait* simple_type_name shape_name {methods=[traits="trait" type_name="simple_type_name"]}
-list_definition ::= [documentation] trait* TOKEN_LIST shape_name members {methods=[traits="trait" members="member"]}
-set_definition ::= [documentation] trait* TOKEN_SET shape_name members {methods=[traits="trait" members="member"]}
-map_definition ::= [documentation] trait* TOKEN_MAP shape_name members {methods=[traits="trait" members="member"]}
-structure_definition ::= [documentation] trait* TOKEN_STRUCTURE shape_name members {methods=[traits="trait" members="member"]}
-union_definition ::= [documentation] trait* TOKEN_UNION shape_name members {methods=[traits="trait" members="member"]}
-service_definition ::= [documentation] trait* TOKEN_SERVICE shape_name object {methods=[traits="trait" body="object"]}
-operation_definition ::= [documentation] trait* TOKEN_OPERATION shape_name object {methods=[traits="trait" body="object"]}
-resource_definition ::= [documentation] trait* TOKEN_RESOURCE shape_name object {methods=[traits="trait" body="object"]}
+shape_statement ::= apply | shape
+shape ::= simple_shape | list | set | map | structure | union | service | operation | resource
+simple_shape ::= [documentation] trait* simple_type_name shape_name {methods=[traits="trait" type_name="simple_type_name"]}
+list ::= [documentation] trait* TOKEN_LIST shape_name members {methods=[traits="trait" members="member"]}
+set ::= [documentation] trait* TOKEN_SET shape_name members {methods=[traits="trait" members="member"]}
+map ::= [documentation] trait* TOKEN_MAP shape_name members {methods=[traits="trait" members="member"]}
+structure ::= [documentation] trait* TOKEN_STRUCTURE shape_name members {methods=[traits="trait" members="member"]}
+union ::= [documentation] trait* TOKEN_UNION shape_name members {methods=[traits="trait" members="member"]}
+service ::= [documentation] trait* TOKEN_SERVICE shape_name object {methods=[traits="trait" body="object"]}
+operation ::= [documentation] trait* TOKEN_OPERATION shape_name object {methods=[traits="trait" body="object"]}
+resource ::= [documentation] trait* TOKEN_RESOURCE shape_name object {methods=[traits="trait" body="object"]}
 private members ::= TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE
 member ::= [documentation] trait* member_name TOKEN_COLON shape_id {methods=[traits="trait"]}
 

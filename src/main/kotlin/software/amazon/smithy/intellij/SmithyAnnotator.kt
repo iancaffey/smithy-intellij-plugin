@@ -26,17 +26,17 @@ class SmithyAnnotator : Annotator {
             SmithyTypes.APPLY,
             SmithyTypes.CONTROL_STATEMENT,
             SmithyTypes.DOCUMENTATION,
-            SmithyTypes.LIST_DEFINITION,
-            SmithyTypes.MAP_DEFINITION,
+            SmithyTypes.LIST,
+            SmithyTypes.MAP,
             SmithyTypes.METADATA_STATEMENT,
             SmithyTypes.NAMESPACE_STATEMENT,
-            SmithyTypes.OPERATION_DEFINITION,
-            SmithyTypes.RESOURCE_DEFINITION,
-            SmithyTypes.SERVICE_DEFINITION,
-            SmithyTypes.SET_DEFINITION,
-            SmithyTypes.SIMPLE_SHAPE_DEFINITION,
-            SmithyTypes.STRUCTURE_DEFINITION,
-            SmithyTypes.UNION_DEFINITION
+            SmithyTypes.OPERATION,
+            SmithyTypes.RESOURCE,
+            SmithyTypes.SERVICE,
+            SmithyTypes.SET,
+            SmithyTypes.SIMPLE_SHAPE,
+            SmithyTypes.STRUCTURE,
+            SmithyTypes.UNION
         )
     }
 

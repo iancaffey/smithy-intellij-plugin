@@ -10,15 +10,15 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyMapDefinitionImpl extends SmithyShapeDefinitionImpl implements SmithyMapDefinition {
+public class SmithySetImpl extends SmithyShapeImpl implements SmithySet {
 
-  public SmithyMapDefinitionImpl(@NotNull ASTNode node) {
+  public SmithySetImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   @Override
   public void accept(@NotNull SmithyVisitor visitor) {
-    visitor.visitMapDefinition(this);
+    visitor.visitSet(this);
   }
 
   @Override

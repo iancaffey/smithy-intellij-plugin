@@ -21,8 +21,8 @@ public interface SmithyTypes {
   IElementType IMPORT = new SmithyElementType("IMPORT");
   IElementType KEY = new SmithyElementType("KEY");
   IElementType KEYWORD = new SmithyElementType("KEYWORD");
-  IElementType LIST_DEFINITION = new SmithyElementType("LIST_DEFINITION");
-  IElementType MAP_DEFINITION = new SmithyElementType("MAP_DEFINITION");
+  IElementType LIST = new SmithyElementType("LIST");
+  IElementType MAP = new SmithyElementType("MAP");
   IElementType MEMBER = new SmithyElementType("MEMBER");
   IElementType MEMBER_NAME = new SmithyElementType("MEMBER_NAME");
   IElementType METADATA_SECTION = new SmithyElementType("METADATA_SECTION");
@@ -33,26 +33,26 @@ public interface SmithyTypes {
   IElementType NULL = new SmithyElementType("NULL");
   IElementType NUMBER = new SmithyElementType("NUMBER");
   IElementType OBJECT = new SmithyElementType("OBJECT");
-  IElementType OPERATION_DEFINITION = new SmithyElementType("OPERATION_DEFINITION");
+  IElementType OPERATION = new SmithyElementType("OPERATION");
   IElementType PRIMITIVE = new SmithyElementType("PRIMITIVE");
-  IElementType RESOURCE_DEFINITION = new SmithyElementType("RESOURCE_DEFINITION");
-  IElementType SERVICE_DEFINITION = new SmithyElementType("SERVICE_DEFINITION");
-  IElementType SET_DEFINITION = new SmithyElementType("SET_DEFINITION");
-  IElementType SHAPE_DEFINITION = new SmithyElementType("SHAPE_DEFINITION");
+  IElementType RESOURCE = new SmithyElementType("RESOURCE");
+  IElementType SERVICE = new SmithyElementType("SERVICE");
+  IElementType SET = new SmithyElementType("SET");
+  IElementType SHAPE = new SmithyElementType("SHAPE");
   IElementType SHAPE_ID = new SmithyElementType("SHAPE_ID");
   IElementType SHAPE_NAME = new SmithyElementType("SHAPE_NAME");
   IElementType SHAPE_SECTION = new SmithyElementType("SHAPE_SECTION");
   IElementType SHAPE_STATEMENT = new SmithyElementType("SHAPE_STATEMENT");
-  IElementType SIMPLE_SHAPE_DEFINITION = new SmithyElementType("SIMPLE_SHAPE_DEFINITION");
+  IElementType SIMPLE_SHAPE = new SmithyElementType("SIMPLE_SHAPE");
   IElementType SIMPLE_TYPE_NAME = new SmithyElementType("SIMPLE_TYPE_NAME");
   IElementType STRING = new SmithyElementType("STRING");
-  IElementType STRUCTURE_DEFINITION = new SmithyElementType("STRUCTURE_DEFINITION");
+  IElementType STRUCTURE = new SmithyElementType("STRUCTURE");
   IElementType SYMBOL = new SmithyElementType("SYMBOL");
   IElementType TEXT_BLOCK = new SmithyElementType("TEXT_BLOCK");
   IElementType TRAIT = new SmithyElementType("TRAIT");
   IElementType TRAIT_ARGUMENTS = new SmithyElementType("TRAIT_ARGUMENTS");
   IElementType TRAIT_VALUES = new SmithyElementType("TRAIT_VALUES");
-  IElementType UNION_DEFINITION = new SmithyElementType("UNION_DEFINITION");
+  IElementType UNION = new SmithyElementType("UNION");
   IElementType VALUE = new SmithyElementType("VALUE");
 
   IElementType TOKEN_APPLY = new SmithyTokenType("apply");
@@ -128,11 +128,11 @@ public interface SmithyTypes {
       else if (type == KEYWORD) {
         return new SmithyKeywordImpl(node);
       }
-      else if (type == LIST_DEFINITION) {
-        return new SmithyListDefinitionImpl(node);
+      else if (type == LIST) {
+        return new SmithyListImpl(node);
       }
-      else if (type == MAP_DEFINITION) {
-        return new SmithyMapDefinitionImpl(node);
+      else if (type == MAP) {
+        return new SmithyMapImpl(node);
       }
       else if (type == MEMBER) {
         return new SmithyMemberImpl(node);
@@ -164,17 +164,17 @@ public interface SmithyTypes {
       else if (type == OBJECT) {
         return new SmithyObjectImpl(node);
       }
-      else if (type == OPERATION_DEFINITION) {
-        return new SmithyOperationDefinitionImpl(node);
+      else if (type == OPERATION) {
+        return new SmithyOperationImpl(node);
       }
-      else if (type == RESOURCE_DEFINITION) {
-        return new SmithyResourceDefinitionImpl(node);
+      else if (type == RESOURCE) {
+        return new SmithyResourceImpl(node);
       }
-      else if (type == SERVICE_DEFINITION) {
-        return new SmithyServiceDefinitionImpl(node);
+      else if (type == SERVICE) {
+        return new SmithyServiceImpl(node);
       }
-      else if (type == SET_DEFINITION) {
-        return new SmithySetDefinitionImpl(node);
+      else if (type == SET) {
+        return new SmithySetImpl(node);
       }
       else if (type == SHAPE_ID) {
         return new SmithyShapeIdImpl(node);
@@ -185,8 +185,8 @@ public interface SmithyTypes {
       else if (type == SHAPE_SECTION) {
         return new SmithyShapeSectionImpl(node);
       }
-      else if (type == SIMPLE_SHAPE_DEFINITION) {
-        return new SmithySimpleShapeDefinitionImpl(node);
+      else if (type == SIMPLE_SHAPE) {
+        return new SmithySimpleShapeImpl(node);
       }
       else if (type == SIMPLE_TYPE_NAME) {
         return new SmithySimpleTypeNameImpl(node);
@@ -194,8 +194,8 @@ public interface SmithyTypes {
       else if (type == STRING) {
         return new SmithyStringImpl(node);
       }
-      else if (type == STRUCTURE_DEFINITION) {
-        return new SmithyStructureDefinitionImpl(node);
+      else if (type == STRUCTURE) {
+        return new SmithyStructureImpl(node);
       }
       else if (type == SYMBOL) {
         return new SmithySymbolImpl(node);
@@ -212,8 +212,8 @@ public interface SmithyTypes {
       else if (type == TRAIT_VALUES) {
         return new SmithyTraitValuesImpl(node);
       }
-      else if (type == UNION_DEFINITION) {
-        return new SmithyUnionDefinitionImpl(node);
+      else if (type == UNION) {
+        return new SmithyUnionImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

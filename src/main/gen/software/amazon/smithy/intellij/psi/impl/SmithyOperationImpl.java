@@ -10,15 +10,15 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyListDefinitionImpl extends SmithyShapeDefinitionImpl implements SmithyListDefinition {
+public class SmithyOperationImpl extends SmithyShapeImpl implements SmithyOperation {
 
-  public SmithyListDefinitionImpl(@NotNull ASTNode node) {
+  public SmithyOperationImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   @Override
   public void accept(@NotNull SmithyVisitor visitor) {
-    visitor.visitListDefinition(this);
+    visitor.visitOperation(this);
   }
 
   @Override
@@ -47,8 +47,8 @@ public class SmithyListDefinitionImpl extends SmithyShapeDefinitionImpl implemen
 
   @Override
   @NotNull
-  public List<SmithyMember> getMembers() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyMember.class);
+  public SmithyObject getBody() {
+    return findNotNullChildByClass(SmithyObject.class);
   }
 
 }
