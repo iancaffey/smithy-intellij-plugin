@@ -10,14 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyNamespaceImpl extends SmithyPsiElement implements SmithyNamespace {
+public class SmithyNamespaceIdImpl extends SmithyPsiElement implements SmithyNamespaceId {
 
-  public SmithyNamespaceImpl(@NotNull ASTNode node) {
+  public SmithyNamespaceIdImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SmithyVisitor visitor) {
-    visitor.visitNamespace(this);
+    visitor.visitNamespaceId(this);
   }
 
   @Override
@@ -27,9 +27,14 @@ public class SmithyNamespaceImpl extends SmithyPsiElement implements SmithyNames
   }
 
   @Override
+  public @NotNull String toString() {
+    return SmithyPsiImplUtil.toString(this);
+  }
+
+  @Override
   @NotNull
-  public SmithyNamespaceId getNamespaceId() {
-    return findNotNullChildByClass(SmithyNamespaceId.class);
+  public List<SmithyId> getParts() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyId.class);
   }
 
 }

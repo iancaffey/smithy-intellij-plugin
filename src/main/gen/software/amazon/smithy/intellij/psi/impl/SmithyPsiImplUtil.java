@@ -13,6 +13,7 @@ import software.amazon.smithy.intellij.psi.SmithyId;
 import software.amazon.smithy.intellij.psi.SmithyMemberName;
 import software.amazon.smithy.intellij.psi.SmithyModel;
 import software.amazon.smithy.intellij.psi.SmithyNamespace;
+import software.amazon.smithy.intellij.psi.SmithyNamespaceId;
 import software.amazon.smithy.intellij.psi.SmithyNumber;
 import software.amazon.smithy.intellij.psi.SmithyShape;
 import software.amazon.smithy.intellij.psi.SmithyShapeId;
@@ -111,9 +112,9 @@ public class SmithyPsiImplUtil {
     @NotNull
     public static String toString(SmithyShapeId id) {
         StringBuilder builder = new StringBuilder();
-        SmithyNamespace namespace = id.getNamespace();
-        if (namespace != null) {
-            builder.append(namespace).append(".");
+        SmithyNamespaceId namespaceId = id.getNamespaceId();
+        if (namespaceId != null) {
+            builder.append(namespaceId).append(".");
         }
         builder.append(id.getShapeName());
         SmithyMemberName memberName = id.getMemberName();
@@ -129,8 +130,8 @@ public class SmithyPsiImplUtil {
     }
 
     @NotNull
-    public static String toString(SmithyNamespace namespace) {
-        return namespace.getParts().stream()
+    public static String toString(SmithyNamespaceId namespaceId) {
+        return namespaceId.getParts().stream()
                 .map(SmithyId::toString)
                 .collect(joining("."));
     }

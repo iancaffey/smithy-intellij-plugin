@@ -35,8 +35,8 @@ public class SmithyShapeIdImpl extends SmithyPrimitiveImpl implements SmithyShap
 
   @Override
   @Nullable
-  public SmithyNamespace getNamespace() {
-    return findChildByClass(SmithyNamespace.class);
+  public SmithyNamespaceId getNamespaceId() {
+    return findChildByClass(SmithyNamespaceId.class);
   }
 
   @Override

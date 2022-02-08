@@ -428,7 +428,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // control* metadata* [TOKEN_NAMESPACE namespace import* (applied_trait | shape)*]
+  // control* metadata* [namespace import* (applied_trait | shape)*]
   public static boolean model(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "model")) return false;
     boolean r;
@@ -462,51 +462,50 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // [TOKEN_NAMESPACE namespace import* (applied_trait | shape)*]
+  // [namespace import* (applied_trait | shape)*]
   private static boolean model_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "model_2")) return false;
     model_2_0(b, l + 1);
     return true;
   }
 
-  // TOKEN_NAMESPACE namespace import* (applied_trait | shape)*
+  // namespace import* (applied_trait | shape)*
   private static boolean model_2_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "model_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, TOKEN_NAMESPACE);
-    r = r && namespace(b, l + 1);
+    r = namespace(b, l + 1);
+    r = r && model_2_0_1(b, l + 1);
     r = r && model_2_0_2(b, l + 1);
-    r = r && model_2_0_3(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // import*
-  private static boolean model_2_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "model_2_0_2")) return false;
+  private static boolean model_2_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "model_2_0_1")) return false;
     while (true) {
       int c = current_position_(b);
       if (!import_$(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "model_2_0_2", c)) break;
+      if (!empty_element_parsed_guard_(b, "model_2_0_1", c)) break;
     }
     return true;
   }
 
   // (applied_trait | shape)*
-  private static boolean model_2_0_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "model_2_0_3")) return false;
+  private static boolean model_2_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "model_2_0_2")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!model_2_0_3_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "model_2_0_3", c)) break;
+      if (!model_2_0_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "model_2_0_2", c)) break;
     }
     return true;
   }
 
   // applied_trait | shape
-  private static boolean model_2_0_3_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "model_2_0_3_0")) return false;
+  private static boolean model_2_0_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "model_2_0_2_0")) return false;
     boolean r;
     r = applied_trait(b, l + 1);
     if (!r) r = shape(b, l + 1);
@@ -514,31 +513,44 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // id (TOKEN_PERIOD id)*
+  // TOKEN_NAMESPACE namespace_id
   public static boolean namespace(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "namespace")) return false;
+    if (!nextTokenIs(b, TOKEN_NAMESPACE)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, NAMESPACE, "<namespace>");
+    Marker m = enter_section_(b);
+    r = consumeToken(b, TOKEN_NAMESPACE);
+    r = r && namespace_id(b, l + 1);
+    exit_section_(b, m, NAMESPACE, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // id (TOKEN_PERIOD id)*
+  public static boolean namespace_id(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "namespace_id")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, NAMESPACE_ID, "<namespace id>");
     r = id(b, l + 1);
-    r = r && namespace_1(b, l + 1);
+    r = r && namespace_id_1(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   // (TOKEN_PERIOD id)*
-  private static boolean namespace_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "namespace_1")) return false;
+  private static boolean namespace_id_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "namespace_id_1")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!namespace_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "namespace_1", c)) break;
+      if (!namespace_id_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "namespace_id_1", c)) break;
     }
     return true;
   }
 
   // TOKEN_PERIOD id
-  private static boolean namespace_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "namespace_1_0")) return false;
+  private static boolean namespace_id_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "namespace_id_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, TOKEN_PERIOD);
@@ -807,7 +819,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // [namespace TOKEN_HASH] shape_name [TOKEN_DOLLAR_SIGN member_name]
+  // [namespace_id TOKEN_HASH] shape_name [TOKEN_DOLLAR_SIGN member_name]
   public static boolean shape_id(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "shape_id")) return false;
     boolean r;
@@ -819,19 +831,19 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // [namespace TOKEN_HASH]
+  // [namespace_id TOKEN_HASH]
   private static boolean shape_id_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "shape_id_0")) return false;
     shape_id_0_0(b, l + 1);
     return true;
   }
 
-  // namespace TOKEN_HASH
+  // namespace_id TOKEN_HASH
   private static boolean shape_id_0_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "shape_id_0_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = namespace(b, l + 1);
+    r = namespace_id(b, l + 1);
     r = r && consumeToken(b, TOKEN_HASH);
     exit_section_(b, m, null, r);
     return r;
