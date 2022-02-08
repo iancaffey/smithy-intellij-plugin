@@ -510,19 +510,6 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TOKEN_NAMESPACE namespace
-  public static boolean namespace_statement(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "namespace_statement")) return false;
-    if (!nextTokenIs(b, TOKEN_NAMESPACE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, TOKEN_NAMESPACE);
-    r = r && namespace(b, l + 1);
-    exit_section_(b, m, NAMESPACE_STATEMENT, r);
-    return r;
-  }
-
-  /* ********************************************************** */
   // TOKEN_NULL
   public static boolean null_$(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "null_$")) return false;
@@ -842,37 +829,38 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // namespace_statement import* shape_statement*
+  // TOKEN_NAMESPACE namespace import* shape_statement*
   public static boolean shape_section(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "shape_section")) return false;
     if (!nextTokenIs(b, TOKEN_NAMESPACE)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = namespace_statement(b, l + 1);
-    r = r && shape_section_1(b, l + 1);
+    r = consumeToken(b, TOKEN_NAMESPACE);
+    r = r && namespace(b, l + 1);
     r = r && shape_section_2(b, l + 1);
+    r = r && shape_section_3(b, l + 1);
     exit_section_(b, m, SHAPE_SECTION, r);
     return r;
   }
 
   // import*
-  private static boolean shape_section_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "shape_section_1")) return false;
+  private static boolean shape_section_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_section_2")) return false;
     while (true) {
       int c = current_position_(b);
       if (!import_$(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "shape_section_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "shape_section_2", c)) break;
     }
     return true;
   }
 
   // shape_statement*
-  private static boolean shape_section_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "shape_section_2")) return false;
+  private static boolean shape_section_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_section_3")) return false;
     while (true) {
       int c = current_position_(b);
       if (!shape_statement(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "shape_section_2", c)) break;
+      if (!empty_element_parsed_guard_(b, "shape_section_3", c)) break;
     }
     return true;
   }

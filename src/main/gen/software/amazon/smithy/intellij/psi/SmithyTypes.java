@@ -29,7 +29,6 @@ public interface SmithyTypes {
   IElementType METADATA_STATEMENT = new SmithyElementType("METADATA_STATEMENT");
   IElementType MODEL = new SmithyElementType("MODEL");
   IElementType NAMESPACE = new SmithyElementType("NAMESPACE");
-  IElementType NAMESPACE_STATEMENT = new SmithyElementType("NAMESPACE_STATEMENT");
   IElementType NULL = new SmithyElementType("NULL");
   IElementType NUMBER = new SmithyElementType("NUMBER");
   IElementType OBJECT = new SmithyElementType("OBJECT");
@@ -151,9 +150,6 @@ public interface SmithyTypes {
       }
       else if (type == NAMESPACE) {
         return new SmithyNamespaceImpl(node);
-      }
-      else if (type == NAMESPACE_STATEMENT) {
-        return new SmithyNamespaceStatementImpl(node);
       }
       else if (type == NULL) {
         return new SmithyNullImpl(node);

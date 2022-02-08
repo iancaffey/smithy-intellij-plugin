@@ -101,10 +101,6 @@ public class SmithyVisitor extends PsiElementVisitor {
     // visitNamedElement(o);
   }
 
-  public void visitNamespaceStatement(@NotNull SmithyNamespaceStatement o) {
-    visitElement(o);
-  }
-
   public void visitNull(@NotNull SmithyNull o) {
     visitPrimitive(o);
     // visitElement(o);

@@ -31,7 +31,7 @@ class SmithyAnnotator : Annotator {
             SmithyTypes.LIST,
             SmithyTypes.MAP,
             SmithyTypes.METADATA_STATEMENT,
-            SmithyTypes.NAMESPACE_STATEMENT,
+            SmithyTypes.NAMESPACE,
             SmithyTypes.OPERATION,
             SmithyTypes.RESOURCE,
             SmithyTypes.SERVICE,

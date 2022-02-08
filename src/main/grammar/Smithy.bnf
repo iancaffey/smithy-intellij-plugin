@@ -78,8 +78,7 @@ metadata_section ::= metadata_statement* {methods=[statements="metadata_statemen
 metadata_statement ::= TOKEN_METADATA key TOKEN_EQUALS value
 
 //Shapes
-shape_section ::= namespace_statement import* shape_statement* {methods=[imports="import" statements="shape_statement"]}
-namespace_statement ::= TOKEN_NAMESPACE namespace
+shape_section ::= TOKEN_NAMESPACE namespace import* shape_statement* {methods=[imports="import" statements="shape_statement"]}
 import ::= TOKEN_USE shape_id
 shape_statement ::= apply | shape
 shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {methods=[getDocumentation getShapeName getTraits]}

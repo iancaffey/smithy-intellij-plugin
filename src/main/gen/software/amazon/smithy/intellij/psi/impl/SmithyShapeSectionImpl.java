@@ -29,8 +29,8 @@ public class SmithyShapeSectionImpl extends ASTWrapperPsiElement implements Smit
 
   @Override
   @NotNull
-  public SmithyNamespaceStatement getNamespaceStatement() {
-    return findNotNullChildByClass(SmithyNamespaceStatement.class);
+  public SmithyNamespace getNamespace() {
+    return findNotNullChildByClass(SmithyNamespace.class);
   }
 
   @Override
