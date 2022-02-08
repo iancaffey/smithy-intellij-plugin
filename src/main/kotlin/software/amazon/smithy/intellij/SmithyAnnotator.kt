@@ -6,10 +6,12 @@ import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.HighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.nextLeaf
+import com.intellij.psi.util.nextLeafs
 import software.amazon.smithy.intellij.psi.*
 
 /**
@@ -90,10 +92,9 @@ class SmithyAnnotator : Annotator {
             }
         }
         //Since whitespace cannot be referenced within parsing rules, error annotations are added for all nodes which are missing a trailing new-line (or EOF)
-        if (element.elementType in TOKENS_REQUIRING_TRAILING_NEW_LINE) {
-            val next = element.nextLeaf()
-            //next == null -> EOF which is treated like a new-line
-            if (next != null && (next !is PsiWhiteSpace || !next.text.contains("\n"))) {
+        if (element.elementType in TOKENS_REQUIRING_TRAILING_NEW_LINE && element.nextLeaf() != null) {
+            val trailingWhiteSpace = element.nextLeafs.takeWhile { it is PsiComment || it is PsiWhiteSpace }
+            if (trailingWhiteSpace.none { it.textContains('\n') }) {
                 holder.highlight(HighlightSeverity.ERROR, "Expecting trailing line break '\\n'")
             }
         }
