@@ -8,10 +8,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyTraitImpl extends ASTWrapperPsiElement implements SmithyTrait {
+public class SmithyTraitImpl extends SmithyPsiElement implements SmithyTrait {
 
   public SmithyTraitImpl(@NotNull ASTNode node) {
     super(node);

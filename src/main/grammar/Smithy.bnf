@@ -1,7 +1,7 @@
 {
     parserClass="software.amazon.smithy.intellij.SmithyParser"
     parserUtilClass="software.amazon.smithy.intellij.SmithyParserUtil"
-    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+    extends="software.amazon.smithy.intellij.psi.impl.SmithyPsiElement"
     psiClassPrefix="Smithy"
     psiImplClassSuffix="Impl"
     psiPackage="software.amazon.smithy.intellij.psi"
