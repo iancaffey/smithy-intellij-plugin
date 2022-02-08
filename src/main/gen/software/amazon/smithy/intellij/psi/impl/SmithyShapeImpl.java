@@ -28,13 +28,18 @@ public abstract class SmithyShapeImpl extends ASTWrapperPsiElement implements Sm
   }
 
   @Override
-  public @Nullable SmithyDocumentation getDocumentation() {
-    return SmithyPsiImplUtil.getDocumentation(this);
+  public @NotNull String getNamespace() {
+    return SmithyPsiImplUtil.getNamespace(this);
   }
 
   @Override
-  public @NotNull SmithyShapeName getShapeName() {
-    return SmithyPsiImplUtil.getShapeName(this);
+  public @NotNull String getName() {
+    return SmithyPsiImplUtil.getName(this);
+  }
+
+  @Override
+  public @Nullable SmithyDocumentation getDocumentation() {
+    return SmithyPsiImplUtil.getDocumentation(this);
   }
 
   @Override

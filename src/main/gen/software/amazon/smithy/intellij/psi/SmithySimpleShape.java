@@ -10,13 +10,6 @@ public interface SmithySimpleShape extends SmithyShape, SmithyElement {
   @Nullable
   SmithyDocumentation getDocumentation();
 
-  @NotNull
-  SmithyShapeName getShapeName();
-
-  @NotNull
-  List<SmithyTrait> getDeclaredTraits();
-
-  @NotNull
-  SmithySimpleTypeName getTypeName();
+  @NotNull String getTypeName();
 
 }

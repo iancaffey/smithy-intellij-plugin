@@ -35,18 +35,6 @@ public class SmithyMapImpl extends SmithyShapeImpl implements SmithyMap {
 
   @Override
   @NotNull
-  public SmithyShapeName getShapeName() {
-    return findNotNullChildByClass(SmithyShapeName.class);
-  }
-
-  @Override
-  @NotNull
-  public List<SmithyTrait> getDeclaredTraits() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyTrait.class);
-  }
-
-  @Override
-  @NotNull
   public List<SmithyMember> getMembers() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyMember.class);
   }

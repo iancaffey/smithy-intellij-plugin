@@ -72,16 +72,16 @@ metadata ::= TOKEN_METADATA key TOKEN_EQUALS value
 import ::= TOKEN_USE shape_id
 
 //Shapes
-shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {methods=[getDocumentation getShapeName getDeclaredTraits]}
-simple_shape ::= [documentation] trait* simple_type_name shape_name {methods=[declared_traits="trait" type_name="simple_type_name"]}
-list ::= [documentation] trait* TOKEN_LIST shape_name members {methods=[declared_traits="trait" members="member"]}
-set ::= [documentation] trait* TOKEN_SET shape_name members {methods=[declared_traits="trait" members="member"]}
-map ::= [documentation] trait* TOKEN_MAP shape_name members {methods=[declared_traits="trait" members="member"]}
-structure ::= [documentation] trait* TOKEN_STRUCTURE shape_name members {methods=[declared_traits="trait" members="member"]}
-union ::= [documentation] trait* TOKEN_UNION shape_name members {methods=[declared_traits="trait" members="member"]}
-service ::= [documentation] trait* TOKEN_SERVICE shape_name object {methods=[declared_traits="trait" body="object"]}
-operation ::= [documentation] trait* TOKEN_OPERATION shape_name object {methods=[declared_traits="trait" body="object"]}
-resource ::= [documentation] trait* TOKEN_RESOURCE shape_name object {methods=[declared_traits="trait" body="object"]}
+shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {methods=[getNamespace getName getDocumentation getDeclaredTraits]}
+simple_shape ::= [documentation] trait* simple_type_name shape_name {methods=[getTypeName trait="" simple_type_name="" shape_name="" ]}
+list ::= [documentation] trait* TOKEN_LIST shape_name members {methods=[trait="" shape_name="" members="member"]}
+set ::= [documentation] trait* TOKEN_SET shape_name members {methods=[trait="" shape_name="" members="member"]}
+map ::= [documentation] trait* TOKEN_MAP shape_name members {methods=[trait="" shape_name="" members="member"]}
+structure ::= [documentation] trait* TOKEN_STRUCTURE shape_name members {methods=[trait="" shape_name="" members="member"]}
+union ::= [documentation] trait* TOKEN_UNION shape_name members {methods=[trait="" shape_name="" members="member"]}
+service ::= [documentation] trait* TOKEN_SERVICE shape_name object {methods=[trait="" shape_name="" body="object"]}
+operation ::= [documentation] trait* TOKEN_OPERATION shape_name object {methods=[trait="" shape_name="" body="object"]}
+resource ::= [documentation] trait* TOKEN_RESOURCE shape_name object {methods=[trait="" shape_name="" body="object"]}
 private members ::= TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE
 member ::= [documentation] trait* member_name TOKEN_COLON shape_id {methods=[declared_traits="trait"]}
 

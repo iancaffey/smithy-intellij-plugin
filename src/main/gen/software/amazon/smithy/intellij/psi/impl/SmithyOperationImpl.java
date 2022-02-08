@@ -35,18 +35,6 @@ public class SmithyOperationImpl extends SmithyShapeImpl implements SmithyOperat
 
   @Override
   @NotNull
-  public SmithyShapeName getShapeName() {
-    return findNotNullChildByClass(SmithyShapeName.class);
-  }
-
-  @Override
-  @NotNull
-  public List<SmithyTrait> getDeclaredTraits() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyTrait.class);
-  }
-
-  @Override
-  @NotNull
   public SmithyObject getBody() {
     return findNotNullChildByClass(SmithyObject.class);
   }

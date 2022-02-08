@@ -11,12 +11,6 @@ public interface SmithyResource extends SmithyShape, SmithyElement {
   SmithyDocumentation getDocumentation();
 
   @NotNull
-  SmithyShapeName getShapeName();
-
-  @NotNull
-  List<SmithyTrait> getDeclaredTraits();
-
-  @NotNull
   SmithyObject getBody();
 
 }
