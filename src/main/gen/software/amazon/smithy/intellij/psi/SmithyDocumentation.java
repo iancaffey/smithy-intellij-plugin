@@ -11,8 +11,8 @@ public interface SmithyDocumentation extends PsiDocCommentBase, SmithyElement {
 
   PsiElement getOwner();
 
-  IElementType getTokenType();
+  @NotNull IElementType getTokenType();
 
-  String toDocString();
+  @NotNull String toDocString();
 
 }

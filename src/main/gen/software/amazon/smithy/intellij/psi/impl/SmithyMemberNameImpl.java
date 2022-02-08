@@ -26,4 +26,9 @@ public class SmithyMemberNameImpl extends SmithyPsiElement implements SmithyMemb
     else super.accept(visitor);
   }
 
+  @Override
+  public @NotNull String toString() {
+    return SmithyPsiImplUtil.toString(this);
+  }
+
 }

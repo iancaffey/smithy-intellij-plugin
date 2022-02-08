@@ -99,11 +99,11 @@ object ::= TOKEN_OPEN_BRACE [entry (TOKEN_COMMA entry)* [TOKEN_COMMA]] TOKEN_CLO
 primitive ::= null | boolean | number | string | text_block | shape_id
 
 //Shape ID
-shape_id ::= [namespace TOKEN_HASH] shape_name [TOKEN_DOLLAR_SIGN member_name]
-namespace ::= id (TOKEN_PERIOD id)* {methods=[parts="id"]}
-shape_name ::= id {methods=[id=""]}
-member_name ::= id {methods=[id=""]}
-id ::= symbol | keyword | null | boolean | simple_type_name {methods=[null="" boolean=""]}
+shape_id ::= [namespace TOKEN_HASH] shape_name [TOKEN_DOLLAR_SIGN member_name] {methods=[toString]}
+namespace ::= id (TOKEN_PERIOD id)* {methods=[toString parts="id"]}
+shape_name ::= id {methods=[toString id=""]}
+member_name ::= id {methods=[toString id=""]}
+id ::= symbol | keyword | null | boolean | simple_type_name {methods=[toString null="" boolean=""]}
 
 //Re-declared tokens which will receive a dedicated AST node instead of raw PsiElement (since they are used in a meaningful way, like as a variant within another AST node)
 null ::= TOKEN_NULL {methods=[TOKEN_NULL=""]}

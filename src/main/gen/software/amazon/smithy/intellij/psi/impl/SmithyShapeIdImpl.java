@@ -45,4 +45,9 @@ public class SmithyShapeIdImpl extends SmithyPrimitiveImpl implements SmithyShap
     return findNotNullChildByClass(SmithyShapeName.class);
   }
 
+  @Override
+  public @NotNull String toString() {
+    return SmithyPsiImplUtil.toString(this);
+  }
+
 }

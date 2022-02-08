@@ -26,4 +26,9 @@ public class SmithyIdImpl extends SmithyPsiElement implements SmithyId {
     else super.accept(visitor);
   }
 
+  @Override
+  public @NotNull String toString() {
+    return SmithyPsiImplUtil.toString(this);
+  }
+
 }

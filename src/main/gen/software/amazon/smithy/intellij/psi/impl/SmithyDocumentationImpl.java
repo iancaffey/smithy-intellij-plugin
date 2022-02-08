@@ -33,12 +33,12 @@ public class SmithyDocumentationImpl extends SmithyPsiElement implements SmithyD
   }
 
   @Override
-  public IElementType getTokenType() {
+  public @NotNull IElementType getTokenType() {
     return SmithyPsiImplUtil.getTokenType(this);
   }
 
   @Override
-  public String toDocString() {
+  public @NotNull String toDocString() {
     return SmithyPsiImplUtil.toDocString(this);
   }
 

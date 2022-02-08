@@ -26,4 +26,9 @@ public class SmithyShapeNameImpl extends SmithyPsiElement implements SmithyShape
     else super.accept(visitor);
   }
 
+  @Override
+  public @NotNull String toString() {
+    return SmithyPsiImplUtil.toString(this);
+  }
+
 }

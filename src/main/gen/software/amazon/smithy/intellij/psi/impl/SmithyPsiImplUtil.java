@@ -10,10 +10,12 @@ import org.jetbrains.annotations.Nullable;
 import software.amazon.smithy.intellij.psi.SmithyBoolean;
 import software.amazon.smithy.intellij.psi.SmithyDocumentation;
 import software.amazon.smithy.intellij.psi.SmithyId;
+import software.amazon.smithy.intellij.psi.SmithyMemberName;
 import software.amazon.smithy.intellij.psi.SmithyModel;
 import software.amazon.smithy.intellij.psi.SmithyNamespace;
 import software.amazon.smithy.intellij.psi.SmithyNumber;
 import software.amazon.smithy.intellij.psi.SmithyShape;
+import software.amazon.smithy.intellij.psi.SmithyShapeId;
 import software.amazon.smithy.intellij.psi.SmithyShapeName;
 import software.amazon.smithy.intellij.psi.SmithySimpleShape;
 import software.amazon.smithy.intellij.psi.SmithySimpleTypeName;
@@ -80,10 +82,12 @@ public class SmithyPsiImplUtil {
         return documentation.getParent();
     }
 
+    @NotNull
     public static IElementType getTokenType(SmithyDocumentation documentation) {
         return SmithyTypes.DOCUMENTATION;
     }
 
+    @NotNull
     public static String toDocString(SmithyDocumentation documentation) {
         //see: https://awslabs.github.io/smithy/1.0/spec/core/idl.html#documentation-comment
         StringJoiner joiner = new StringJoiner("\n");
@@ -92,6 +96,43 @@ public class SmithyPsiImplUtil {
             joiner.add(text.substring(text.length() > 3 && text.charAt(3) == ' ' ? 4 : 3));
         }
         return joiner.toString();
+    }
+
+    @NotNull
+    public static String toString(SmithyId id) {
+        return id.getText();
+    }
+
+    @NotNull
+    public static String toString(SmithyMemberName name) {
+        return name.getText();
+    }
+
+    @NotNull
+    public static String toString(SmithyShapeId id) {
+        StringBuilder builder = new StringBuilder();
+        SmithyNamespace namespace = id.getNamespace();
+        if (namespace != null) {
+            builder.append(namespace).append(".");
+        }
+        builder.append(id.getShapeName());
+        SmithyMemberName memberName = id.getMemberName();
+        if (memberName != null) {
+            builder.append("$").append(memberName);
+        }
+        return builder.toString();
+    }
+
+    @NotNull
+    public static String toString(SmithyShapeName name) {
+        return name.getText();
+    }
+
+    @NotNull
+    public static String toString(SmithyNamespace namespace) {
+        return namespace.getParts().stream()
+                .map(SmithyId::toString)
+                .collect(joining("."));
     }
 
     @NotNull
@@ -111,9 +152,7 @@ public class SmithyPsiImplUtil {
 
     @NotNull
     public static String getNamespace(SmithyShape shape) {
-        return requireNonNull(PsiTreeUtil.getChildOfType(shape.getParent(), SmithyNamespace.class)).getParts().stream()
-                .map(SmithyId::getText)
-                .collect(joining("."));
+        return requireNonNull(PsiTreeUtil.getChildOfType(shape.getParent(), SmithyNamespace.class)).toString();
     }
 
     @NotNull
