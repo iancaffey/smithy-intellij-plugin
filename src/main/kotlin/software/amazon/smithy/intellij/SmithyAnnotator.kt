@@ -25,7 +25,7 @@ import software.amazon.smithy.intellij.psi.*
 class SmithyAnnotator : Annotator {
     companion object {
         private val TOKENS_REQUIRING_TRAILING_NEW_LINE = setOf(
-            SmithyTypes.APPLY,
+            SmithyTypes.APPLIED_TRAIT,
             SmithyTypes.CONTROL,
             SmithyTypes.DOCUMENTATION,
             SmithyTypes.LIST,

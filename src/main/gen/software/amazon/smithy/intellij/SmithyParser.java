@@ -47,15 +47,15 @@ public class SmithyParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // TOKEN_APPLY shape_id trait
-  public static boolean apply(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "apply")) return false;
+  public static boolean applied_trait(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "applied_trait")) return false;
     if (!nextTokenIs(b, TOKEN_APPLY)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, TOKEN_APPLY);
     r = r && shape_id(b, l + 1);
     r = r && trait(b, l + 1);
-    exit_section_(b, m, APPLY, r);
+    exit_section_(b, m, APPLIED_TRAIT, r);
     return r;
   }
 
@@ -428,7 +428,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // control* metadata* [TOKEN_NAMESPACE namespace import* (apply | shape)*]
+  // control* metadata* [TOKEN_NAMESPACE namespace import* (applied_trait | shape)*]
   public static boolean model(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "model")) return false;
     boolean r;
@@ -462,14 +462,14 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // [TOKEN_NAMESPACE namespace import* (apply | shape)*]
+  // [TOKEN_NAMESPACE namespace import* (applied_trait | shape)*]
   private static boolean model_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "model_2")) return false;
     model_2_0(b, l + 1);
     return true;
   }
 
-  // TOKEN_NAMESPACE namespace import* (apply | shape)*
+  // TOKEN_NAMESPACE namespace import* (applied_trait | shape)*
   private static boolean model_2_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "model_2_0")) return false;
     boolean r;
@@ -493,7 +493,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // (apply | shape)*
+  // (applied_trait | shape)*
   private static boolean model_2_0_3(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "model_2_0_3")) return false;
     while (true) {
@@ -504,11 +504,11 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // apply | shape
+  // applied_trait | shape
   private static boolean model_2_0_3_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "model_2_0_3_0")) return false;
     boolean r;
-    r = apply(b, l + 1);
+    r = applied_trait(b, l + 1);
     if (!r) r = shape(b, l + 1);
     return r;
   }

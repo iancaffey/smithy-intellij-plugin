@@ -8,7 +8,7 @@ import com.intellij.psi.PsiDocCommentBase;
 
 public class SmithyVisitor extends PsiElementVisitor {
 
-  public void visitApply(@NotNull SmithyApply o) {
+  public void visitAppliedTrait(@NotNull SmithyAppliedTrait o) {
     visitElement(o);
   }
 

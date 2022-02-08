@@ -66,7 +66,7 @@
 }
 //https://awslabs.github.io/smithy/1.0/spec/core/idl.html
 root ::= model
-model ::= control* metadata* [TOKEN_NAMESPACE namespace import* (apply | shape)*] {methods=[getShapes control="" metadata="" namespace="" import="" apply="" shape=""]}
+model ::= control* metadata* [TOKEN_NAMESPACE namespace import* (applied_trait | shape)*] {methods=[getShapes control="" metadata="" namespace="" import="" applied_trait="" shape=""]}
 control ::= TOKEN_DOLLAR_SIGN key TOKEN_COLON value
 metadata ::= TOKEN_METADATA key TOKEN_EQUALS value
 import ::= TOKEN_USE shape_id
@@ -86,7 +86,7 @@ private members ::= TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA]
 member ::= [documentation] trait* member_name TOKEN_COLON shape_id {methods=[traits="trait"]}
 
 //Traits
-apply ::= TOKEN_APPLY shape_id trait
+applied_trait ::= TOKEN_APPLY shape_id trait
 trait ::= TOKEN_AT shape_id [trait_arguments] {methods=[arguments="trait_arguments"]}
 trait_arguments ::= TOKEN_OPEN_PAREN (trait_values | value) TOKEN_CLOSE_PAREN {methods=[values="trait_values"]}
 trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA] {methods=[entries="entry"]}

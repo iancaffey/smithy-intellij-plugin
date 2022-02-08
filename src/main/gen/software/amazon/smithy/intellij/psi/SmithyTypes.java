@@ -10,7 +10,7 @@ import software.amazon.smithy.intellij.psi.impl.*;
 
 public interface SmithyTypes {
 
-  IElementType APPLY = new SmithyElementType("APPLY");
+  IElementType APPLIED_TRAIT = new SmithyElementType("APPLIED_TRAIT");
   IElementType ARRAY = new SmithyElementType("ARRAY");
   IElementType BOOLEAN = new SmithyElementType("BOOLEAN");
   IElementType CONTROL = new SmithyElementType("CONTROL");
@@ -90,8 +90,8 @@ public interface SmithyTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-      if (type == APPLY) {
-        return new SmithyApplyImpl(node);
+      if (type == APPLIED_TRAIT) {
+        return new SmithyAppliedTraitImpl(node);
       }
       else if (type == ARRAY) {
         return new SmithyArrayImpl(node);
