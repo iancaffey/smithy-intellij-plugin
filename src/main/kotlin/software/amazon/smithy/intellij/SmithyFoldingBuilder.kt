@@ -7,7 +7,8 @@ import com.intellij.lang.folding.FoldingDescriptor
 import com.intellij.openapi.editor.Document
 import com.intellij.psi.PsiElement
 import com.intellij.psi.SyntaxTraverser
-import com.intellij.util.containers.map2Array
+import com.intellij.psi.util.elementType
+import com.intellij.psi.util.siblings
 import software.amazon.smithy.intellij.psi.SmithyTypes
 
 /**
@@ -22,6 +23,10 @@ class SmithyFoldingBuilder : FoldingBuilderEx() {
     override fun isCollapsedByDefault(node: ASTNode) = false
     override fun getPlaceholderText(node: ASTNode) = "{...}"
     override fun buildFoldRegions(root: PsiElement, document: Document, quick: Boolean) =
-        SyntaxTraverser.psiTraverser(root).filterTypes { it == SmithyTypes.TOKEN_OPEN_BRACE }.toList()
-            .mapNotNull { it.parent }.map2Array { FoldingDescriptor(it.node, it.textRange) }
+        SyntaxTraverser.psiTraverser(root).filterTypes { it == SmithyTypes.TOKEN_OPEN_BRACE }.toList().mapNotNull {
+            it.siblings().lastOrNull { sibling -> sibling.elementType == SmithyTypes.TOKEN_CLOSE_BRACE }
+                ?.let { closingBrace ->
+                    FoldingDescriptor(it.node, it.textRange.union(closingBrace.textRange))
+                }
+        }.toTypedArray()
 }
