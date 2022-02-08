@@ -8,15 +8,15 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 
-public abstract class SmithyShapeImpl extends SmithyShapeStatementImpl implements SmithyShape {
+public abstract class SmithyShapeImpl extends ASTWrapperPsiElement implements SmithyShape {
 
   public SmithyShapeImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  @Override
   public void accept(@NotNull SmithyVisitor visitor) {
     visitor.visitShape(this);
   }

@@ -61,26 +61,17 @@
     implements("member_name|namespace|shape_id|shape_name|trait")=named_element
     extends("array|object|primitive")=value
     extends("null|boolean|number|string|text_block|shape_id")=primitive
-    extends("apply|shape")=shape_statement
     extends("symbol|keyword|null|boolean|simple_type_name")=id
     extends("simple_shape|list|set|map|structure|union|service|operation|resource")=shape
 }
 //https://awslabs.github.io/smithy/1.0/spec/core/idl.html
 root ::= model
-model ::= control_section metadata_section [shape_section]
-
-//Control
-control_section ::= control_statement* {methods=[statements="control_statement"]}
-control_statement ::= TOKEN_DOLLAR_SIGN key TOKEN_COLON value
-
-//Metadata
-metadata_section ::= metadata_statement* {methods=[statements="metadata_statement"]}
-metadata_statement ::= TOKEN_METADATA key TOKEN_EQUALS value
+model ::= control* metadata* [TOKEN_NAMESPACE namespace import* (apply | shape)*] {methods=[getShapes control="" metadata="" namespace="" import="" apply="" shape=""]}
+control ::= TOKEN_DOLLAR_SIGN key TOKEN_COLON value
+metadata ::= TOKEN_METADATA key TOKEN_EQUALS value
+import ::= TOKEN_USE shape_id
 
 //Shapes
-shape_section ::= TOKEN_NAMESPACE namespace import* shape_statement* {methods=[imports="import" statements="shape_statement"]}
-import ::= TOKEN_USE shape_id
-shape_statement ::= apply | shape
 shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {methods=[getDocumentation getShapeName getTraits]}
 simple_shape ::= [documentation] trait* simple_type_name shape_name {methods=[traits="trait" type_name="simple_type_name"]}
 list ::= [documentation] trait* TOKEN_LIST shape_name members {methods=[traits="trait" members="member"]}
@@ -101,7 +92,7 @@ trait_arguments ::= TOKEN_OPEN_PAREN (trait_values | value) TOKEN_CLOSE_PAREN {m
 trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA] {methods=[entries="entry"]}
 
 //Node values
-key ::= id | string
+key ::= id | string {methods=[stringValue]}
 value ::= array | object | primitive
 entry ::= key TOKEN_COLON value
 array ::= TOKEN_OPEN_BRACKET [value (TOKEN_COMMA value)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACKET {methods=[values="value"]}

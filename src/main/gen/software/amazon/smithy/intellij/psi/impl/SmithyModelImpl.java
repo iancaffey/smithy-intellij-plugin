@@ -28,21 +28,8 @@ public class SmithyModelImpl extends ASTWrapperPsiElement implements SmithyModel
   }
 
   @Override
-  @NotNull
-  public SmithyControlSection getControlSection() {
-    return findNotNullChildByClass(SmithyControlSection.class);
-  }
-
-  @Override
-  @NotNull
-  public SmithyMetadataSection getMetadataSection() {
-    return findNotNullChildByClass(SmithyMetadataSection.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyShapeSection getShapeSection() {
-    return findChildByClass(SmithyShapeSection.class);
+  public @NotNull List<SmithyShape> getShapes() {
+    return SmithyPsiImplUtil.getShapes(this);
   }
 
 }

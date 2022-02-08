@@ -26,11 +26,11 @@ class SmithyAnnotator : Annotator {
     companion object {
         private val TOKENS_REQUIRING_TRAILING_NEW_LINE = setOf(
             SmithyTypes.APPLY,
-            SmithyTypes.CONTROL_STATEMENT,
+            SmithyTypes.CONTROL,
             SmithyTypes.DOCUMENTATION,
             SmithyTypes.LIST,
             SmithyTypes.MAP,
-            SmithyTypes.METADATA_STATEMENT,
+            SmithyTypes.METADATA,
             SmithyTypes.NAMESPACE,
             SmithyTypes.OPERATION,
             SmithyTypes.RESOURCE,
@@ -43,10 +43,10 @@ class SmithyAnnotator : Annotator {
     }
 
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-        if ((element is SmithyKey || element.elementType == SmithyTypes.TOKEN_DOLLAR_SIGN) && element.parent is SmithyControlStatement) {
+        if ((element is SmithyKey || element.elementType == SmithyTypes.TOKEN_DOLLAR_SIGN) && element.parent is SmithyControl) {
             holder.highlight(SmithyColorSettings.CONTROL)
         }
-        if (element is SmithyKey && element.parent !is SmithyControlStatement) {
+        if (element is SmithyKey && element.parent !is SmithyControl) {
             holder.highlight(SmithyColorSettings.KEY)
         }
         if (element is SmithyMemberName) {

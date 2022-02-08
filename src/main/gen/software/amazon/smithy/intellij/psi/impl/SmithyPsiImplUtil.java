@@ -4,10 +4,12 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.amazon.smithy.intellij.psi.SmithyBoolean;
 import software.amazon.smithy.intellij.psi.SmithyDocumentation;
+import software.amazon.smithy.intellij.psi.SmithyModel;
 import software.amazon.smithy.intellij.psi.SmithyNumber;
 import software.amazon.smithy.intellij.psi.SmithyShape;
 import software.amazon.smithy.intellij.psi.SmithyShapeName;
@@ -99,5 +101,10 @@ public class SmithyPsiImplUtil {
     @NotNull
     public static List<SmithyTrait> getTraits(SmithyShape shape) {
         throw new UnsupportedOperationException();
+    }
+
+    @NotNull
+    public static List<SmithyShape> getShapes(SmithyModel model) {
+        return PsiTreeUtil.getChildrenOfTypeAsList(model, SmithyShape.class);
     }
 }

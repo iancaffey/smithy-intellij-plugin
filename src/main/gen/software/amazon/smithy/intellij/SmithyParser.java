@@ -37,12 +37,12 @@ public class SmithyParser implements PsiParser, LightPsiParser {
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(ID, KEYWORD, SIMPLE_TYPE_NAME, SYMBOL),
+    create_token_set_(LIST, MAP, OPERATION, RESOURCE,
+      SERVICE, SET, SHAPE, SIMPLE_SHAPE,
+      STRUCTURE, UNION),
     create_token_set_(ARRAY, BOOLEAN, NULL, NUMBER,
       OBJECT, PRIMITIVE, SHAPE_ID, STRING,
       TEXT_BLOCK, VALUE),
-    create_token_set_(APPLY, LIST, MAP, OPERATION,
-      RESOURCE, SERVICE, SET, SHAPE,
-      SHAPE_STATEMENT, SIMPLE_SHAPE, STRUCTURE, UNION),
   };
 
   /* ********************************************************** */
@@ -134,23 +134,9 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // control_statement*
-  public static boolean control_section(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "control_section")) return false;
-    Marker m = enter_section_(b, l, _NONE_, CONTROL_SECTION, "<control section>");
-    while (true) {
-      int c = current_position_(b);
-      if (!control_statement(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "control_section", c)) break;
-    }
-    exit_section_(b, l, m, true, false, null);
-    return true;
-  }
-
-  /* ********************************************************** */
   // TOKEN_DOLLAR_SIGN key TOKEN_COLON value
-  public static boolean control_statement(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "control_statement")) return false;
+  public static boolean control(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "control")) return false;
     if (!nextTokenIs(b, TOKEN_DOLLAR_SIGN)) return false;
     boolean r;
     Marker m = enter_section_(b);
@@ -158,7 +144,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     r = r && key(b, l + 1);
     r = r && consumeToken(b, TOKEN_COLON);
     r = r && value(b, l + 1);
-    exit_section_(b, m, CONTROL_STATEMENT, r);
+    exit_section_(b, m, CONTROL, r);
     return r;
   }
 
@@ -427,23 +413,9 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // metadata_statement*
-  public static boolean metadata_section(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "metadata_section")) return false;
-    Marker m = enter_section_(b, l, _NONE_, METADATA_SECTION, "<metadata section>");
-    while (true) {
-      int c = current_position_(b);
-      if (!metadata_statement(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "metadata_section", c)) break;
-    }
-    exit_section_(b, l, m, true, false, null);
-    return true;
-  }
-
-  /* ********************************************************** */
   // TOKEN_METADATA key TOKEN_EQUALS value
-  public static boolean metadata_statement(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "metadata_statement")) return false;
+  public static boolean metadata(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "metadata")) return false;
     if (!nextTokenIs(b, TOKEN_METADATA)) return false;
     boolean r;
     Marker m = enter_section_(b);
@@ -451,28 +423,94 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     r = r && key(b, l + 1);
     r = r && consumeToken(b, TOKEN_EQUALS);
     r = r && value(b, l + 1);
-    exit_section_(b, m, METADATA_STATEMENT, r);
+    exit_section_(b, m, METADATA, r);
     return r;
   }
 
   /* ********************************************************** */
-  // control_section metadata_section [shape_section]
+  // control* metadata* [TOKEN_NAMESPACE namespace import* (apply | shape)*]
   public static boolean model(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "model")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, MODEL, "<model>");
-    r = control_section(b, l + 1);
-    r = r && metadata_section(b, l + 1);
+    r = model_0(b, l + 1);
+    r = r && model_1(b, l + 1);
     r = r && model_2(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // [shape_section]
+  // control*
+  private static boolean model_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "model_0")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!control(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "model_0", c)) break;
+    }
+    return true;
+  }
+
+  // metadata*
+  private static boolean model_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "model_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!metadata(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "model_1", c)) break;
+    }
+    return true;
+  }
+
+  // [TOKEN_NAMESPACE namespace import* (apply | shape)*]
   private static boolean model_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "model_2")) return false;
-    shape_section(b, l + 1);
+    model_2_0(b, l + 1);
     return true;
+  }
+
+  // TOKEN_NAMESPACE namespace import* (apply | shape)*
+  private static boolean model_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "model_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, TOKEN_NAMESPACE);
+    r = r && namespace(b, l + 1);
+    r = r && model_2_0_2(b, l + 1);
+    r = r && model_2_0_3(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // import*
+  private static boolean model_2_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "model_2_0_2")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!import_$(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "model_2_0_2", c)) break;
+    }
+    return true;
+  }
+
+  // (apply | shape)*
+  private static boolean model_2_0_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "model_2_0_3")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!model_2_0_3_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "model_2_0_3", c)) break;
+    }
+    return true;
+  }
+
+  // apply | shape
+  private static boolean model_2_0_3_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "model_2_0_3_0")) return false;
+    boolean r;
+    r = apply(b, l + 1);
+    if (!r) r = shape(b, l + 1);
+    return r;
   }
 
   /* ********************************************************** */
@@ -824,55 +862,6 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, SHAPE_NAME, "<shape name>");
     r = id(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // TOKEN_NAMESPACE namespace import* shape_statement*
-  public static boolean shape_section(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "shape_section")) return false;
-    if (!nextTokenIs(b, TOKEN_NAMESPACE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, TOKEN_NAMESPACE);
-    r = r && namespace(b, l + 1);
-    r = r && shape_section_2(b, l + 1);
-    r = r && shape_section_3(b, l + 1);
-    exit_section_(b, m, SHAPE_SECTION, r);
-    return r;
-  }
-
-  // import*
-  private static boolean shape_section_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "shape_section_2")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!import_$(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "shape_section_2", c)) break;
-    }
-    return true;
-  }
-
-  // shape_statement*
-  private static boolean shape_section_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "shape_section_3")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!shape_statement(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "shape_section_3", c)) break;
-    }
-    return true;
-  }
-
-  /* ********************************************************** */
-  // apply | shape
-  public static boolean shape_statement(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "shape_statement")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _COLLAPSE_, SHAPE_STATEMENT, "<shape statement>");
-    r = apply(b, l + 1);
-    if (!r) r = shape(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

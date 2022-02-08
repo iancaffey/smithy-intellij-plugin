@@ -13,8 +13,7 @@ public interface SmithyTypes {
   IElementType APPLY = new SmithyElementType("APPLY");
   IElementType ARRAY = new SmithyElementType("ARRAY");
   IElementType BOOLEAN = new SmithyElementType("BOOLEAN");
-  IElementType CONTROL_SECTION = new SmithyElementType("CONTROL_SECTION");
-  IElementType CONTROL_STATEMENT = new SmithyElementType("CONTROL_STATEMENT");
+  IElementType CONTROL = new SmithyElementType("CONTROL");
   IElementType DOCUMENTATION = new SmithyElementType("DOCUMENTATION");
   IElementType ENTRY = new SmithyElementType("ENTRY");
   IElementType ID = new SmithyElementType("ID");
@@ -25,8 +24,7 @@ public interface SmithyTypes {
   IElementType MAP = new SmithyElementType("MAP");
   IElementType MEMBER = new SmithyElementType("MEMBER");
   IElementType MEMBER_NAME = new SmithyElementType("MEMBER_NAME");
-  IElementType METADATA_SECTION = new SmithyElementType("METADATA_SECTION");
-  IElementType METADATA_STATEMENT = new SmithyElementType("METADATA_STATEMENT");
+  IElementType METADATA = new SmithyElementType("METADATA");
   IElementType MODEL = new SmithyElementType("MODEL");
   IElementType NAMESPACE = new SmithyElementType("NAMESPACE");
   IElementType NULL = new SmithyElementType("NULL");
@@ -40,8 +38,6 @@ public interface SmithyTypes {
   IElementType SHAPE = new SmithyElementType("SHAPE");
   IElementType SHAPE_ID = new SmithyElementType("SHAPE_ID");
   IElementType SHAPE_NAME = new SmithyElementType("SHAPE_NAME");
-  IElementType SHAPE_SECTION = new SmithyElementType("SHAPE_SECTION");
-  IElementType SHAPE_STATEMENT = new SmithyElementType("SHAPE_STATEMENT");
   IElementType SIMPLE_SHAPE = new SmithyElementType("SIMPLE_SHAPE");
   IElementType SIMPLE_TYPE_NAME = new SmithyElementType("SIMPLE_TYPE_NAME");
   IElementType STRING = new SmithyElementType("STRING");
@@ -103,11 +99,8 @@ public interface SmithyTypes {
       else if (type == BOOLEAN) {
         return new SmithyBooleanImpl(node);
       }
-      else if (type == CONTROL_SECTION) {
-        return new SmithyControlSectionImpl(node);
-      }
-      else if (type == CONTROL_STATEMENT) {
-        return new SmithyControlStatementImpl(node);
+      else if (type == CONTROL) {
+        return new SmithyControlImpl(node);
       }
       else if (type == DOCUMENTATION) {
         return new SmithyDocumentationImpl(node);
@@ -139,11 +132,8 @@ public interface SmithyTypes {
       else if (type == MEMBER_NAME) {
         return new SmithyMemberNameImpl(node);
       }
-      else if (type == METADATA_SECTION) {
-        return new SmithyMetadataSectionImpl(node);
-      }
-      else if (type == METADATA_STATEMENT) {
-        return new SmithyMetadataStatementImpl(node);
+      else if (type == METADATA) {
+        return new SmithyMetadataImpl(node);
       }
       else if (type == MODEL) {
         return new SmithyModelImpl(node);
@@ -177,9 +167,6 @@ public interface SmithyTypes {
       }
       else if (type == SHAPE_NAME) {
         return new SmithyShapeNameImpl(node);
-      }
-      else if (type == SHAPE_SECTION) {
-        return new SmithyShapeSectionImpl(node);
       }
       else if (type == SIMPLE_SHAPE) {
         return new SmithySimpleShapeImpl(node);

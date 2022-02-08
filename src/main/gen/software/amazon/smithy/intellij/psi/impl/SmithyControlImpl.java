@@ -11,14 +11,14 @@ import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyControlStatementImpl extends ASTWrapperPsiElement implements SmithyControlStatement {
+public class SmithyControlImpl extends ASTWrapperPsiElement implements SmithyControl {
 
-  public SmithyControlStatementImpl(@NotNull ASTNode node) {
+  public SmithyControlImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SmithyVisitor visitor) {
-    visitor.visitControlStatement(this);
+    visitor.visitControl(this);
   }
 
   @Override

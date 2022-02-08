@@ -9,8 +9,7 @@ import com.intellij.psi.PsiDocCommentBase;
 public class SmithyVisitor extends PsiElementVisitor {
 
   public void visitApply(@NotNull SmithyApply o) {
-    visitShapeStatement(o);
-    // visitElement(o);
+    visitElement(o);
   }
 
   public void visitArray(@NotNull SmithyArray o) {
@@ -23,11 +22,7 @@ public class SmithyVisitor extends PsiElementVisitor {
     // visitElement(o);
   }
 
-  public void visitControlSection(@NotNull SmithyControlSection o) {
-    visitElement(o);
-  }
-
-  public void visitControlStatement(@NotNull SmithyControlStatement o) {
+  public void visitControl(@NotNull SmithyControl o) {
     visitElement(o);
   }
 
@@ -80,11 +75,7 @@ public class SmithyVisitor extends PsiElementVisitor {
     // visitNamedElement(o);
   }
 
-  public void visitMetadataSection(@NotNull SmithyMetadataSection o) {
-    visitElement(o);
-  }
-
-  public void visitMetadataStatement(@NotNull SmithyMetadataStatement o) {
+  public void visitMetadata(@NotNull SmithyMetadata o) {
     visitElement(o);
   }
 
@@ -142,8 +133,7 @@ public class SmithyVisitor extends PsiElementVisitor {
   }
 
   public void visitShape(@NotNull SmithyShape o) {
-    visitShapeStatement(o);
-    // visitElement(o);
+    visitElement(o);
   }
 
   public void visitShapeId(@NotNull SmithyShapeId o) {
@@ -155,14 +145,6 @@ public class SmithyVisitor extends PsiElementVisitor {
   public void visitShapeName(@NotNull SmithyShapeName o) {
     visitElement(o);
     // visitNamedElement(o);
-  }
-
-  public void visitShapeSection(@NotNull SmithyShapeSection o) {
-    visitElement(o);
-  }
-
-  public void visitShapeStatement(@NotNull SmithyShapeStatement o) {
-    visitElement(o);
   }
 
   public void visitSimpleShape(@NotNull SmithySimpleShape o) {
