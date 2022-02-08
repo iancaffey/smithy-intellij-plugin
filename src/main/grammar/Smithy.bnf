@@ -58,7 +58,6 @@
         TOKEN_INCOMPLETE_TEXT_BLOCK="regexp:\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))+"
     ]
     implements("^(?!.*element).*")=element
-    implements("member_name|namespace|shape_id|shape_name|trait")=named_element
     extends("array|object|primitive")=value
     extends("null|boolean|number|string|text_block|shape_id")=primitive
     extends("symbol|keyword|null|boolean|simple_type_name")=id
@@ -92,7 +91,7 @@ trait_arguments ::= TOKEN_OPEN_PAREN (trait_values | value) TOKEN_CLOSE_PAREN {m
 trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA] {methods=[entries="entry"]}
 
 //Node values
-key ::= id | string {methods=[stringValue]}
+key ::= id | string
 value ::= array | object | primitive
 entry ::= key TOKEN_COLON value
 array ::= TOKEN_OPEN_BRACKET [value (TOKEN_COMMA value)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACKET {methods=[values="value"]}
@@ -119,4 +118,3 @@ documentation ::= TOKEN_DOCUMENTATION_LINE+ {implements="com.intellij.psi.PsiDoc
 
 //Fake rules (for introducing superinterfaces into the AST)
 fake element ::=
-fake named_element ::=

@@ -13,8 +13,4 @@ public interface SmithyKey extends SmithyElement {
   @Nullable
   SmithyString getString();
 
-  //WARNING: stringValue(...) is skipped
-  //matching stringValue(SmithyKey, ...)
-  //methods are not found in SmithyPsiImplUtil
-
 }
