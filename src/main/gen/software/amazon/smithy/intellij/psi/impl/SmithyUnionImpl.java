@@ -41,7 +41,7 @@ public class SmithyUnionImpl extends SmithyShapeImpl implements SmithyUnion {
 
   @Override
   @NotNull
-  public List<SmithyTrait> getTraits() {
+  public List<SmithyTrait> getDeclaredTraits() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyTrait.class);
   }
 

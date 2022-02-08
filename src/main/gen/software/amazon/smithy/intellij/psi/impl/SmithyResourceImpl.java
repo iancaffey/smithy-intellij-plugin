@@ -41,7 +41,7 @@ public class SmithyResourceImpl extends SmithyShapeImpl implements SmithyResourc
 
   @Override
   @NotNull
-  public List<SmithyTrait> getTraits() {
+  public List<SmithyTrait> getDeclaredTraits() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyTrait.class);
   }
 

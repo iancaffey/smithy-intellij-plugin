@@ -14,7 +14,7 @@ public interface SmithyOperation extends SmithyShape, SmithyElement {
   SmithyShapeName getShapeName();
 
   @NotNull
-  List<SmithyTrait> getTraits();
+  List<SmithyTrait> getDeclaredTraits();
 
   @NotNull
   SmithyObject getBody();

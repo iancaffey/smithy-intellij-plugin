@@ -99,7 +99,7 @@ public class SmithyPsiImplUtil {
     }
 
     @NotNull
-    public static List<SmithyTrait> getTraits(SmithyShape shape) {
+    public static List<SmithyTrait> getDeclaredTraits(SmithyShape shape) {
         throw new UnsupportedOperationException();
     }
 

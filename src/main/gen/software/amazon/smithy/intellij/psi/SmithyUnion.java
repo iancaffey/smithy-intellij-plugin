@@ -14,7 +14,7 @@ public interface SmithyUnion extends SmithyShape, SmithyElement {
   SmithyShapeName getShapeName();
 
   @NotNull
-  List<SmithyTrait> getTraits();
+  List<SmithyTrait> getDeclaredTraits();
 
   @NotNull
   List<SmithyMember> getMembers();

@@ -11,6 +11,6 @@ public interface SmithyShape extends SmithyElement {
 
   @NotNull SmithyShapeName getShapeName();
 
-  @NotNull List<SmithyTrait> getTraits();
+  @NotNull List<SmithyTrait> getDeclaredTraits();
 
 }

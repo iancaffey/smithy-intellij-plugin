@@ -41,7 +41,7 @@ public class SmithyServiceImpl extends SmithyShapeImpl implements SmithyService 
 
   @Override
   @NotNull
-  public List<SmithyTrait> getTraits() {
+  public List<SmithyTrait> getDeclaredTraits() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyTrait.class);
   }
 

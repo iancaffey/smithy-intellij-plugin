@@ -38,8 +38,8 @@ public abstract class SmithyShapeImpl extends ASTWrapperPsiElement implements Sm
   }
 
   @Override
-  public @NotNull List<SmithyTrait> getTraits() {
-    return SmithyPsiImplUtil.getTraits(this);
+  public @NotNull List<SmithyTrait> getDeclaredTraits() {
+    return SmithyPsiImplUtil.getDeclaredTraits(this);
   }
 
 }
