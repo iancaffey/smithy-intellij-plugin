@@ -49,7 +49,7 @@
         TOKEN_STRING="regexp:\"((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF]))*\""
         TOKEN_TEXT_BLOCK="regexp:\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))*\"\"\""
         //Note: since DOCUMENTATION_LINE can't include the trailing line-break, we need to explicitly match against an empty line comment or a non-empty line comment without the third leading slash (since the new-line matches more characters and would win when matching doc comment lines)
-        TOKEN_LINE_COMMENT="regexp:((//)|(//[^/][\t -\U10FFFF]*))\r?\n"
+        TOKEN_LINE_COMMENT="regexp:((//)|(//[^/\n][\t -\U10FFFF]*))\r?\n"
         //Note: due to limitations with DocRenderPassFactory, documentation blocks cannot include the trailing line-break (otherwise it deems it invalid to render), so line-breaks are enforced within SmithySyntaxAnnotator
         TOKEN_DOCUMENTATION_LINE="regexp:///[\t -\U10FFFF]*"
         //Partial-match tokens for intermediate fallback states to avoid returning BAD_CHARACTER when quoted text is being typed out
