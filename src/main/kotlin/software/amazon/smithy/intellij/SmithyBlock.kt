@@ -1,12 +1,25 @@
 package software.amazon.smithy.intellij
 
-import com.intellij.formatting.*
+import com.intellij.formatting.Alignment
+import com.intellij.formatting.Block
+import com.intellij.formatting.Indent
+import com.intellij.formatting.SpacingBuilder
+import com.intellij.formatting.Wrap
+import com.intellij.formatting.WrapType
 import com.intellij.lang.ASTNode
 import com.intellij.psi.TokenType
 import com.intellij.psi.formatter.common.AbstractBlock
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.elementType
-import software.amazon.smithy.intellij.psi.*
+import software.amazon.smithy.intellij.psi.SmithyArray
+import software.amazon.smithy.intellij.psi.SmithyElement
+import software.amazon.smithy.intellij.psi.SmithyEntry
+import software.amazon.smithy.intellij.psi.SmithyMember
+import software.amazon.smithy.intellij.psi.SmithyModel
+import software.amazon.smithy.intellij.psi.SmithyObject
+import software.amazon.smithy.intellij.psi.SmithyTraitArguments
+import software.amazon.smithy.intellij.psi.SmithyTraitValues
+import software.amazon.smithy.intellij.psi.SmithyTypes
 
 /**
  * A formatter [Block] for [Smithy](https://awslabs.github.io/smithy).

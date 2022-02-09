@@ -13,7 +13,19 @@ import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.nextLeaf
 import com.intellij.psi.util.nextLeafs
-import software.amazon.smithy.intellij.psi.*
+import software.amazon.smithy.intellij.psi.SmithyBoolean
+import software.amazon.smithy.intellij.psi.SmithyControl
+import software.amazon.smithy.intellij.psi.SmithyId
+import software.amazon.smithy.intellij.psi.SmithyKey
+import software.amazon.smithy.intellij.psi.SmithyKeyword
+import software.amazon.smithy.intellij.psi.SmithyMemberName
+import software.amazon.smithy.intellij.psi.SmithyNull
+import software.amazon.smithy.intellij.psi.SmithyShapeId
+import software.amazon.smithy.intellij.psi.SmithySimpleTypeName
+import software.amazon.smithy.intellij.psi.SmithyString
+import software.amazon.smithy.intellij.psi.SmithyTextBlock
+import software.amazon.smithy.intellij.psi.SmithyTrait
+import software.amazon.smithy.intellij.psi.SmithyTypes
 
 /**
  * An [Annotator] which provides annotations to [Smithy](https://awslabs.github.io/smithy) model files.

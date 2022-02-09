@@ -1,6 +1,10 @@
 package software.amazon.smithy.intellij
 
-import com.intellij.formatting.*
+import com.intellij.formatting.FormattingContext
+import com.intellij.formatting.FormattingModel
+import com.intellij.formatting.FormattingModelBuilder
+import com.intellij.formatting.FormattingModelProvider
+import com.intellij.formatting.SpacingBuilder
 import com.intellij.psi.tree.TokenSet
 import software.amazon.smithy.intellij.psi.SmithyTypes
 
