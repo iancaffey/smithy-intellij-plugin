@@ -38,6 +38,7 @@ class SmithyAnnotator : Annotator {
             SmithyTypes.SET,
             SmithyTypes.SIMPLE_SHAPE,
             SmithyTypes.STRUCTURE,
+            SmithyTypes.TOKEN_LINE_COMMENT,
             SmithyTypes.UNION
         )
     }
