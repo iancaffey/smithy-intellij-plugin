@@ -22,6 +22,8 @@
                                     implementationClass="software.amazon.smithy.intellij.SmithyDocumentationProvider"/>
         <lang.foldingBuilder language="Smithy"
                              implementationClass="software.amazon.smithy.intellij.SmithyFoldingBuilder"/>
+        <lang.formatter language="Smithy"
+                        implementationClass="software.amazon.smithy.intellij.SmithyFormattingModelBuilder"/>
         <lang.parserDefinition language="Smithy"
                                implementationClass="software.amazon.smithy.intellij.SmithyParserDefinition"/>
         <lang.quoteHandler language="Smithy"

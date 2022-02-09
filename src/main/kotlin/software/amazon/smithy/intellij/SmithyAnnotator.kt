@@ -9,6 +9,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
+import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.nextLeaf
 import com.intellij.psi.util.nextLeafs
@@ -24,7 +25,7 @@ import software.amazon.smithy.intellij.psi.*
  */
 class SmithyAnnotator : Annotator {
     companion object {
-        private val TOKENS_REQUIRING_TRAILING_NEW_LINE = setOf(
+        val TOKENS_REQUIRING_TRAILING_NEW_LINE = TokenSet.create(
             SmithyTypes.APPLIED_TRAIT,
             SmithyTypes.CONTROL,
             SmithyTypes.DOCUMENTATION,
