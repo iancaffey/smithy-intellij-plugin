@@ -9,24 +9,29 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.SyntaxTraverser
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.siblings
-import software.amazon.smithy.intellij.psi.SmithyTypes
 
 /**
  * A [FoldingBuilder] for [Smithy](https://awslabs.github.io/smithy).
  *
- * All elements which are enclosed by curly braces will support folding.
+ * All tokens supported in [SmithyBraceMatcher] can be folded.
  *
  * @author Ian Caffey
  * @since 1.0
  */
 class SmithyFoldingBuilder : FoldingBuilderEx() {
     override fun isCollapsedByDefault(node: ASTNode) = false
-    override fun getPlaceholderText(node: ASTNode) = "{...}"
+    override fun getPlaceholderText(node: ASTNode): String {
+        val pair = SmithyBraceMatcher.PAIRS.first { pair -> node.elementType == pair.leftBraceType }
+        return "${pair.leftBraceType}...${pair.rightBraceType}"
+    }
+
     override fun buildFoldRegions(root: PsiElement, document: Document, quick: Boolean) =
-        SyntaxTraverser.psiTraverser(root).filterTypes { it == SmithyTypes.TOKEN_OPEN_BRACE }.toList().mapNotNull {
-            it.siblings().lastOrNull { sibling -> sibling.elementType == SmithyTypes.TOKEN_CLOSE_BRACE }
-                ?.let { closingBrace ->
-                    FoldingDescriptor(it.node, it.textRange.union(closingBrace.textRange))
-                }
+        SyntaxTraverser.psiTraverser(root).filterTypes {
+            SmithyBraceMatcher.PAIRS.any { pair -> it == pair.leftBraceType }
+        }.toList().mapNotNull {
+            val pair = SmithyBraceMatcher.PAIRS.first { pair -> it.elementType == pair.leftBraceType }
+            it.siblings().lastOrNull { sibling -> sibling.elementType == pair.rightBraceType }?.let { closingBrace ->
+                FoldingDescriptor(it.node, it.textRange.union(closingBrace.textRange))
+            }
         }.toTypedArray()
 }

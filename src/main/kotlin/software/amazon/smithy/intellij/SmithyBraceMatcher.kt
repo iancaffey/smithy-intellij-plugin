@@ -14,7 +14,7 @@ import software.amazon.smithy.intellij.psi.SmithyTypes
  */
 class SmithyBraceMatcher : PairedBraceMatcher {
     companion object {
-        private val PAIRS = arrayOf(
+        val PAIRS = arrayOf(
             BracePair(SmithyTypes.TOKEN_OPEN_BRACE, SmithyTypes.TOKEN_CLOSE_BRACE, true),
             BracePair(SmithyTypes.TOKEN_OPEN_BRACKET, SmithyTypes.TOKEN_CLOSE_BRACKET, false),
             BracePair(SmithyTypes.TOKEN_OPEN_PAREN, SmithyTypes.TOKEN_CLOSE_PAREN, false)
