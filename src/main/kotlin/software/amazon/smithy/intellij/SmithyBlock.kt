@@ -48,7 +48,12 @@ class SmithyBlock constructor(
             val requiresIndent = node.psi is SmithyContainer && it.psi.let { psi ->
                 psi is PsiComment || psi is SmithyElement
             } && !(node.psi is SmithyTraitBody && it.psi is SmithyContainer)
+            //Note: closing braces are wrapped alongside other children but take on the indent/alignment of the parent
+            val closingBrace = node.psi is SmithyContainer && SmithyBraceMatcher.PAIRS.any { pair ->
+                it.elementType == pair.rightBraceType
+            }
             if (requiresIndent) SmithyBlock(it, spacingBuilder, this, childIndent, childWrap, childAlignment)
+            else if (closingBrace) SmithyBlock(it, spacingBuilder, this, wrap = childWrap)
             else SmithyBlock(it, spacingBuilder, this)
         }
     }
