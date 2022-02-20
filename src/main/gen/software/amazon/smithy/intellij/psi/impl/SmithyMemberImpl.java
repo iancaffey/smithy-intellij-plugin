@@ -34,12 +34,6 @@ public class SmithyMemberImpl extends SmithyPsiElement implements SmithyMember {
 
   @Override
   @NotNull
-  public SmithyMemberName getMemberName() {
-    return findNotNullChildByClass(SmithyMemberName.class);
-  }
-
-  @Override
-  @NotNull
   public SmithyShapeId getShapeId() {
     return findNotNullChildByClass(SmithyShapeId.class);
   }
@@ -48,6 +42,27 @@ public class SmithyMemberImpl extends SmithyPsiElement implements SmithyMember {
   @NotNull
   public List<SmithyTrait> getDeclaredTraits() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyTrait.class);
+  }
+
+  @Override
+  @NotNull
+  public SmithyMemberName getNameIdentifier() {
+    return findNotNullChildByClass(SmithyMemberName.class);
+  }
+
+  @Override
+  public @NotNull String getName() {
+    return SmithyPsiImplUtil.getName(this);
+  }
+
+  @Override
+  public int getTextOffset() {
+    return SmithyPsiImplUtil.getTextOffset(this);
+  }
+
+  @Override
+  public @NotNull SmithyMember setName(String newName) {
+    return SmithyPsiImplUtil.setName(this, newName);
   }
 
 }

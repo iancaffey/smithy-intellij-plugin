@@ -4,10 +4,8 @@ package software.amazon.smithy.intellij.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNameIdentifierOwner;
 
-public interface SmithyEntry extends SmithyKeyedElement, SmithyElement {
-
-  @NotNull
-  SmithyValue getValue();
+public interface SmithyNamedElement extends PsiNameIdentifierOwner {
 
 }

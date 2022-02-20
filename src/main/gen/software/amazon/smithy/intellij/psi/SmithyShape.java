@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyShape extends SmithyElement {
+public interface SmithyShape extends SmithyNamedElement, SmithyElement {
 
   @NotNull String getNamespace();
 
@@ -14,5 +14,11 @@ public interface SmithyShape extends SmithyElement {
   @Nullable SmithyDocumentation getDocumentation();
 
   @NotNull List<SmithyTrait> getDeclaredTraits();
+
+  @NotNull SmithyShapeName getNameIdentifier();
+
+  int getTextOffset();
+
+  @NotNull SmithyShape setName(String newName);
 
 }

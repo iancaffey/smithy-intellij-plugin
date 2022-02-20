@@ -10,12 +10,13 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyControlImpl extends SmithyPsiElement implements SmithyControl {
+public class SmithyControlImpl extends SmithyKeyedElementImpl implements SmithyControl {
 
   public SmithyControlImpl(@NotNull ASTNode node) {
     super(node);
   }
 
+  @Override
   public void accept(@NotNull SmithyVisitor visitor) {
     visitor.visitControl(this);
   }
@@ -24,12 +25,6 @@ public class SmithyControlImpl extends SmithyPsiElement implements SmithyControl
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SmithyVisitor) accept((SmithyVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @NotNull
-  public SmithyKey getKey() {
-    return findNotNullChildByClass(SmithyKey.class);
   }
 
   @Override

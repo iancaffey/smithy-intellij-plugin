@@ -46,4 +46,19 @@ public abstract class SmithyShapeImpl extends SmithyPsiElement implements Smithy
     return SmithyPsiImplUtil.getDeclaredTraits(this);
   }
 
+  @Override
+  public @NotNull SmithyShapeName getNameIdentifier() {
+    return SmithyPsiImplUtil.getNameIdentifier(this);
+  }
+
+  @Override
+  public int getTextOffset() {
+    return SmithyPsiImplUtil.getTextOffset(this);
+  }
+
+  @Override
+  public @NotNull SmithyShape setName(String newName) {
+    return SmithyPsiImplUtil.setName(this, newName);
+  }
+
 }

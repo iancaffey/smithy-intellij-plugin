@@ -62,6 +62,7 @@
     extends("null|boolean|number|string|text_block|shape_id")=primitive
     extends("symbol|keyword|null|boolean|simple_type_name")=id
     extends("simple_shape|list|set|map|structure|union|service|operation|resource")=shape
+    extends("control|entry|metadata")=keyed_element
 }
 //https://awslabs.github.io/smithy/1.0/spec/core/idl.html
 root ::= model
@@ -72,7 +73,7 @@ namespace ::= TOKEN_NAMESPACE namespace_id
 import ::= TOKEN_USE shape_id
 
 //Shapes
-shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {methods=[getNamespace getName getDocumentation getDeclaredTraits]}
+shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {implements=named_element methods=[getNamespace getName getDocumentation getDeclaredTraits getNameIdentifier getTextOffset setName]}
 simple_shape ::= [documentation] trait* simple_type_name shape_name {methods=[getTypeName trait="" simple_type_name="" shape_name="" ]}
 list ::= [documentation] trait* TOKEN_LIST shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
 set ::= [documentation] trait* TOKEN_SET shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
@@ -83,7 +84,7 @@ service ::= [documentation] trait* TOKEN_SERVICE shape_name object {methods=[tra
 operation ::= [documentation] trait* TOKEN_OPERATION shape_name object {methods=[trait="" shape_name="" body="object"]}
 resource ::= [documentation] trait* TOKEN_RESOURCE shape_name object {methods=[trait="" shape_name="" body="object"]}
 shape_body ::= TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE {methods=[members="member"]}
-member ::= [documentation] trait* member_name TOKEN_COLON shape_id {methods=[declared_traits="trait"]}
+member ::= [documentation] trait* member_name TOKEN_COLON shape_id {implements=named_element methods=[declared_traits="trait" name_identifier="member_name" getName getTextOffset setName]}
 
 //Traits
 applied_trait ::= TOKEN_APPLY shape_id trait
@@ -120,3 +121,5 @@ documentation ::= TOKEN_DOCUMENTATION_LINE+ {implements="com.intellij.psi.PsiDoc
 //Fake rules (for introducing superinterfaces into the AST)
 fake element ::=
 fake container ::=
+fake named_element ::= {implements="com.intellij.psi.PsiNameIdentifierOwner"}
+fake keyed_element ::= key {implements=named_element methods=[getName setName getNameIdentifier getTextOffset]}

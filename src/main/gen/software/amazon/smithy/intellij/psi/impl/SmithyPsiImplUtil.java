@@ -1,6 +1,10 @@
 package software.amazon.smithy.intellij.psi.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
@@ -10,6 +14,9 @@ import org.jetbrains.annotations.Nullable;
 import software.amazon.smithy.intellij.psi.SmithyBoolean;
 import software.amazon.smithy.intellij.psi.SmithyDocumentation;
 import software.amazon.smithy.intellij.psi.SmithyId;
+import software.amazon.smithy.intellij.psi.SmithyKey;
+import software.amazon.smithy.intellij.psi.SmithyKeyedElement;
+import software.amazon.smithy.intellij.psi.SmithyMember;
 import software.amazon.smithy.intellij.psi.SmithyMemberName;
 import software.amazon.smithy.intellij.psi.SmithyModel;
 import software.amazon.smithy.intellij.psi.SmithyNamespace;
@@ -137,8 +144,70 @@ public class SmithyPsiImplUtil {
     }
 
     @NotNull
+    public static String getName(SmithyKeyedElement element) {
+        return element.getKey().getText();
+    }
+
+    @NotNull
+    public static SmithyKeyedElement setName(SmithyKeyedElement element, String newName) {
+        SmithyKey key = element.getKey();
+        TextRange textRange = key.getTextRange();
+        Document document = FileDocumentManager.getInstance().getDocument(key.getContainingFile().getVirtualFile());
+        document.replaceString(textRange.getStartOffset(), textRange.getEndOffset(), newName);
+        PsiDocumentManager.getInstance(key.getProject()).commitDocument(document);
+        return element;
+    }
+
+    @NotNull
+    public static SmithyKey getNameIdentifier(SmithyKeyedElement element) {
+        return element.getKey();
+    }
+
+    public static int getTextOffset(SmithyKeyedElement element) {
+        return element.getKey().getTextOffset();
+    }
+
+    @NotNull
+    public static String getName(SmithyMember member) {
+        return member.getNameIdentifier().getText();
+    }
+
+    @NotNull
+    public static SmithyMember setName(SmithyMember member, String newName) {
+        SmithyMemberName name = member.getNameIdentifier();
+        TextRange textRange = name.getTextRange();
+        Document document = FileDocumentManager.getInstance().getDocument(name.getContainingFile().getVirtualFile());
+        document.replaceString(textRange.getStartOffset(), textRange.getEndOffset(), newName);
+        PsiDocumentManager.getInstance(name.getProject()).commitDocument(document);
+        return member;
+    }
+
+    public static int getTextOffset(SmithyMember member) {
+        return member.getNameIdentifier().getTextOffset();
+    }
+
+    @NotNull
     public static String getName(SmithyShape shape) {
-        return requireNonNull(PsiTreeUtil.getChildOfType(shape, SmithyShapeName.class)).getText();
+        return shape.getNameIdentifier().getText();
+    }
+
+    @NotNull
+    public static SmithyShape setName(SmithyShape shape, String newName) {
+        SmithyShapeName name = shape.getNameIdentifier();
+        TextRange textRange = name.getTextRange();
+        Document document = FileDocumentManager.getInstance().getDocument(name.getContainingFile().getVirtualFile());
+        document.replaceString(textRange.getStartOffset(), textRange.getEndOffset(), newName);
+        PsiDocumentManager.getInstance(name.getProject()).commitDocument(document);
+        return shape;
+    }
+
+    @NotNull
+    public static SmithyShapeName getNameIdentifier(SmithyShape shape) {
+        return requireNonNull(PsiTreeUtil.getChildOfType(shape, SmithyShapeName.class));
+    }
+
+    public static int getTextOffset(SmithyShape shape) {
+        return shape.getNameIdentifier().getTextOffset();
     }
 
     @NotNull

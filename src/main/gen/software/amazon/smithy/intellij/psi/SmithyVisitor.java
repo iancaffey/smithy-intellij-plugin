@@ -4,6 +4,7 @@ package software.amazon.smithy.intellij.psi;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiDocCommentBase;
 
 public class SmithyVisitor extends PsiElementVisitor {
@@ -28,7 +29,8 @@ public class SmithyVisitor extends PsiElementVisitor {
   }
 
   public void visitControl(@NotNull SmithyControl o) {
-    visitElement(o);
+    visitKeyedElement(o);
+    // visitElement(o);
   }
 
   public void visitDocumentation(@NotNull SmithyDocumentation o) {
@@ -41,7 +43,8 @@ public class SmithyVisitor extends PsiElementVisitor {
   }
 
   public void visitEntry(@NotNull SmithyEntry o) {
-    visitElement(o);
+    visitKeyedElement(o);
+    // visitElement(o);
   }
 
   public void visitId(@NotNull SmithyId o) {
@@ -54,6 +57,10 @@ public class SmithyVisitor extends PsiElementVisitor {
 
   public void visitKey(@NotNull SmithyKey o) {
     visitElement(o);
+  }
+
+  public void visitKeyedElement(@NotNull SmithyKeyedElement o) {
+    visitNamedElement(o);
   }
 
   public void visitKeyword(@NotNull SmithyKeyword o) {
@@ -72,7 +79,8 @@ public class SmithyVisitor extends PsiElementVisitor {
   }
 
   public void visitMember(@NotNull SmithyMember o) {
-    visitElement(o);
+    visitNamedElement(o);
+    // visitElement(o);
   }
 
   public void visitMemberName(@NotNull SmithyMemberName o) {
@@ -80,11 +88,16 @@ public class SmithyVisitor extends PsiElementVisitor {
   }
 
   public void visitMetadata(@NotNull SmithyMetadata o) {
-    visitElement(o);
+    visitKeyedElement(o);
+    // visitElement(o);
   }
 
   public void visitModel(@NotNull SmithyModel o) {
     visitElement(o);
+  }
+
+  public void visitNamedElement(@NotNull SmithyNamedElement o) {
+    visitPsiNameIdentifierOwner(o);
   }
 
   public void visitNamespace(@NotNull SmithyNamespace o) {
@@ -137,7 +150,8 @@ public class SmithyVisitor extends PsiElementVisitor {
   }
 
   public void visitShape(@NotNull SmithyShape o) {
-    visitElement(o);
+    visitNamedElement(o);
+    // visitElement(o);
   }
 
   public void visitShapeBody(@NotNull SmithyShapeBody o) {
@@ -203,6 +217,10 @@ public class SmithyVisitor extends PsiElementVisitor {
   }
 
   public void visitPsiDocCommentBase(@NotNull PsiDocCommentBase o) {
+    visitElement(o);
+  }
+
+  public void visitPsiNameIdentifierOwner(@NotNull PsiNameIdentifierOwner o) {
     visitElement(o);
   }
 

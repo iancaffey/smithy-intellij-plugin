@@ -36,6 +36,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
+    create_token_set_(CONTROL, ENTRY, METADATA),
     create_token_set_(ID, KEYWORD, SIMPLE_TYPE_NAME, SYMBOL),
     create_token_set_(LIST, MAP, OPERATION, RESOURCE,
       SERVICE, SET, SHAPE, SIMPLE_SHAPE,
