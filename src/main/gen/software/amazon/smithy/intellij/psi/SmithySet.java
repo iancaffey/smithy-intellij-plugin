@@ -11,6 +11,6 @@ public interface SmithySet extends SmithyShape, SmithyElement {
   SmithyDocumentation getDocumentation();
 
   @NotNull
-  List<SmithyMember> getMembers();
+  SmithyShapeBody getBody();
 
 }

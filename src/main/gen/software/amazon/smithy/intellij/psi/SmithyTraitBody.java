@@ -5,12 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyTraitArguments extends SmithyElement {
+public interface SmithyTraitBody extends SmithyElement, SmithyContainer {
 
   @Nullable
   SmithyValue getValue();
 
-  @Nullable
-  SmithyTraitValues getValues();
+  @NotNull
+  List<SmithyEntry> getValues();
 
 }

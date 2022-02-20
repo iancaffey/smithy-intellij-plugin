@@ -37,6 +37,7 @@ public interface SmithyTypes {
   IElementType SERVICE = new SmithyElementType("SERVICE");
   IElementType SET = new SmithyElementType("SET");
   IElementType SHAPE = new SmithyElementType("SHAPE");
+  IElementType SHAPE_BODY = new SmithyElementType("SHAPE_BODY");
   IElementType SHAPE_ID = new SmithyElementType("SHAPE_ID");
   IElementType SHAPE_NAME = new SmithyElementType("SHAPE_NAME");
   IElementType SIMPLE_SHAPE = new SmithyElementType("SIMPLE_SHAPE");
@@ -46,8 +47,7 @@ public interface SmithyTypes {
   IElementType SYMBOL = new SmithyElementType("SYMBOL");
   IElementType TEXT_BLOCK = new SmithyElementType("TEXT_BLOCK");
   IElementType TRAIT = new SmithyElementType("TRAIT");
-  IElementType TRAIT_ARGUMENTS = new SmithyElementType("TRAIT_ARGUMENTS");
-  IElementType TRAIT_VALUES = new SmithyElementType("TRAIT_VALUES");
+  IElementType TRAIT_BODY = new SmithyElementType("TRAIT_BODY");
   IElementType UNION = new SmithyElementType("UNION");
   IElementType VALUE = new SmithyElementType("VALUE");
 
@@ -166,6 +166,9 @@ public interface SmithyTypes {
       else if (type == SET) {
         return new SmithySetImpl(node);
       }
+      else if (type == SHAPE_BODY) {
+        return new SmithyShapeBodyImpl(node);
+      }
       else if (type == SHAPE_ID) {
         return new SmithyShapeIdImpl(node);
       }
@@ -193,11 +196,8 @@ public interface SmithyTypes {
       else if (type == TRAIT) {
         return new SmithyTraitImpl(node);
       }
-      else if (type == TRAIT_ARGUMENTS) {
-        return new SmithyTraitArgumentsImpl(node);
-      }
-      else if (type == TRAIT_VALUES) {
-        return new SmithyTraitValuesImpl(node);
+      else if (type == TRAIT_BODY) {
+        return new SmithyTraitBodyImpl(node);
       }
       else if (type == UNION) {
         return new SmithyUnionImpl(node);

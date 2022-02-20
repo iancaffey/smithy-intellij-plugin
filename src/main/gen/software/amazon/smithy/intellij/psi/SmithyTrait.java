@@ -11,6 +11,6 @@ public interface SmithyTrait extends SmithyElement {
   SmithyShapeId getShapeId();
 
   @Nullable
-  SmithyTraitArguments getArguments();
+  SmithyTraitBody getBody();
 
 }

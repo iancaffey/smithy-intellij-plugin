@@ -10,14 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyTraitValuesImpl extends SmithyPsiElement implements SmithyTraitValues {
+public class SmithyShapeBodyImpl extends SmithyPsiElement implements SmithyShapeBody {
 
-  public SmithyTraitValuesImpl(@NotNull ASTNode node) {
+  public SmithyShapeBodyImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SmithyVisitor visitor) {
-    visitor.visitTraitValues(this);
+    visitor.visitShapeBody(this);
   }
 
   @Override
@@ -28,8 +28,8 @@ public class SmithyTraitValuesImpl extends SmithyPsiElement implements SmithyTra
 
   @Override
   @NotNull
-  public List<SmithyEntry> getEntries() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyEntry.class);
+  public List<SmithyMember> getMembers() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyMember.class);
   }
 
 }

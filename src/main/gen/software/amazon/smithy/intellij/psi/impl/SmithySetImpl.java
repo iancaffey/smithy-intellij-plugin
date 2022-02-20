@@ -35,8 +35,8 @@ public class SmithySetImpl extends SmithyShapeImpl implements SmithySet {
 
   @Override
   @NotNull
-  public List<SmithyMember> getMembers() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyMember.class);
+  public SmithyShapeBody getBody() {
+    return findNotNullChildByClass(SmithyShapeBody.class);
   }
 
 }

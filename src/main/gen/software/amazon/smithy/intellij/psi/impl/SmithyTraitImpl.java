@@ -34,8 +34,8 @@ public class SmithyTraitImpl extends SmithyPsiElement implements SmithyTrait {
 
   @Override
   @Nullable
-  public SmithyTraitArguments getArguments() {
-    return findChildByClass(SmithyTraitArguments.class);
+  public SmithyTraitBody getBody() {
+    return findChildByClass(SmithyTraitBody.class);
   }
 
 }

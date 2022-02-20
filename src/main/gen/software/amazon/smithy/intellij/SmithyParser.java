@@ -241,7 +241,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // [documentation] trait* TOKEN_LIST shape_name members
+  // [documentation] trait* TOKEN_LIST shape_name shape_body
   public static boolean list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "list")) return false;
     boolean r;
@@ -250,7 +250,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     r = r && list_1(b, l + 1);
     r = r && consumeToken(b, TOKEN_LIST);
     r = r && shape_name(b, l + 1);
-    r = r && members(b, l + 1);
+    r = r && shape_body(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -274,7 +274,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // [documentation] trait* TOKEN_MAP shape_name members
+  // [documentation] trait* TOKEN_MAP shape_name shape_body
   public static boolean map(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "map")) return false;
     boolean r;
@@ -283,7 +283,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     r = r && map_1(b, l + 1);
     r = r && consumeToken(b, TOKEN_MAP);
     r = r && shape_name(b, l + 1);
-    r = r && members(b, l + 1);
+    r = r && shape_body(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -348,68 +348,6 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     r = id(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
-  }
-
-  /* ********************************************************** */
-  // TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE
-  static boolean members(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "members")) return false;
-    if (!nextTokenIs(b, TOKEN_OPEN_BRACE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, TOKEN_OPEN_BRACE);
-    r = r && members_1(b, l + 1);
-    r = r && consumeToken(b, TOKEN_CLOSE_BRACE);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // [member (TOKEN_COMMA member)* [TOKEN_COMMA]]
-  private static boolean members_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "members_1")) return false;
-    members_1_0(b, l + 1);
-    return true;
-  }
-
-  // member (TOKEN_COMMA member)* [TOKEN_COMMA]
-  private static boolean members_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "members_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = member(b, l + 1);
-    r = r && members_1_0_1(b, l + 1);
-    r = r && members_1_0_2(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // (TOKEN_COMMA member)*
-  private static boolean members_1_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "members_1_0_1")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!members_1_0_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "members_1_0_1", c)) break;
-    }
-    return true;
-  }
-
-  // TOKEN_COMMA member
-  private static boolean members_1_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "members_1_0_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, TOKEN_COMMA);
-    r = r && member(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // [TOKEN_COMMA]
-  private static boolean members_1_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "members_1_0_2")) return false;
-    consumeToken(b, TOKEN_COMMA);
-    return true;
   }
 
   /* ********************************************************** */
@@ -767,7 +705,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // [documentation] trait* TOKEN_SET shape_name members
+  // [documentation] trait* TOKEN_SET shape_name shape_body
   public static boolean set(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "set")) return false;
     boolean r;
@@ -776,7 +714,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     r = r && set_1(b, l + 1);
     r = r && consumeToken(b, TOKEN_SET);
     r = r && shape_name(b, l + 1);
-    r = r && members(b, l + 1);
+    r = r && shape_body(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -816,6 +754,68 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     if (!r) r = resource(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
+  }
+
+  /* ********************************************************** */
+  // TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE
+  public static boolean shape_body(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_body")) return false;
+    if (!nextTokenIs(b, TOKEN_OPEN_BRACE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, TOKEN_OPEN_BRACE);
+    r = r && shape_body_1(b, l + 1);
+    r = r && consumeToken(b, TOKEN_CLOSE_BRACE);
+    exit_section_(b, m, SHAPE_BODY, r);
+    return r;
+  }
+
+  // [member (TOKEN_COMMA member)* [TOKEN_COMMA]]
+  private static boolean shape_body_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_body_1")) return false;
+    shape_body_1_0(b, l + 1);
+    return true;
+  }
+
+  // member (TOKEN_COMMA member)* [TOKEN_COMMA]
+  private static boolean shape_body_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_body_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = member(b, l + 1);
+    r = r && shape_body_1_0_1(b, l + 1);
+    r = r && shape_body_1_0_2(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (TOKEN_COMMA member)*
+  private static boolean shape_body_1_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_body_1_0_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!shape_body_1_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "shape_body_1_0_1", c)) break;
+    }
+    return true;
+  }
+
+  // TOKEN_COMMA member
+  private static boolean shape_body_1_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_body_1_0_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, TOKEN_COMMA);
+    r = r && member(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // [TOKEN_COMMA]
+  private static boolean shape_body_1_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_body_1_0_2")) return false;
+    consumeToken(b, TOKEN_COMMA);
+    return true;
   }
 
   /* ********************************************************** */
@@ -935,7 +935,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // [documentation] trait* TOKEN_STRUCTURE shape_name members
+  // [documentation] trait* TOKEN_STRUCTURE shape_name shape_body
   public static boolean structure(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "structure")) return false;
     boolean r;
@@ -944,7 +944,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     r = r && structure_1(b, l + 1);
     r = r && consumeToken(b, TOKEN_STRUCTURE);
     r = r && shape_name(b, l + 1);
-    r = r && members(b, l + 1);
+    r = r && shape_body(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -992,7 +992,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TOKEN_AT shape_id [trait_arguments]
+  // TOKEN_AT shape_id [trait_body]
   public static boolean trait(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "trait")) return false;
     if (!nextTokenIs(b, TOKEN_AT)) return false;
@@ -1005,30 +1005,30 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // [trait_arguments]
+  // [trait_body]
   private static boolean trait_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "trait_2")) return false;
-    trait_arguments(b, l + 1);
+    trait_body(b, l + 1);
     return true;
   }
 
   /* ********************************************************** */
   // TOKEN_OPEN_PAREN (trait_values | value) TOKEN_CLOSE_PAREN
-  public static boolean trait_arguments(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "trait_arguments")) return false;
+  public static boolean trait_body(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "trait_body")) return false;
     if (!nextTokenIs(b, TOKEN_OPEN_PAREN)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, TOKEN_OPEN_PAREN);
-    r = r && trait_arguments_1(b, l + 1);
+    r = r && trait_body_1(b, l + 1);
     r = r && consumeToken(b, TOKEN_CLOSE_PAREN);
-    exit_section_(b, m, TRAIT_ARGUMENTS, r);
+    exit_section_(b, m, TRAIT_BODY, r);
     return r;
   }
 
   // trait_values | value
-  private static boolean trait_arguments_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "trait_arguments_1")) return false;
+  private static boolean trait_body_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "trait_body_1")) return false;
     boolean r;
     r = trait_values(b, l + 1);
     if (!r) r = value(b, l + 1);
@@ -1037,14 +1037,14 @@ public class SmithyParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // entry (TOKEN_COMMA entry)* [TOKEN_COMMA]
-  public static boolean trait_values(PsiBuilder b, int l) {
+  static boolean trait_values(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "trait_values")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, TRAIT_VALUES, "<trait values>");
+    Marker m = enter_section_(b);
     r = entry(b, l + 1);
     r = r && trait_values_1(b, l + 1);
     r = r && trait_values_2(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -1078,7 +1078,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // [documentation] trait* TOKEN_UNION shape_name members
+  // [documentation] trait* TOKEN_UNION shape_name shape_body
   public static boolean union(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "union")) return false;
     boolean r;
@@ -1087,7 +1087,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     r = r && union_1(b, l + 1);
     r = r && consumeToken(b, TOKEN_UNION);
     r = r && shape_name(b, l + 1);
-    r = r && members(b, l + 1);
+    r = r && shape_body(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

@@ -57,6 +57,7 @@
         TOKEN_INCOMPLETE_TEXT_BLOCK="regexp:\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))+"
     ]
     implements("^(?!.*element).*")=element
+    implements("array|object|shape_body|trait_body")=container
     extends("array|object|primitive")=value
     extends("null|boolean|number|string|text_block|shape_id")=primitive
     extends("symbol|keyword|null|boolean|simple_type_name")=id
@@ -73,22 +74,22 @@ import ::= TOKEN_USE shape_id
 //Shapes
 shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {methods=[getNamespace getName getDocumentation getDeclaredTraits]}
 simple_shape ::= [documentation] trait* simple_type_name shape_name {methods=[getTypeName trait="" simple_type_name="" shape_name="" ]}
-list ::= [documentation] trait* TOKEN_LIST shape_name members {methods=[trait="" shape_name="" members="member"]}
-set ::= [documentation] trait* TOKEN_SET shape_name members {methods=[trait="" shape_name="" members="member"]}
-map ::= [documentation] trait* TOKEN_MAP shape_name members {methods=[trait="" shape_name="" members="member"]}
-structure ::= [documentation] trait* TOKEN_STRUCTURE shape_name members {methods=[trait="" shape_name="" members="member"]}
-union ::= [documentation] trait* TOKEN_UNION shape_name members {methods=[trait="" shape_name="" members="member"]}
+list ::= [documentation] trait* TOKEN_LIST shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
+set ::= [documentation] trait* TOKEN_SET shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
+map ::= [documentation] trait* TOKEN_MAP shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
+structure ::= [documentation] trait* TOKEN_STRUCTURE shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
+union ::= [documentation] trait* TOKEN_UNION shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
 service ::= [documentation] trait* TOKEN_SERVICE shape_name object {methods=[trait="" shape_name="" body="object"]}
 operation ::= [documentation] trait* TOKEN_OPERATION shape_name object {methods=[trait="" shape_name="" body="object"]}
 resource ::= [documentation] trait* TOKEN_RESOURCE shape_name object {methods=[trait="" shape_name="" body="object"]}
-private members ::= TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE
+shape_body ::= TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE {methods=[members="member"]}
 member ::= [documentation] trait* member_name TOKEN_COLON shape_id {methods=[declared_traits="trait"]}
 
 //Traits
 applied_trait ::= TOKEN_APPLY shape_id trait
-trait ::= TOKEN_AT shape_id [trait_arguments] {methods=[arguments="trait_arguments"]}
-trait_arguments ::= TOKEN_OPEN_PAREN (trait_values | value) TOKEN_CLOSE_PAREN {methods=[values="trait_values"]}
-trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA] {methods=[entries="entry"]}
+trait ::= TOKEN_AT shape_id [trait_body] {methods=[body="trait_body"]}
+trait_body ::= TOKEN_OPEN_PAREN (trait_values | value) TOKEN_CLOSE_PAREN {methods=[values="entry"]}
+private trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA]
 
 //Node values
 key ::= id | string
@@ -118,3 +119,4 @@ documentation ::= TOKEN_DOCUMENTATION_LINE+ {implements="com.intellij.psi.PsiDoc
 
 //Fake rules (for introducing superinterfaces into the AST)
 fake element ::=
+fake container ::=
