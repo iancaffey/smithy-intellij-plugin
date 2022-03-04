@@ -2,6 +2,7 @@ package software.amazon.smithy.intellij
 
 import com.intellij.formatting.Alignment
 import com.intellij.formatting.Block
+import com.intellij.formatting.ChildAttributes
 import com.intellij.formatting.Indent
 import com.intellij.formatting.SpacingBuilder
 import com.intellij.formatting.Wrap
@@ -34,11 +35,12 @@ class SmithyBlock constructor(
 ) : AbstractBlock(node, wrap, alignment) {
 
     private val childAlignment = Alignment.createAlignment()
-    private val childIndent = Indent.getNormalIndent()
+    private val childIndent = if (node.psi is SmithyContainer) Indent.getNormalIndent() else Indent.getNoneIndent()
     private val childWrap = Wrap.createWrap(WrapType.CHOP_DOWN_IF_LONG, true)
 
     override fun isLeaf() = node.firstChildNode !is SmithyElement
     override fun getIndent() = indent
+    override fun getChildAttributes(newChildIndex: Int) = ChildAttributes(childIndent, childAlignment)
     override fun getChildIndent(): Indent = childIndent
     override fun getSpacing(child1: Block?, child2: Block) = spacingBuilder.getSpacing(this, child1, child2)
     override fun buildChildren(): List<SmithyBlock> {
