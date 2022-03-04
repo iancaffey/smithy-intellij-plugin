@@ -6,7 +6,20 @@
     <span>A language for defining services and SDKs.</span>
     <br/>
     <br/>
-    <a href="https://awslabs.github.io/smithy/">Homepage</a><span> | </span><a href="https://github.com/awslabs/smithy">GitHub</a>
+    <span>Adds support for the Smithy language.</span>
+    <br/>
+    <br/>
+    <span>Features</span>
+    <ul>
+    <li>Code Completion</li>
+    <li>Documentation Rendering (Markdown -> HTML)</li>
+    <li>Formatting</li>
+    <li>Refactoring</li>
+    <li>Syntax highlighting (customizable)</li>
+    <li>and more coming..</li>
+    </ul>
+    <br/>
+    <a href="https://awslabs.github.io/smithy/">Homepage</a><span> | </span><a href="https://github.com/iancaffey/smithy-intellij-plugin">GitHub</a>
     ]]></description>
     <depends>com.intellij.modules.platform</depends>
     <extensions defaultExtensionNs="com.intellij">
