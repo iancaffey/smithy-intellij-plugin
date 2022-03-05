@@ -4,7 +4,7 @@
 
 IntelliJ plugin for the [Smithy](https://awslabs.github.io/smithy) interface definition language.
 
-####Features
+**Features**
 - Code Completion
 - Documentation Rendering (Markdown -> HTML)
 - Formatting
