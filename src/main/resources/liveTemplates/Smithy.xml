@@ -1,0 +1,148 @@
+<templateSet group="Smithy">
+    <template name="apply"
+              value="apply $SHAPE_ID$ @$TRAIT_SHAPE_ID$$END$"
+              description="Applies a trait to a shape"
+              toReformat="true">
+        <variable name="SHAPE_ID" expression="" defaultValue="" alwaysStopAt="true"/>
+        <variable name="TRAIT_SHAPE_ID" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
+    <template name="kvp"
+              value="$KEY$: $VALUE$$END$"
+              description="Adds a key-value pair"
+              toReformat="true">
+        <variable name="KEY" expression="" defaultValue="" alwaysStopAt="true"/>
+        <variable name="VALUE" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
+    <template name="list"
+              value="list $SHAPE_NAME$ {&#10;member: $MEMBER_SHAPE_ID$&#10;}$END$"
+              description="Adds a list shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <variable name="MEMBER_SHAPE_ID" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
+    <template name="map"
+              value="map $SHAPE_NAME$ {&#10;key: $KEY_SHAPE_ID$,&#10;value: $VALUE_SHAPE_ID$&#10;}$END$"
+              description="Adds a map shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <variable name="KEY_SHAPE_ID" expression="" defaultValue="" alwaysStopAt="true"/>
+        <variable name="VALUE_SHAPE_ID" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
+    <template name="metadata"
+              value="metadata $KEY$ = $VALUE$$END$"
+              description="Adds a metadata entry"
+              toReformat="true">
+        <variable name="KEY" expression="" defaultValue="" alwaysStopAt="true"/>
+        <variable name="VALUE" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
+    <template name="namespace"
+              value="namespace $VALUE$$END$"
+              description="Sets namespace"
+              toReformat="true">
+        <variable name="VALUE" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
+    <template name="operation"
+              value="operation $SHAPE_NAME$ {&#10;$END$&#10;}"
+              description="Adds an operation shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
+    <template name="resource"
+              value="resource $SHAPE_NAME$ {&#10;$END$&#10;}"
+              description="Adds a resource shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
+    <template name="service"
+              value="service $SHAPE_NAME$ {&#10;$END$&#10;}"
+              description="Adds a service shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
+    <template name="set"
+              value="set $SHAPE_NAME$ {&#10;member: $MEMBER_SHAPE_ID$&#10;}$END$"
+              description="Adds a set shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <variable name="MEMBER_SHAPE_ID" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
+    <template name="simple"
+              value="$TYPE_NAME$ $SHAPE_ID$$END$"
+              description="Adds a simple shape"
+              toReformat="true">
+        <variable name="TYPE_NAME"
+                  expression="enum(&quot;bigDecimal&quot;,&quot;bigInteger&quot;,&quot;blob&quot;,&quot;boolean&quot;,&quot;byte&quot;,&quot;document&quot;,&quot;double&quot;,&quot;float&quot;,&quot;integer&quot;,&quot;long&quot;,&quot;short&quot;,&quot;string&quot;,&quot;timestamp&quot;)"
+                  defaultValue=""
+                  alwaysStopAt="true"/>
+        <variable name="SHAPE_ID" expression="" defaultValue="capitalize(TYPE_NAME)" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
+    <template name="structure"
+              value="structure $SHAPE_NAME$ {&#10;$END$&#10;}"
+              description="Adds a structure shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
+    <template name="union"
+              value="union $SHAPE_NAME$ {&#10;$END$}"
+              description="Adds a union shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
+    <template name="use"
+              value="use $SHAPE_ID$$END$"
+              description="Imports a shape into the current namespace"
+              toReformat="true">
+        <variable name="SHAPE_ID" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
+    <template name="version"
+              value="$version: &quot;$VERSION$&quot;$END$"
+              description="Sets version"
+              toReformat="true">
+        <variable name="VERSION" expression="" defaultValue="1.0" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
+</templateSet>

@@ -47,6 +47,8 @@
         <colorSettingsPage implementation="software.amazon.smithy.intellij.SmithyColorSettingsPage"/>
         <completion.contributor language="Smithy"
                                 implementationClass="software.amazon.smithy.intellij.SmithyCompletionContributor"/>
+        <defaultLiveTemplates file="/liveTemplates/Smithy.xml"/>
         <enterHandlerDelegate implementation="software.amazon.smithy.intellij.SmithyDocumentationEnterHandler"/>
+        <liveTemplateContext implementation="software.amazon.smithy.intellij.SmithyContextType"/>
     </extensions>
 </idea-plugin>
