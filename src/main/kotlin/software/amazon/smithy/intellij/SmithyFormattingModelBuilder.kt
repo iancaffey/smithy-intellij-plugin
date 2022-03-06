@@ -32,7 +32,6 @@ class SmithyFormattingModelBuilder : FormattingModelBuilder {
                     SmithyTypes.IMPORT,
                     SmithyTypes.LIST,
                     SmithyTypes.MAP,
-                    SmithyTypes.METADATA,
                     SmithyTypes.NAMESPACE,
                     SmithyTypes.OPERATION,
                     SmithyTypes.RESOURCE,
