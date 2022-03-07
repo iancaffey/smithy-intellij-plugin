@@ -59,4 +59,5 @@
         <enterHandlerDelegate implementation="software.amazon.smithy.intellij.SmithyDocumentationEnterHandler"/>
         <liveTemplateContext implementation="software.amazon.smithy.intellij.SmithyContextType"/>
     </extensions>
+    <idea-version since-build="203"/>
 </idea-plugin>
