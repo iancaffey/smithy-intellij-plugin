@@ -27,9 +27,6 @@ class SmithyFormattingModelBuilder : FormattingModelBuilder {
             //Blank lines after all top-level declarations (not before so line comments can be placed)
             .after(
                 TokenSet.create(
-                    SmithyTypes.APPLIED_TRAIT,
-                    SmithyTypes.CONTROL,
-                    SmithyTypes.IMPORT,
                     SmithyTypes.LIST,
                     SmithyTypes.MAP,
                     SmithyTypes.NAMESPACE,
