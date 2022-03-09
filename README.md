@@ -1,4 +1,5 @@
-# Smithy IntelliJ Plugin
+# [Smithy IntelliJ Plugin](https://plugins.jetbrains.com/plugin/18717-smithy)
+
 
 ![Release](https://img.shields.io/github/v/release/iancaffey/smithy-intellij-plugin?include_prereleases&style=for-the-badge) ![License](https://img.shields.io/github/license/iancaffey/smithy-intellij-plugin?style=for-the-badge)
 
