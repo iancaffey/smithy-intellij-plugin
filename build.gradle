@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'software.amazon.smithy'
-version '1.02'
+version '1.03'
 
 repositories {
     mavenCentral()
@@ -20,4 +20,8 @@ dependencies {
 
 intellij {
     version = '2021.3.2'
+}
+
+patchPluginXml {
+    sinceBuild = '211'
 }
