@@ -1,3 +1,5 @@
+**Disclaimer: This plugin is very early on in development. For requesting any functionality you would like to see implemented, please raise a feature request [here](https://github.com/iancaffey/smithy-intellij-plugin/issues).**
+
 # [Smithy IntelliJ Plugin](https://plugins.jetbrains.com/plugin/18717-smithy)
 
 
