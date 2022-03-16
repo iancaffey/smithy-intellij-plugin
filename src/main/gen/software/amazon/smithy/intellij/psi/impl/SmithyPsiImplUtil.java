@@ -211,6 +211,30 @@ public class SmithyPsiImplUtil {
     }
 
     @NotNull
+    public static String getName(SmithyTrait trait) {
+        return trait.getNameIdentifier().getText();
+    }
+
+    @NotNull
+    public static SmithyTrait setName(SmithyTrait trait, String newName) {
+        SmithyShapeName name = trait.getNameIdentifier();
+        TextRange textRange = name.getTextRange();
+        Document document = FileDocumentManager.getInstance().getDocument(name.getContainingFile().getVirtualFile());
+        document.replaceString(textRange.getStartOffset(), textRange.getEndOffset(), newName);
+        PsiDocumentManager.getInstance(name.getProject()).commitDocument(document);
+        return trait;
+    }
+
+    @NotNull
+    public static SmithyShapeName getNameIdentifier(SmithyTrait trait) {
+        return trait.getShapeId().getShapeName();
+    }
+
+    public static int getTextOffset(SmithyTrait trait) {
+        return trait.getNameIdentifier().getTextOffset();
+    }
+
+    @NotNull
     public static String getTypeName(SmithySimpleShape shape) {
         return requireNonNull(PsiTreeUtil.getChildOfType(shape, SmithySimpleTypeName.class)).getText();
     }

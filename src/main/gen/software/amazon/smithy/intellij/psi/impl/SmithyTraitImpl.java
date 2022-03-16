@@ -38,4 +38,24 @@ public class SmithyTraitImpl extends SmithyPsiElement implements SmithyTrait {
     return findChildByClass(SmithyTraitBody.class);
   }
 
+  @Override
+  public @NotNull String getName() {
+    return SmithyPsiImplUtil.getName(this);
+  }
+
+  @Override
+  public @NotNull SmithyShapeName getNameIdentifier() {
+    return SmithyPsiImplUtil.getNameIdentifier(this);
+  }
+
+  @Override
+  public int getTextOffset() {
+    return SmithyPsiImplUtil.getTextOffset(this);
+  }
+
+  @Override
+  public @NotNull SmithyTrait setName(String newName) {
+    return SmithyPsiImplUtil.setName(this, newName);
+  }
+
 }

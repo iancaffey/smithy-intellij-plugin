@@ -88,7 +88,7 @@ member ::= [documentation] trait* member_name TOKEN_COLON shape_id {implements=n
 
 //Traits
 applied_trait ::= TOKEN_APPLY shape_id trait
-trait ::= TOKEN_AT shape_id [trait_body] {methods=[body="trait_body"]}
+trait ::= TOKEN_AT shape_id [trait_body] {implements=named_element methods=[body="trait_body" getName getNameIdentifier getTextOffset setName]}
 trait_body ::= TOKEN_OPEN_PAREN ([trait_values | value]) TOKEN_CLOSE_PAREN {methods=[values="entry"]}
 private trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA]
 
