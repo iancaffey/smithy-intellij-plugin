@@ -1014,7 +1014,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TOKEN_OPEN_PAREN (trait_values | value) TOKEN_CLOSE_PAREN
+  // TOKEN_OPEN_PAREN ([trait_values | value]) TOKEN_CLOSE_PAREN
   public static boolean trait_body(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "trait_body")) return false;
     if (!nextTokenIs(b, TOKEN_OPEN_PAREN)) return false;
@@ -1027,9 +1027,16 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // trait_values | value
+  // [trait_values | value]
   private static boolean trait_body_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "trait_body_1")) return false;
+    trait_body_1_0(b, l + 1);
+    return true;
+  }
+
+  // trait_values | value
+  private static boolean trait_body_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "trait_body_1_0")) return false;
     boolean r;
     r = trait_values(b, l + 1);
     if (!r) r = value(b, l + 1);
