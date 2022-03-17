@@ -46,6 +46,11 @@ public class SmithyShapeIdImpl extends SmithyPrimitiveImpl implements SmithyShap
   }
 
   @Override
+  public @NotNull String getId() {
+    return SmithyPsiImplUtil.getId(this);
+  }
+
+  @Override
   public @NotNull String toString() {
     return SmithyPsiImplUtil.toString(this);
   }

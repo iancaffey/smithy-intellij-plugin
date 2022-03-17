@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
+import com.intellij.navigation.ItemPresentation;
 
 public class SmithyMemberImpl extends SmithyPsiElement implements SmithyMember {
 
@@ -53,6 +54,11 @@ public class SmithyMemberImpl extends SmithyPsiElement implements SmithyMember {
   @Override
   public @NotNull String getName() {
     return SmithyPsiImplUtil.getName(this);
+  }
+
+  @Override
+  public @NotNull ItemPresentation getPresentation() {
+    return SmithyPsiImplUtil.getPresentation(this);
   }
 
   @Override

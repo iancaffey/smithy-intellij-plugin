@@ -10,15 +10,15 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyUnionImpl extends SmithyAggregateShapeImpl implements SmithyUnion {
+public class SmithyAggregateShapeImpl extends SmithyShapeImpl implements SmithyAggregateShape {
 
-  public SmithyUnionImpl(@NotNull ASTNode node) {
+  public SmithyAggregateShapeImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   @Override
   public void accept(@NotNull SmithyVisitor visitor) {
-    visitor.visitUnion(this);
+    visitor.visitAggregateShape(this);
   }
 
   @Override
@@ -28,9 +28,9 @@ public class SmithyUnionImpl extends SmithyAggregateShapeImpl implements SmithyU
   }
 
   @Override
-  @Nullable
-  public SmithyDocumentation getDocumentation() {
-    return findChildByClass(SmithyDocumentation.class);
+  @NotNull
+  public SmithyShapeBody getBody() {
+    return findNotNullChildByClass(SmithyShapeBody.class);
   }
 
 }

@@ -1,6 +1,8 @@
 package software.amazon.smithy.intellij.psi.impl;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.TextRange;
@@ -30,6 +32,7 @@ import software.amazon.smithy.intellij.psi.SmithySimpleTypeName;
 import software.amazon.smithy.intellij.psi.SmithyTrait;
 import software.amazon.smithy.intellij.psi.SmithyTypes;
 
+import javax.swing.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -138,9 +141,7 @@ public class SmithyPsiImplUtil {
 
     @NotNull
     public static String toString(SmithyNamespaceId namespaceId) {
-        return namespaceId.getParts().stream()
-                .map(SmithyId::toString)
-                .collect(joining("."));
+        return namespaceId.getParts().stream().map(SmithyId::toString).collect(joining("."));
     }
 
     @NotNull
@@ -246,7 +247,8 @@ public class SmithyPsiImplUtil {
 
     @NotNull
     public static String getNamespace(SmithyShape shape) {
-        return requireNonNull(PsiTreeUtil.getChildOfType(shape.getParent(), SmithyNamespace.class)).toString();
+        SmithyNamespace namespace = requireNonNull(PsiTreeUtil.getChildOfType(shape.getParent(), SmithyNamespace.class));
+        return namespace.getNamespaceId().getId();
     }
 
     @NotNull
@@ -257,5 +259,61 @@ public class SmithyPsiImplUtil {
     @NotNull
     public static List<SmithyShape> getShapes(SmithyModel model) {
         return PsiTreeUtil.getChildrenOfTypeAsList(model, SmithyShape.class);
+    }
+
+    @NotNull
+    public static String getId(SmithyNamespaceId id) {
+        return id.getParts().stream().map(SmithyId::getText).collect(joining("."));
+    }
+
+    @NotNull
+    public static String getId(SmithyShapeId id) {
+        SmithyNamespaceId namespaceId = id.getNamespaceId();
+        SmithyShapeName shapeName = id.getShapeName();
+        SmithyMemberName memberName = id.getMemberName();
+        StringBuilder builder = new StringBuilder();
+        if (namespaceId != null) {
+            builder.append(namespaceId.getId()).append("#");
+        }
+        builder.append(shapeName.getText());
+        if (memberName != null) {
+            builder.append("$").append(memberName.getText());
+        }
+        return builder.toString();
+    }
+
+    @NotNull
+    public static ItemPresentation getPresentation(SmithyMember member) {
+        return new ItemPresentation() {
+            @Override
+            public String getPresentableText() {
+                return member.getName() + ": " + member.getShapeId().getId();
+            }
+
+            @Override
+            public Icon getIcon(boolean unused) {
+                return AllIcons.Nodes.Method; //Method icon displays as [m]
+            }
+        };
+    }
+
+    @NotNull
+    public static ItemPresentation getPresentation(SmithyShape shape) {
+        return new ItemPresentation() {
+            @Override
+            public String getPresentableText() {
+                return shape.getName();
+            }
+
+            @Override
+            public String getLocationString() {
+                return shape.getNamespace();
+            }
+
+            @Override
+            public Icon getIcon(boolean unused) {
+                return shape.getContainingFile().getIcon(0);
+            }
+        };
     }
 }

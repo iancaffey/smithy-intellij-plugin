@@ -4,8 +4,10 @@ package software.amazon.smithy.intellij.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.NavigatablePsiElement;
+import com.intellij.navigation.ItemPresentation;
 
-public interface SmithyShape extends SmithyNamedElement, SmithyElement {
+public interface SmithyShape extends SmithyNamedElement, NavigatablePsiElement, SmithyElement {
 
   @NotNull String getNamespace();
 
@@ -16,6 +18,8 @@ public interface SmithyShape extends SmithyNamedElement, SmithyElement {
   @NotNull List<SmithyTrait> getDeclaredTraits();
 
   @NotNull SmithyShapeName getNameIdentifier();
+
+  @NotNull ItemPresentation getPresentation();
 
   int getTextOffset();
 

@@ -5,9 +5,15 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
+import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiDocCommentBase;
 
 public class SmithyVisitor extends PsiElementVisitor {
+
+  public void visitAggregateShape(@NotNull SmithyAggregateShape o) {
+    visitShape(o);
+    // visitElement(o);
+  }
 
   public void visitAppliedTrait(@NotNull SmithyAppliedTrait o) {
     visitElement(o);
@@ -69,17 +75,18 @@ public class SmithyVisitor extends PsiElementVisitor {
   }
 
   public void visitList(@NotNull SmithyList o) {
-    visitShape(o);
+    visitAggregateShape(o);
     // visitElement(o);
   }
 
   public void visitMap(@NotNull SmithyMap o) {
-    visitShape(o);
+    visitAggregateShape(o);
     // visitElement(o);
   }
 
   public void visitMember(@NotNull SmithyMember o) {
     visitNamedElement(o);
+    // visitNavigatablePsiElement(o);
     // visitElement(o);
   }
 
@@ -145,12 +152,13 @@ public class SmithyVisitor extends PsiElementVisitor {
   }
 
   public void visitSet(@NotNull SmithySet o) {
-    visitShape(o);
+    visitAggregateShape(o);
     // visitElement(o);
   }
 
   public void visitShape(@NotNull SmithyShape o) {
     visitNamedElement(o);
+    // visitNavigatablePsiElement(o);
     // visitElement(o);
   }
 
@@ -184,7 +192,7 @@ public class SmithyVisitor extends PsiElementVisitor {
   }
 
   public void visitStructure(@NotNull SmithyStructure o) {
-    visitShape(o);
+    visitAggregateShape(o);
     // visitElement(o);
   }
 
@@ -209,7 +217,7 @@ public class SmithyVisitor extends PsiElementVisitor {
   }
 
   public void visitUnion(@NotNull SmithyUnion o) {
-    visitShape(o);
+    visitAggregateShape(o);
     // visitElement(o);
   }
 

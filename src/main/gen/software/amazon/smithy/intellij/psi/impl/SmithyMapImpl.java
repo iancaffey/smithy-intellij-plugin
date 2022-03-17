@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
 
-public class SmithyMapImpl extends SmithyShapeImpl implements SmithyMap {
+public class SmithyMapImpl extends SmithyAggregateShapeImpl implements SmithyMap {
 
   public SmithyMapImpl(@NotNull ASTNode node) {
     super(node);
@@ -31,12 +31,6 @@ public class SmithyMapImpl extends SmithyShapeImpl implements SmithyMap {
   @Nullable
   public SmithyDocumentation getDocumentation() {
     return findChildByClass(SmithyDocumentation.class);
-  }
-
-  @Override
-  @NotNull
-  public SmithyShapeBody getBody() {
-    return findNotNullChildByClass(SmithyShapeBody.class);
   }
 
 }

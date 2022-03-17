@@ -47,6 +47,8 @@
                         implementationClass="software.amazon.smithy.intellij.SmithyFormattingModelBuilder"/>
         <lang.parserDefinition language="Smithy"
                                implementationClass="software.amazon.smithy.intellij.SmithyParserDefinition"/>
+        <lang.psiStructureViewFactory language="Smithy"
+                                      implementationClass="software.amazon.smithy.intellij.SmithyStructureViewFactory"/>
         <lang.quoteHandler language="Smithy"
                            implementationClass="software.amazon.smithy.intellij.SmithyQuoteHandler"/>
         <lang.syntaxHighlighterFactory language="Smithy"

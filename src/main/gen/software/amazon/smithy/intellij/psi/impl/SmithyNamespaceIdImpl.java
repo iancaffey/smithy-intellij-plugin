@@ -27,14 +27,19 @@ public class SmithyNamespaceIdImpl extends SmithyPsiElement implements SmithyNam
   }
 
   @Override
-  public @NotNull String toString() {
-    return SmithyPsiImplUtil.toString(this);
-  }
-
-  @Override
   @NotNull
   public List<SmithyId> getParts() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyId.class);
+  }
+
+  @Override
+  public @NotNull String getId() {
+    return SmithyPsiImplUtil.getId(this);
+  }
+
+  @Override
+  public @NotNull String toString() {
+    return SmithyPsiImplUtil.toString(this);
   }
 
 }
