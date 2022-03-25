@@ -27,8 +27,10 @@ public interface SmithyShapeId extends SmithyPrimitive, SmithyNamedElement, Smit
 
   int getTextOffset();
 
-  @NotNull String getNamespace();
+  @Nullable String getDeclaredNamespace();
 
-  SmithyShapeReference getReference();
+  @NotNull String getEnclosingNamespace();
+
+  @NotNull SmithyShapeReference getReference();
 
 }

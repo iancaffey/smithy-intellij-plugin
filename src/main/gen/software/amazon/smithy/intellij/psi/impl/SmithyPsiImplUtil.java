@@ -17,6 +17,7 @@ import software.amazon.smithy.intellij.SmithyShapeReference;
 import software.amazon.smithy.intellij.psi.SmithyBoolean;
 import software.amazon.smithy.intellij.psi.SmithyDocumentation;
 import software.amazon.smithy.intellij.psi.SmithyId;
+import software.amazon.smithy.intellij.psi.SmithyImport;
 import software.amazon.smithy.intellij.psi.SmithyKey;
 import software.amazon.smithy.intellij.psi.SmithyKeyedElement;
 import software.amazon.smithy.intellij.psi.SmithyMember;
@@ -252,15 +253,28 @@ public class SmithyPsiImplUtil {
         return namespace.getNamespaceId().getId();
     }
 
-    @NotNull
-    public static String getNamespace(SmithyShapeId shapeId) {
+    @Nullable
+    public static String getDeclaredNamespace(SmithyShapeId shapeId) {
         SmithyNamespaceId namespaceId = shapeId.getNamespaceId();
         if (namespaceId != null) {
             return namespaceId.getId();
         }
         SmithyModel model = ((SmithyFile) shapeId.getContainingFile()).getModel();
-        SmithyNamespace namespace = requireNonNull(PsiTreeUtil.getChildOfType(model, SmithyNamespace.class));
-        return namespace.getNamespaceId().getId();
+        List<SmithyImport> imports = PsiTreeUtil.getChildrenOfTypeAsList(model, SmithyImport.class);
+        for (SmithyImport i : imports) {
+            SmithyShapeId importedShapeId = i.getShapeId();
+            SmithyNamespaceId importedNamespaceId = importedShapeId.getNamespaceId();
+            if (importedNamespaceId != null && shapeId.getName().equals(importedShapeId.getName())) {
+                return importedNamespaceId.getId();
+            }
+        }
+        return null;
+    }
+
+    @NotNull
+    public static String getEnclosingNamespace(SmithyShapeId shapeId) {
+        SmithyModel model = ((SmithyFile) shapeId.getContainingFile()).getModel();
+        return requireNonNull(PsiTreeUtil.getChildOfType(model, SmithyNamespace.class)).getNamespaceId().getId();
     }
 
     @NotNull

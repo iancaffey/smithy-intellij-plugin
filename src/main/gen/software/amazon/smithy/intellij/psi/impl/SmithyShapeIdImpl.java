@@ -72,12 +72,17 @@ public class SmithyShapeIdImpl extends SmithyPrimitiveImpl implements SmithyShap
   }
 
   @Override
-  public @NotNull String getNamespace() {
-    return SmithyPsiImplUtil.getNamespace(this);
+  public @Nullable String getDeclaredNamespace() {
+    return SmithyPsiImplUtil.getDeclaredNamespace(this);
   }
 
   @Override
-  public SmithyShapeReference getReference() {
+  public @NotNull String getEnclosingNamespace() {
+    return SmithyPsiImplUtil.getEnclosingNamespace(this);
+  }
+
+  @Override
+  public @NotNull SmithyShapeReference getReference() {
     return SmithyPsiImplUtil.getReference(this);
   }
 
