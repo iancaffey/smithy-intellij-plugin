@@ -59,6 +59,7 @@
                                 implementationClass="software.amazon.smithy.intellij.SmithyCompletionContributor"/>
         <defaultLiveTemplates file="/liveTemplates/Smithy.xml"/>
         <enterHandlerDelegate implementation="software.amazon.smithy.intellij.SmithyDocumentationEnterHandler"/>
+        <gotoClassContributor implementation="software.amazon.smithy.intellij.SmithyGotoShapeContributor"/>
         <liveTemplateContext implementation="software.amazon.smithy.intellij.SmithyContextType"/>
     </extensions>
 </idea-plugin>
