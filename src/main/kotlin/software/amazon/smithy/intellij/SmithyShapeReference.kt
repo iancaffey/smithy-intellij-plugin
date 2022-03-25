@@ -46,7 +46,7 @@ class SmithyShapeReference(shapeId: SmithyShapeId) : PsiReferenceBase<SmithyShap
             }
         }
         //Attempt to find the shape within the bundled prelude
-        if ((declaredNamespace == null || "smithy.api" == declaredNamespace) && myElement.containingFile != preludes[myElement.project]) {
+        if ((declaredNamespace == null || "smithy.api" == declaredNamespace)) {
             val prelude = preludes.getOrCreate(myElement.project) {
                 PsiFileFactory.getInstance(it).createFileFromText(
                     "prelude.smithy", SmithyLanguage, PRELUDE_TEXT
