@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
+import software.amazon.smithy.intellij.SmithyShapeReference;
 
 public class SmithyShapeIdImpl extends SmithyPrimitiveImpl implements SmithyShapeId {
 
@@ -68,6 +69,16 @@ public class SmithyShapeIdImpl extends SmithyPrimitiveImpl implements SmithyShap
   @Override
   public int getTextOffset() {
     return SmithyPsiImplUtil.getTextOffset(this);
+  }
+
+  @Override
+  public @NotNull String getNamespace() {
+    return SmithyPsiImplUtil.getNamespace(this);
+  }
+
+  @Override
+  public SmithyShapeReference getReference() {
+    return SmithyPsiImplUtil.getReference(this);
   }
 
   @Override

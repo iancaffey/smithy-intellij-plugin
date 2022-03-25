@@ -12,6 +12,8 @@ import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import software.amazon.smithy.intellij.SmithyFile;
+import software.amazon.smithy.intellij.SmithyShapeReference;
 import software.amazon.smithy.intellij.psi.SmithyBoolean;
 import software.amazon.smithy.intellij.psi.SmithyDocumentation;
 import software.amazon.smithy.intellij.psi.SmithyId;
@@ -251,6 +253,17 @@ public class SmithyPsiImplUtil {
     }
 
     @NotNull
+    public static String getNamespace(SmithyShapeId shapeId) {
+        SmithyNamespaceId namespaceId = shapeId.getNamespaceId();
+        if (namespaceId != null) {
+            return namespaceId.getId();
+        }
+        SmithyModel model = ((SmithyFile) shapeId.getContainingFile()).getModel();
+        SmithyNamespace namespace = requireNonNull(PsiTreeUtil.getChildOfType(model, SmithyNamespace.class));
+        return namespace.getNamespaceId().getId();
+    }
+
+    @NotNull
     public static List<SmithyTrait> getDeclaredTraits(SmithyShape shape) {
         return PsiTreeUtil.getChildrenOfTypeAsList(shape, SmithyTrait.class);
     }
@@ -320,5 +333,10 @@ public class SmithyPsiImplUtil {
                 return shape.getIcon(0);
             }
         };
+    }
+
+    @NotNull
+    public static SmithyShapeReference getReference(SmithyShapeId shapeId) {
+        return new SmithyShapeReference(shapeId);
     }
 }
