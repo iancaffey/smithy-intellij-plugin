@@ -104,7 +104,7 @@ primitive ::= null | boolean | number | string | text_block | shape_id
 //Shape ID
 shape_id ::= [namespace_id TOKEN_HASH] shape_name [TOKEN_DOLLAR_SIGN member_name] {implements=named_element methods=[getId getName setName getNameIdentifier getTextOffset getDeclaredNamespace getEnclosingNamespace getReference toString]}
 namespace_id ::= id (TOKEN_PERIOD id)* {methods=[parts="id" getId toString]}
-shape_name ::= id {methods=[toString id=""]}
+shape_name ::= id {methods=[id="" getReference toString]}
 member_name ::= id {methods=[toString id=""]}
 id ::= symbol | keyword | null | boolean | simple_type_name {methods=[toString null="" boolean=""]}
 

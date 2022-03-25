@@ -9,6 +9,7 @@ import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
 import software.amazon.smithy.intellij.psi.SmithyShape
 import software.amazon.smithy.intellij.psi.SmithyShapeId
+import software.amazon.smithy.intellij.psi.SmithyShapeName
 
 /**
  * A [PsiReference] from a [SmithyShapeId] to its original [SmithyShape].
@@ -36,5 +37,20 @@ class SmithyShapeReference(shapeId: SmithyShapeId) : PsiReferenceBase<SmithyShap
         }
         //Note: this could resolve to a prelude shape (which could be represented with a fake PsiElement for display in the IDE)
         return null
+    }
+
+    /**
+     * A [PsiReference] from a [SmithyShapeName] which can resolve to its original [SmithyShape] using the parent [SmithyShapeId] or [SmithyShape] (for own references).
+     *
+     * @author Ian Caffey
+     * @since 1.0
+     */
+    class ByName(shapeName: SmithyShapeName) : PsiReferenceBase<SmithyShapeName>(
+        shapeName, TextRange.from(0, shapeName.textLength), true
+    ) {
+        private val ownRef = shapeName.parent as? SmithyShape
+        private val delegate = (shapeName.parent as? SmithyShapeId)?.let { SmithyShapeReference(it) }
+        override fun getAbsoluteRange(): TextRange = myElement.textRange
+        override fun resolve() = ownRef ?: delegate?.resolve()
     }
 }

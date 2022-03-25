@@ -349,6 +349,11 @@ public class SmithyPsiImplUtil {
         };
     }
 
+    @Nullable
+    public static SmithyShapeReference.ByName getReference(SmithyShapeName shapeName) {
+        return new SmithyShapeReference.ByName(shapeName);
+    }
+
     @NotNull
     public static SmithyShapeReference getReference(SmithyShapeId shapeId) {
         return new SmithyShapeReference(shapeId);
