@@ -51,6 +51,26 @@ public class SmithyShapeIdImpl extends SmithyPrimitiveImpl implements SmithyShap
   }
 
   @Override
+  public @NotNull String getName() {
+    return SmithyPsiImplUtil.getName(this);
+  }
+
+  @Override
+  public @NotNull SmithyShapeId setName(String newName) {
+    return SmithyPsiImplUtil.setName(this, newName);
+  }
+
+  @Override
+  public @NotNull SmithyShapeName getNameIdentifier() {
+    return SmithyPsiImplUtil.getNameIdentifier(this);
+  }
+
+  @Override
+  public int getTextOffset() {
+    return SmithyPsiImplUtil.getTextOffset(this);
+  }
+
+  @Override
   public @NotNull String toString() {
     return SmithyPsiImplUtil.toString(this);
   }

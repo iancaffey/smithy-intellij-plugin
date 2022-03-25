@@ -5,20 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyTrait extends SmithyNamedElement, SmithyElement {
+public interface SmithyTrait extends SmithyElement {
 
   @NotNull
   SmithyShapeId getShapeId();
 
   @Nullable
   SmithyTraitBody getBody();
-
-  @NotNull String getName();
-
-  @NotNull SmithyShapeName getNameIdentifier();
-
-  int getTextOffset();
-
-  @NotNull SmithyTrait setName(String newName);
 
 }

@@ -211,27 +211,27 @@ public class SmithyPsiImplUtil {
     }
 
     @NotNull
-    public static String getName(SmithyTrait trait) {
-        return trait.getNameIdentifier().getText();
+    public static String getName(SmithyShapeId shapeId) {
+        return shapeId.getNameIdentifier().getText();
     }
 
     @NotNull
-    public static SmithyTrait setName(SmithyTrait trait, String newName) {
-        SmithyShapeName name = trait.getNameIdentifier();
+    public static SmithyShapeId setName(SmithyShapeId shapeId, String newName) {
+        SmithyShapeName name = shapeId.getNameIdentifier();
         TextRange textRange = name.getTextRange();
         Document document = FileDocumentManager.getInstance().getDocument(name.getContainingFile().getVirtualFile());
         document.replaceString(textRange.getStartOffset(), textRange.getEndOffset(), newName);
         PsiDocumentManager.getInstance(name.getProject()).commitDocument(document);
-        return trait;
+        return shapeId;
     }
 
     @NotNull
-    public static SmithyShapeName getNameIdentifier(SmithyTrait trait) {
-        return trait.getShapeId().getShapeName();
+    public static SmithyShapeName getNameIdentifier(SmithyShapeId shapeId) {
+        return shapeId.getShapeName();
     }
 
-    public static int getTextOffset(SmithyTrait trait) {
-        return trait.getNameIdentifier().getTextOffset();
+    public static int getTextOffset(SmithyShapeId shapeId) {
+        return shapeId.getNameIdentifier().getTextOffset();
     }
 
     @NotNull

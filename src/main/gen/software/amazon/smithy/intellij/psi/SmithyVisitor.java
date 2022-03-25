@@ -169,6 +169,7 @@ public class SmithyVisitor extends PsiElementVisitor {
 
   public void visitShapeId(@NotNull SmithyShapeId o) {
     visitPrimitive(o);
+    // visitNamedElement(o);
     // visitElement(o);
   }
 
@@ -207,8 +208,7 @@ public class SmithyVisitor extends PsiElementVisitor {
   }
 
   public void visitTrait(@NotNull SmithyTrait o) {
-    visitNamedElement(o);
-    // visitElement(o);
+    visitElement(o);
   }
 
   public void visitTraitBody(@NotNull SmithyTraitBody o) {
