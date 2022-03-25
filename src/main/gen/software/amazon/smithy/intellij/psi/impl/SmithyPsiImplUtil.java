@@ -1,6 +1,5 @@
 package software.amazon.smithy.intellij.psi.impl;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.editor.Document;
@@ -291,8 +290,14 @@ public class SmithyPsiImplUtil {
             }
 
             @Override
+            public String getLocationString() {
+                SmithyShape parentShape = (SmithyShape) member.getParent().getParent();
+                return parentShape.getNamespace() + "#" + parentShape.getName();
+            }
+
+            @Override
             public Icon getIcon(boolean unused) {
-                return AllIcons.Nodes.Method; //Method icon displays as [m]
+                return member.getIcon(0);
             }
         };
     }
@@ -312,7 +317,7 @@ public class SmithyPsiImplUtil {
 
             @Override
             public Icon getIcon(boolean unused) {
-                return shape.getContainingFile().getIcon(0);
+                return shape.getIcon(0);
             }
         };
     }
