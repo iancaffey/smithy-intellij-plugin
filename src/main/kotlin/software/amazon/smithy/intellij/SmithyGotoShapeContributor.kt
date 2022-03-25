@@ -25,17 +25,18 @@ class SmithyGotoShapeContributor : GotoClassContributor, ChooseByNameContributor
     override fun getTabTitlePluralized() = "Shapes"
     override fun getElementLanguage() = SmithyLanguage
     override fun processNames(processor: Processor<in String>, scope: GlobalSearchScope, filter: IdFilter?) {
-        findShapes(scope).forEach { processor.process(it.name) }
+        processShapes(scope) { processor.process(it.name) }
     }
 
     override fun processElementsWithName(
         name: String, processor: Processor<in NavigationItem>, parameters: FindSymbolParameters
     ) {
-        findShapes(parameters.searchScope).forEach { if (it.name == name) processor.process(it) }
+        processShapes(parameters.searchScope) { if (it.name == name) processor.process(it) }
     }
 
-    private fun findShapes(scope: GlobalSearchScope) = FileTypeIndex.getFiles(SmithyFileType, scope).flatMap {
-        val file = PsiManager.getInstance(scope.project!!).findFile(it) as? SmithyFile
-        file?.model?.shapes ?: emptyList()
-    }
+    private fun processShapes(scope: GlobalSearchScope, action: (SmithyShape) -> Unit) =
+        FileTypeIndex.getFiles(SmithyFileType, scope).forEach {
+            val file = PsiManager.getInstance(scope.project!!).findFile(it) as? SmithyFile ?: return@forEach
+            file.model.shapes.forEach(action)
+        }
 }

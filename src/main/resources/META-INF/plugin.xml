@@ -60,6 +60,7 @@
         <defaultLiveTemplates file="/liveTemplates/Smithy.xml"/>
         <enterHandlerDelegate implementation="software.amazon.smithy.intellij.SmithyDocumentationEnterHandler"/>
         <gotoClassContributor implementation="software.amazon.smithy.intellij.SmithyGotoShapeContributor"/>
+        <gotoSymbolContributor implementation="software.amazon.smithy.intellij.SmithyGotoMemberContributor"/>
         <liveTemplateContext implementation="software.amazon.smithy.intellij.SmithyContextType"/>
     </extensions>
 </idea-plugin>
