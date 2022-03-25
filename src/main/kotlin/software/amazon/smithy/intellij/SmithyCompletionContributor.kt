@@ -7,7 +7,11 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.patterns.PlatformPatterns
+import com.intellij.psi.PsiManager
+import com.intellij.psi.search.FileTypeIndex
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.ProcessingContext
+import software.amazon.smithy.intellij.psi.SmithyAggregateShape
 import software.amazon.smithy.intellij.psi.SmithyTypes
 
 /**
@@ -84,7 +88,19 @@ class SmithyCompletionContributor : CompletionContributor() {
                 override fun addCompletions(
                     parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet
                 ) {
+                    val project = parameters.editor.project!!
                     GLOBAL_SYMBOLS.forEach { result.addElement(LookupElementBuilder.create(it)) }
+                    FileTypeIndex.getFiles(SmithyFileType, GlobalSearchScope.allScope(project)).forEach {
+                        val file = PsiManager.getInstance(project).findFile(it) as? SmithyFile ?: return@forEach
+                        file.model.shapes.forEach { shape ->
+                            result.addElement(LookupElementBuilder.create(shape.name))
+                            if (shape is SmithyAggregateShape) {
+                                shape.body.members.forEach { member ->
+                                    result.addElement(LookupElementBuilder.create(member.name))
+                                }
+                            }
+                        }
+                    }
                 }
             })
     }
