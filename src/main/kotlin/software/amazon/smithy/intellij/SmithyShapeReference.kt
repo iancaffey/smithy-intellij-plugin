@@ -1,15 +1,19 @@
 package software.amazon.smithy.intellij
 
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
+import com.jetbrains.rd.util.getOrCreate
 import software.amazon.smithy.intellij.psi.SmithyShape
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 import software.amazon.smithy.intellij.psi.SmithyShapeName
+import java.nio.charset.StandardCharsets
 
 /**
  * A [PsiReference] from a [SmithyShapeId] to its original [SmithyShape].
@@ -20,6 +24,12 @@ import software.amazon.smithy.intellij.psi.SmithyShapeName
 class SmithyShapeReference(shapeId: SmithyShapeId) : PsiReferenceBase<SmithyShapeId>(
     shapeId, TextRange.from(0, shapeId.textLength), true
 ) {
+    companion object {
+        private val PRELUDE_TEXT = this::class.java.getResourceAsStream("/prelude/1.0.smithy")!!.readAllBytes()
+            .toString(StandardCharsets.UTF_8)
+        private val preludes = mutableMapOf<Project, SmithyFile>()
+    }
+
     override fun getAbsoluteRange(): TextRange = myElement.textRange
     override fun resolve(): PsiElement? {
         val declaredNamespace = myElement.declaredNamespace
@@ -35,7 +45,15 @@ class SmithyShapeReference(shapeId: SmithyShapeId) : PsiReferenceBase<SmithyShap
                 }
             }
         }
-        //Note: this could resolve to a prelude shape (which could be represented with a fake PsiElement for display in the IDE)
+        //Attempt to find the shape within the bundled prelude
+        if ((declaredNamespace == null || "smithy.api" == declaredNamespace) && myElement.containingFile != preludes[myElement.project]) {
+            val prelude = preludes.getOrCreate(myElement.project) {
+                PsiFileFactory.getInstance(it).createFileFromText(
+                    "prelude.smithy", SmithyLanguage, PRELUDE_TEXT
+                ) as SmithyFile
+            }
+            return prelude.model.shapes.find { it.name == myElement.name }
+        }
         return null
     }
 
