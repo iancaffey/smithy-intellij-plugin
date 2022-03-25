@@ -9,6 +9,10 @@ import com.intellij.openapi.util.IconLoader
  * @since 1.0
  */
 object SmithyIcons {
-    val FILE = IconLoader.getIcon("META-INF/fileIcon.svg", SmithyIcons.javaClass)
-    val LOGO = IconLoader.getIcon("META-INF/pluginIcon.svg", SmithyIcons.javaClass)
+    val FILE = icon("file")
+    val LOGO = icon("plugin")
+    val MEMBER = icon("member")
+    val SHAPE = icon("shape")
+
+    private fun icon(name: String) = IconLoader.getIcon("META-INF/${name}Icon.svg", SmithyIcons.javaClass)
 }
