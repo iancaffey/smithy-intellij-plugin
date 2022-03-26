@@ -52,13 +52,32 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 1f
             )
             element.body?.let { body ->
-                HtmlSyntaxInfoUtil.appendHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
-                    this,
-                    element.project,
-                    SmithyLanguage,
-                    body.text,
-                    1f
-                )
+                //Note: since keys are dynamically highlighted using an annotator, this will manually apply the same
+                //behavior to improve readability of trait values
+                if (body.values.isNotEmpty()) {
+                    append(body.values.joinToString(", ", "(", ")") {
+                        val key = HtmlSyntaxInfoUtil.getStyledSpan(
+                            SmithyColorSettings.KEY,
+                            it.key.text,
+                            1f
+                        )
+                        val value = HtmlSyntaxInfoUtil.getHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
+                            element.project,
+                            SmithyLanguage,
+                            it.value.text,
+                            1f
+                        )
+                        "$key: $value"
+                    })
+                } else {
+                    HtmlSyntaxInfoUtil.appendHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
+                        this,
+                        element.project,
+                        SmithyLanguage,
+                        body.text,
+                        1f
+                    )
+                }
             }
         }
         else -> null
