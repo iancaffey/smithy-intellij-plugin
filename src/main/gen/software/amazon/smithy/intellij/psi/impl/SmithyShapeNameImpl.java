@@ -28,7 +28,7 @@ public class SmithyShapeNameImpl extends SmithyPsiElement implements SmithyShape
   }
 
   @Override
-  public @Nullable SmithyShapeReference.ByName getReference() {
+  public @NotNull SmithyShapeReference.ByName getReference() {
     return SmithyPsiImplUtil.getReference(this);
   }
 

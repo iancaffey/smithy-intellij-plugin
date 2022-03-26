@@ -16,6 +16,7 @@ import software.amazon.smithy.intellij.SmithyFile;
 import software.amazon.smithy.intellij.SmithyShapeReference;
 import software.amazon.smithy.intellij.psi.SmithyBoolean;
 import software.amazon.smithy.intellij.psi.SmithyDocumentation;
+import software.amazon.smithy.intellij.psi.SmithyEntry;
 import software.amazon.smithy.intellij.psi.SmithyId;
 import software.amazon.smithy.intellij.psi.SmithyImport;
 import software.amazon.smithy.intellij.psi.SmithyKey;
@@ -349,13 +350,23 @@ public class SmithyPsiImplUtil {
         };
     }
 
-    @Nullable
+    @NotNull
+    public static SmithyShapeReference getReference(SmithyShapeId shapeId) {
+        return new SmithyShapeReference(shapeId);
+    }
+
+    @NotNull
     public static SmithyShapeReference.ByName getReference(SmithyShapeName shapeName) {
         return new SmithyShapeReference.ByName(shapeName);
     }
 
     @NotNull
-    public static SmithyShapeReference getReference(SmithyShapeId shapeId) {
-        return new SmithyShapeReference(shapeId);
+    public static SmithyShapeReference.ByKey getReference(SmithyKey key) {
+        return new SmithyShapeReference.ByKey(key);
+    }
+
+    @NotNull
+    public static SmithyShapeReference.ByMember getReference(SmithyEntry entry) {
+        return new SmithyShapeReference.ByMember(entry);
     }
 }

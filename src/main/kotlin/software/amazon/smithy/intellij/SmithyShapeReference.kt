@@ -2,17 +2,22 @@ package software.amazon.smithy.intellij
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.rd.util.getOrCreate
+import software.amazon.smithy.intellij.psi.SmithyAggregateShape
+import software.amazon.smithy.intellij.psi.SmithyEntry
+import software.amazon.smithy.intellij.psi.SmithyKey
+import software.amazon.smithy.intellij.psi.SmithyMember
 import software.amazon.smithy.intellij.psi.SmithyShape
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 import software.amazon.smithy.intellij.psi.SmithyShapeName
+import software.amazon.smithy.intellij.psi.SmithyTrait
 import java.nio.charset.StandardCharsets
 
 /**
@@ -31,7 +36,7 @@ class SmithyShapeReference(shapeId: SmithyShapeId) : PsiReferenceBase<SmithyShap
     }
 
     override fun getAbsoluteRange(): TextRange = myElement.textRange
-    override fun resolve(): PsiElement? {
+    override fun resolve(): SmithyShape? {
         val declaredNamespace = myElement.declaredNamespace
         val enclosingNamespace = myElement.enclosingNamespace
         //Note: currently this can only resolve references between project source files
@@ -70,5 +75,38 @@ class SmithyShapeReference(shapeId: SmithyShapeId) : PsiReferenceBase<SmithyShap
         private val delegate = (shapeName.parent as? SmithyShapeId)?.let { SmithyShapeReference(it) }
         override fun getAbsoluteRange(): TextRange = myElement.textRange
         override fun resolve() = ownRef ?: delegate?.resolve()
+    }
+
+    /**
+     * A [PsiReference] from a [SmithyEntry] which can resolve to its original [SmithyMember].
+     *
+     * @author Ian Caffey
+     * @since 1.0
+     */
+    class ByMember(entry: SmithyEntry) : PsiReferenceBase<SmithyEntry>(
+        entry, TextRange.from(0, entry.textLength), true
+    ) {
+        private val delegate = PsiTreeUtil.findFirstParent(entry) { it is SmithyTrait }?.let {
+            SmithyShapeReference((it as SmithyTrait).shapeId)
+        }
+
+        override fun getAbsoluteRange(): TextRange = myElement.textRange
+        override fun resolve() = (delegate?.resolve() as? SmithyAggregateShape)?.let { shape ->
+            shape.body.members.find { it.name == myElement.name }
+        }
+    }
+
+    /**
+     * A [PsiReference] from a [SmithyKey] which can resolve to its original [SmithyMember] using the parent [SmithyEntry].
+     *
+     * @author Ian Caffey
+     * @since 1.0
+     */
+    class ByKey(key: SmithyKey) : PsiReferenceBase<SmithyKey>(
+        key, TextRange.from(0, key.textLength), true
+    ) {
+        private val delegate = (myElement.parent as? SmithyEntry)?.let { ByMember(it) }
+        override fun getAbsoluteRange(): TextRange = myElement.textRange
+        override fun resolve() = delegate?.resolve()
     }
 }

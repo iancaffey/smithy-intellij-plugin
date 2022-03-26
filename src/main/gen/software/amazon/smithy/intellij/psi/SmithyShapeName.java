@@ -8,6 +8,6 @@ import software.amazon.smithy.intellij.SmithyShapeReference;
 
 public interface SmithyShapeName extends SmithyElement {
 
-  @Nullable SmithyShapeReference.ByName getReference();
+  @NotNull SmithyShapeReference.ByName getReference();
 
 }
