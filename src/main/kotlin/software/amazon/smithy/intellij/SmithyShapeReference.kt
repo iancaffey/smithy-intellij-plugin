@@ -2,6 +2,7 @@ package software.amazon.smithy.intellij
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiReference
@@ -55,7 +56,10 @@ class SmithyShapeReference(shapeId: SmithyShapeId) : PsiReferenceBase<SmithyShap
             val prelude = preludes.getOrCreate(myElement.project) {
                 PsiFileFactory.getInstance(it).createFileFromText(
                     "prelude.smithy", SmithyLanguage, PRELUDE_TEXT
-                ) as SmithyFile
+                ).apply {
+                    virtualFile.isWritable = false
+                    PsiDocumentManager.getInstance(myElement.project).getDocument(this)?.setReadOnly(true)
+                } as SmithyFile
             }
             return prelude.model.shapes.find { it.name == myElement.name }
         }
