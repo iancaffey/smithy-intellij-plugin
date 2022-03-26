@@ -18,7 +18,11 @@ import software.amazon.smithy.intellij.psi.SmithyShape
  * @since 1.0
  */
 class SmithyGotoShapeContributor : GotoClassContributor, ChooseByNameContributorEx {
-    override fun getQualifiedName(item: NavigationItem) = (item as SmithyShape).let { "${it.namespace}#${it.name}" }
+    override fun getQualifiedName(item: NavigationItem) = when (item) {
+        is SmithyShape -> "${item.namespace}#${item.name}"
+        else -> item.name
+    }
+
     override fun getQualifiedNameSeparator() = "#"
     override fun getElementKind() = "shape"
     override fun getElementKindsPluralized() = listOf("Shapes")
