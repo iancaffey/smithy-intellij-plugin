@@ -1,5 +1,6 @@
 package software.amazon.smithy.intellij
 
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiDocumentManager
@@ -36,6 +37,7 @@ class SmithyShapeReference(shapeId: SmithyShapeId) : PsiReferenceBase<SmithyShap
         private val preludes = mutableMapOf<Project, SmithyFile>()
     }
 
+    override fun handleElementRename(newElementName: String) = myElement.setName(newElementName)
     override fun getAbsoluteRange(): TextRange = myElement.textRange
     override fun resolve(): SmithyShape? {
         val declaredNamespace = myElement.declaredNamespace
@@ -79,6 +81,13 @@ class SmithyShapeReference(shapeId: SmithyShapeId) : PsiReferenceBase<SmithyShap
         private val delegate = (shapeName.parent as? SmithyShapeId)?.let { SmithyShapeReference(it) }
         override fun getAbsoluteRange(): TextRange = myElement.textRange
         override fun resolve() = ownRef ?: delegate?.resolve()
+        override fun handleElementRename(newElementName: String): SmithyShapeName {
+            val textRange = myElement.textRange
+            val document = FileDocumentManager.getInstance().getDocument(myElement.containingFile.virtualFile)
+            document!!.replaceString(textRange.startOffset, textRange.endOffset, newElementName)
+            PsiDocumentManager.getInstance(myElement.project).commitDocument(document)
+            return myElement
+        }
     }
 
     /**
@@ -94,6 +103,7 @@ class SmithyShapeReference(shapeId: SmithyShapeId) : PsiReferenceBase<SmithyShap
             SmithyShapeReference((it as SmithyTrait).shapeId)
         }
 
+        override fun handleElementRename(newElementName: String) = myElement.setName(newElementName)
         override fun getAbsoluteRange(): TextRange = myElement.textRange
         override fun resolve() = (delegate?.resolve() as? SmithyAggregateShape)?.let { shape ->
             shape.body.members.find { it.name == myElement.name }
@@ -112,5 +122,12 @@ class SmithyShapeReference(shapeId: SmithyShapeId) : PsiReferenceBase<SmithyShap
         private val delegate = (myElement.parent as? SmithyEntry)?.let { ByMember(it) }
         override fun getAbsoluteRange(): TextRange = myElement.textRange
         override fun resolve() = delegate?.resolve()
+        override fun handleElementRename(newElementName: String): SmithyKey {
+            val textRange = myElement.textRange
+            val document = FileDocumentManager.getInstance().getDocument(myElement.containingFile.virtualFile)
+            document!!.replaceString(textRange.startOffset, textRange.endOffset, newElementName)
+            PsiDocumentManager.getInstance(myElement.project).commitDocument(document)
+            return myElement
+        }
     }
 }
