@@ -26,6 +26,6 @@ intellij {
 }
 
 patchPluginXml {
-    sinceBuild = '211'
+    sinceBuild = '213'
     changeNotes = provider { changelog.getLatest().toHTML() }
 }
