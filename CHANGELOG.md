@@ -2,6 +2,10 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [1.4.1]
+### Added
+- Enabled the plugin for use in 2022.1 (and all future builds).
+
 ## [1.4.0]
 ### Added
 - Added support for resolving `SmithyShapeId` references (only within the current project for now). 

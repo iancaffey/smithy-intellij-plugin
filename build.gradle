@@ -7,7 +7,7 @@ plugins {
 apply plugin: 'org.jetbrains.changelog'
 
 group 'software.amazon.smithy'
-version '1.4.0'
+version '1.4.1'
 
 repositories {
     mavenCentral()
@@ -23,6 +23,7 @@ dependencies {
 
 intellij {
     version = '2021.3.2'
+    updateSinceUntilBuild = false
 }
 
 patchPluginXml {
