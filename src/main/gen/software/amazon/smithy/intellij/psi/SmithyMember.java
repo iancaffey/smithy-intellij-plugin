@@ -21,12 +21,15 @@ public interface SmithyMember extends SmithyNamedElement, NavigatablePsiElement,
   @NotNull
   SmithyMemberName getNameIdentifier();
 
-  @NotNull String getName();
+  @NotNull
+  String getName();
 
-  @NotNull ItemPresentation getPresentation();
+  @NotNull
+  ItemPresentation getPresentation();
 
   int getTextOffset();
 
-  @NotNull SmithyMember setName(String newName);
+  @NotNull
+  SmithyMember setName(@Nullable String newName);
 
 }

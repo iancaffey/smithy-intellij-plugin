@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface SmithyModel extends SmithyElement {
 
-  @NotNull List<SmithyShape> getShapes();
+  @NotNull
+  List<SmithyShape> getShapes();
 
 }

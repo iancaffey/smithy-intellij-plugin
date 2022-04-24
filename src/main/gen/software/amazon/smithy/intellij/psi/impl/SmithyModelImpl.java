@@ -8,7 +8,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
+import software.amazon.smithy.intellij.ext.SmithyPsiElement;
 import software.amazon.smithy.intellij.psi.*;
+import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 
 public class SmithyModelImpl extends SmithyPsiElement implements SmithyModel {
 
@@ -27,8 +29,9 @@ public class SmithyModelImpl extends SmithyPsiElement implements SmithyModel {
   }
 
   @Override
-  public @NotNull List<SmithyShape> getShapes() {
-    return SmithyPsiImplUtil.getShapes(this);
+  @NotNull
+  public List<SmithyShape> getShapes() {
+    return SmithyPsiImplUtilKt.getShapes(this);
   }
 
 }

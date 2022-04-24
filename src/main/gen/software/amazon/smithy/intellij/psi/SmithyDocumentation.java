@@ -9,10 +9,13 @@ import com.intellij.psi.tree.IElementType;
 
 public interface SmithyDocumentation extends PsiDocCommentBase, SmithyElement {
 
+  @NotNull
   PsiElement getOwner();
 
-  @NotNull IElementType getTokenType();
+  @NotNull
+  IElementType getTokenType();
 
-  @NotNull String toDocString();
+  @NotNull
+  String toDocString();
 
 }

@@ -8,7 +8,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
+import software.amazon.smithy.intellij.ext.SmithyPsiElement;
 import software.amazon.smithy.intellij.psi.*;
+import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 
 public class SmithyKeyedElementImpl extends SmithyPsiElement implements SmithyKeyedElement {
 
@@ -33,23 +35,26 @@ public class SmithyKeyedElementImpl extends SmithyPsiElement implements SmithyKe
   }
 
   @Override
-  public @NotNull String getName() {
-    return SmithyPsiImplUtil.getName(this);
+  @NotNull
+  public String getName() {
+    return SmithyPsiImplUtilKt.getName(this);
   }
 
   @Override
-  public @NotNull SmithyKeyedElement setName(String newName) {
-    return SmithyPsiImplUtil.setName(this, newName);
+  @NotNull
+  public SmithyKeyedElement setName(@Nullable String newName) {
+    return SmithyPsiImplUtilKt.setName(this, newName);
   }
 
   @Override
-  public @NotNull SmithyKey getNameIdentifier() {
-    return SmithyPsiImplUtil.getNameIdentifier(this);
+  @NotNull
+  public SmithyKey getNameIdentifier() {
+    return SmithyPsiImplUtilKt.getNameIdentifier(this);
   }
 
   @Override
   public int getTextOffset() {
-    return SmithyPsiImplUtil.getTextOffset(this);
+    return SmithyPsiImplUtilKt.getTextOffset(this);
   }
 
 }

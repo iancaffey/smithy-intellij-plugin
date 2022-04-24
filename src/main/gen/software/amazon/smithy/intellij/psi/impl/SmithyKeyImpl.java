@@ -8,8 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
+import software.amazon.smithy.intellij.ext.SmithyPsiElement;
 import software.amazon.smithy.intellij.psi.*;
-import software.amazon.smithy.intellij.SmithyShapeReference;
+import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
+import software.amazon.smithy.intellij.SmithyShapeReference.ByKey;
 
 public class SmithyKeyImpl extends SmithyPsiElement implements SmithyKey {
 
@@ -40,8 +42,9 @@ public class SmithyKeyImpl extends SmithyPsiElement implements SmithyKey {
   }
 
   @Override
-  public @NotNull SmithyShapeReference.ByKey getReference() {
-    return SmithyPsiImplUtil.getReference(this);
+  @NotNull
+  public ByKey getReference() {
+    return SmithyPsiImplUtilKt.getReference(this);
   }
 
 }

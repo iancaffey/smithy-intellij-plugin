@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
+import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 import software.amazon.smithy.intellij.SmithyShapeReference;
 
 public class SmithyShapeIdImpl extends SmithyPrimitiveImpl implements SmithyShapeId {
@@ -47,48 +48,56 @@ public class SmithyShapeIdImpl extends SmithyPrimitiveImpl implements SmithyShap
   }
 
   @Override
-  public @NotNull String getId() {
-    return SmithyPsiImplUtil.getId(this);
+  @NotNull
+  public String getId() {
+    return SmithyPsiImplUtilKt.getId(this);
   }
 
   @Override
-  public @NotNull String getName() {
-    return SmithyPsiImplUtil.getName(this);
+  @NotNull
+  public String getName() {
+    return SmithyPsiImplUtilKt.getName(this);
   }
 
   @Override
-  public @NotNull SmithyShapeId setName(String newName) {
-    return SmithyPsiImplUtil.setName(this, newName);
+  @NotNull
+  public SmithyShapeId setName(@Nullable String newName) {
+    return SmithyPsiImplUtilKt.setName(this, newName);
   }
 
   @Override
-  public @NotNull SmithyShapeName getNameIdentifier() {
-    return SmithyPsiImplUtil.getNameIdentifier(this);
+  @NotNull
+  public SmithyShapeName getNameIdentifier() {
+    return SmithyPsiImplUtilKt.getNameIdentifier(this);
   }
 
   @Override
   public int getTextOffset() {
-    return SmithyPsiImplUtil.getTextOffset(this);
+    return SmithyPsiImplUtilKt.getTextOffset(this);
   }
 
   @Override
-  public @Nullable String getDeclaredNamespace() {
-    return SmithyPsiImplUtil.getDeclaredNamespace(this);
+  @Nullable
+  public String getDeclaredNamespace() {
+    return SmithyPsiImplUtilKt.getDeclaredNamespace(this);
   }
 
   @Override
-  public @NotNull String getEnclosingNamespace() {
-    return SmithyPsiImplUtil.getEnclosingNamespace(this);
+  @NotNull
+  public String getEnclosingNamespace() {
+    return SmithyPsiImplUtilKt.getEnclosingNamespace(this);
   }
 
   @Override
-  public @NotNull SmithyShapeReference getReference() {
-    return SmithyPsiImplUtil.getReference(this);
+  @NotNull
+  public SmithyShapeReference getReference() {
+    return SmithyPsiImplUtilKt.getReference(this);
   }
 
   @Override
-  public @NotNull String toString() {
-    return SmithyPsiImplUtil.toString(this);
+  @NotNull
+  public String toString() {
+    return SmithyPsiImplUtilKt.toString(this);
   }
 
 }

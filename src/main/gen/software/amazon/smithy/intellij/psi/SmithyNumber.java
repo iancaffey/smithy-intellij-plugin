@@ -21,8 +21,10 @@ public interface SmithyNumber extends SmithyPrimitive, SmithyElement {
 
   double doubleValue();
 
+  @NotNull
   BigDecimal bigDecimalValue();
 
+  @NotNull
   BigInteger bigIntegerValue();
 
 }

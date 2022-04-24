@@ -10,6 +10,7 @@ public interface SmithyNamespaceId extends SmithyElement {
   @NotNull
   List<SmithyId> getParts();
 
-  @NotNull String getId();
+  @NotNull
+  String getId();
 
 }

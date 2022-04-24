@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
+import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 
 public class SmithyTextBlockImpl extends SmithyPrimitiveImpl implements SmithyTextBlock {
 

@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
+import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -31,42 +32,44 @@ public class SmithyNumberImpl extends SmithyPrimitiveImpl implements SmithyNumbe
 
   @Override
   public double byteValue() {
-    return SmithyPsiImplUtil.byteValue(this);
+    return SmithyPsiImplUtilKt.byteValue(this);
   }
 
   @Override
   public double shortValue() {
-    return SmithyPsiImplUtil.shortValue(this);
+    return SmithyPsiImplUtilKt.shortValue(this);
   }
 
   @Override
   public double intValue() {
-    return SmithyPsiImplUtil.intValue(this);
+    return SmithyPsiImplUtilKt.intValue(this);
   }
 
   @Override
   public long longValue() {
-    return SmithyPsiImplUtil.longValue(this);
+    return SmithyPsiImplUtilKt.longValue(this);
   }
 
   @Override
   public float floatValue() {
-    return SmithyPsiImplUtil.floatValue(this);
+    return SmithyPsiImplUtilKt.floatValue(this);
   }
 
   @Override
   public double doubleValue() {
-    return SmithyPsiImplUtil.doubleValue(this);
+    return SmithyPsiImplUtilKt.doubleValue(this);
   }
 
   @Override
+  @NotNull
   public BigDecimal bigDecimalValue() {
-    return SmithyPsiImplUtil.bigDecimalValue(this);
+    return SmithyPsiImplUtilKt.bigDecimalValue(this);
   }
 
   @Override
+  @NotNull
   public BigInteger bigIntegerValue() {
-    return SmithyPsiImplUtil.bigIntegerValue(this);
+    return SmithyPsiImplUtilKt.bigIntegerValue(this);
   }
 
 }

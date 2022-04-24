@@ -8,7 +8,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
+import software.amazon.smithy.intellij.ext.SmithyPsiElement;
 import software.amazon.smithy.intellij.psi.*;
+import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 import com.intellij.navigation.ItemPresentation;
 
 public abstract class SmithyShapeImpl extends SmithyPsiElement implements SmithyShape {
@@ -28,43 +30,50 @@ public abstract class SmithyShapeImpl extends SmithyPsiElement implements Smithy
   }
 
   @Override
-  public @NotNull String getNamespace() {
-    return SmithyPsiImplUtil.getNamespace(this);
+  @NotNull
+  public String getNamespace() {
+    return SmithyPsiImplUtilKt.getNamespace(this);
   }
 
   @Override
-  public @NotNull String getName() {
-    return SmithyPsiImplUtil.getName(this);
+  @NotNull
+  public String getName() {
+    return SmithyPsiImplUtilKt.getName(this);
   }
 
   @Override
-  public @Nullable SmithyDocumentation getDocumentation() {
-    return SmithyPsiImplUtil.getDocumentation(this);
+  @Nullable
+  public SmithyDocumentation getDocumentation() {
+    return SmithyPsiImplUtilKt.getDocumentation(this);
   }
 
   @Override
-  public @NotNull List<SmithyTrait> getDeclaredTraits() {
-    return SmithyPsiImplUtil.getDeclaredTraits(this);
+  @NotNull
+  public List<SmithyTrait> getDeclaredTraits() {
+    return SmithyPsiImplUtilKt.getDeclaredTraits(this);
   }
 
   @Override
-  public @NotNull SmithyShapeName getNameIdentifier() {
-    return SmithyPsiImplUtil.getNameIdentifier(this);
+  @NotNull
+  public SmithyShapeName getNameIdentifier() {
+    return SmithyPsiImplUtilKt.getNameIdentifier(this);
   }
 
   @Override
-  public @NotNull ItemPresentation getPresentation() {
-    return SmithyPsiImplUtil.getPresentation(this);
+  @NotNull
+  public ItemPresentation getPresentation() {
+    return SmithyPsiImplUtilKt.getPresentation(this);
   }
 
   @Override
   public int getTextOffset() {
-    return SmithyPsiImplUtil.getTextOffset(this);
+    return SmithyPsiImplUtilKt.getTextOffset(this);
   }
 
   @Override
-  public @NotNull SmithyShape setName(String newName) {
-    return SmithyPsiImplUtil.setName(this, newName);
+  @NotNull
+  public SmithyShape setName(@Nullable String newName) {
+    return SmithyPsiImplUtilKt.setName(this, newName);
   }
 
 }

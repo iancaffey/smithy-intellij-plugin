@@ -9,20 +9,27 @@ import com.intellij.navigation.ItemPresentation;
 
 public interface SmithyShape extends SmithyNamedElement, NavigatablePsiElement, SmithyElement {
 
-  @NotNull String getNamespace();
+  @NotNull
+  String getNamespace();
 
-  @NotNull String getName();
+  @NotNull
+  String getName();
 
-  @Nullable SmithyDocumentation getDocumentation();
+  @Nullable
+  SmithyDocumentation getDocumentation();
 
-  @NotNull List<SmithyTrait> getDeclaredTraits();
+  @NotNull
+  List<SmithyTrait> getDeclaredTraits();
 
-  @NotNull SmithyShapeName getNameIdentifier();
+  @NotNull
+  SmithyShapeName getNameIdentifier();
 
-  @NotNull ItemPresentation getPresentation();
+  @NotNull
+  ItemPresentation getPresentation();
 
   int getTextOffset();
 
-  @NotNull SmithyShape setName(String newName);
+  @NotNull
+  SmithyShape setName(@Nullable String newName);
 
 }

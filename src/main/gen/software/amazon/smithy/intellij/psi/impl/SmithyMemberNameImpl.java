@@ -8,7 +8,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
+import software.amazon.smithy.intellij.ext.SmithyPsiElement;
 import software.amazon.smithy.intellij.psi.*;
+import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 
 public class SmithyMemberNameImpl extends SmithyPsiElement implements SmithyMemberName {
 
@@ -27,8 +29,9 @@ public class SmithyMemberNameImpl extends SmithyPsiElement implements SmithyMemb
   }
 
   @Override
-  public @NotNull String toString() {
-    return SmithyPsiImplUtil.toString(this);
+  @NotNull
+  public String toString() {
+    return SmithyPsiImplUtilKt.toString(this);
   }
 
 }

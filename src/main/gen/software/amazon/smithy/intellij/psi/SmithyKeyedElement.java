@@ -10,11 +10,14 @@ public interface SmithyKeyedElement extends SmithyNamedElement {
   @NotNull
   SmithyKey getKey();
 
-  @NotNull String getName();
+  @NotNull
+  String getName();
 
-  @NotNull SmithyKeyedElement setName(String newName);
+  @NotNull
+  SmithyKeyedElement setName(@Nullable String newName);
 
-  @NotNull SmithyKey getNameIdentifier();
+  @NotNull
+  SmithyKey getNameIdentifier();
 
   int getTextOffset();
 

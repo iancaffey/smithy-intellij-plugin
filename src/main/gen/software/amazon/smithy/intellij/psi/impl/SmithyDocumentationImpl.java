@@ -8,7 +8,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
+import software.amazon.smithy.intellij.ext.SmithyPsiElement;
 import software.amazon.smithy.intellij.psi.*;
+import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 import com.intellij.psi.tree.IElementType;
 
 public class SmithyDocumentationImpl extends SmithyPsiElement implements SmithyDocumentation {
@@ -28,18 +30,21 @@ public class SmithyDocumentationImpl extends SmithyPsiElement implements SmithyD
   }
 
   @Override
+  @NotNull
   public PsiElement getOwner() {
-    return SmithyPsiImplUtil.getOwner(this);
+    return SmithyPsiImplUtilKt.getOwner(this);
   }
 
   @Override
-  public @NotNull IElementType getTokenType() {
-    return SmithyPsiImplUtil.getTokenType(this);
+  @NotNull
+  public IElementType getTokenType() {
+    return SmithyPsiImplUtilKt.getTokenType(this);
   }
 
   @Override
-  public @NotNull String toDocString() {
-    return SmithyPsiImplUtil.toDocString(this);
+  @NotNull
+  public String toDocString() {
+    return SmithyPsiImplUtilKt.toDocString(this);
   }
 
 }

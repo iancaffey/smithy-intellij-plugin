@@ -4,10 +4,11 @@ package software.amazon.smithy.intellij.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import software.amazon.smithy.intellij.SmithyShapeReference;
+import software.amazon.smithy.intellij.SmithyShapeReference.ByName;
 
 public interface SmithyShapeName extends SmithyElement {
 
-  @NotNull SmithyShapeReference.ByName getReference();
+  @NotNull
+  ByName getReference();
 
 }

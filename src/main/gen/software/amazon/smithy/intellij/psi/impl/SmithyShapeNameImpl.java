@@ -8,8 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
+import software.amazon.smithy.intellij.ext.SmithyPsiElement;
 import software.amazon.smithy.intellij.psi.*;
-import software.amazon.smithy.intellij.SmithyShapeReference;
+import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
+import software.amazon.smithy.intellij.SmithyShapeReference.ByName;
 
 public class SmithyShapeNameImpl extends SmithyPsiElement implements SmithyShapeName {
 
@@ -28,13 +30,15 @@ public class SmithyShapeNameImpl extends SmithyPsiElement implements SmithyShape
   }
 
   @Override
-  public @NotNull SmithyShapeReference.ByName getReference() {
-    return SmithyPsiImplUtil.getReference(this);
+  @NotNull
+  public ByName getReference() {
+    return SmithyPsiImplUtilKt.getReference(this);
   }
 
   @Override
-  public @NotNull String toString() {
-    return SmithyPsiImplUtil.toString(this);
+  @NotNull
+  public String toString() {
+    return SmithyPsiImplUtilKt.toString(this);
   }
 
 }

@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
+import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 
 public class SmithyBooleanImpl extends SmithyPrimitiveImpl implements SmithyBoolean {
 
@@ -29,7 +30,7 @@ public class SmithyBooleanImpl extends SmithyPrimitiveImpl implements SmithyBool
 
   @Override
   public boolean booleanValue() {
-    return SmithyPsiImplUtil.booleanValue(this);
+    return SmithyPsiImplUtilKt.booleanValue(this);
   }
 
 }
