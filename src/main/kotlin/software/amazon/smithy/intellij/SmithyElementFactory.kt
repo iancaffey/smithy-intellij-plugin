@@ -19,7 +19,14 @@ object SmithyElementFactory {
         val imports = PsiTreeUtil.getChildrenOfTypeAsList(model, SmithyImport::class.java)
         if (imports.isNotEmpty()) {
             if (imports.any { shapeId == it.shapeId.id }) return
-            model.addAfter(createImport(file.project, shapeId), imports.last())
+            val newImport = createImport(file.project, shapeId)
+            val sortedImports = imports.toMutableList().plus(newImport).sortedBy { it.shapeId.id }
+            val insertIndex = sortedImports.indexOf(newImport)
+            if (insertIndex == 0) {
+                model.addBefore(newImport, sortedImports[1])
+            } else {
+                model.addAfter(newImport, sortedImports[insertIndex - 1])
+            }
         } else {
             val namespace = PsiTreeUtil.getChildOfType(model, SmithyNamespace::class.java)
             model.addAfter(createImport(file.project, shapeId), namespace)
@@ -36,6 +43,8 @@ object SmithyElementFactory {
         )
         return PsiTreeUtil.getChildOfType(file.model!!, SmithyImport::class.java)!!
     }
+
+    fun createShapeId(project: Project, shapeId: String) = createImport(project, shapeId).shapeId
 
     fun createFile(project: Project, content: String) =
         PsiFileFactory.getInstance(project).createFileFromText("tmp.smithy", SmithyFileType, content) as SmithyFile

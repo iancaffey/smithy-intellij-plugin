@@ -17,6 +17,7 @@ import com.intellij.psi.util.nextLeafs
 import software.amazon.smithy.intellij.psi.SmithyBoolean
 import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyId
+import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyKeyword
 import software.amazon.smithy.intellij.psi.SmithyMemberName
@@ -120,12 +121,26 @@ class SmithyAnnotator : Annotator {
         if (element.elementType == SmithyTypes.TOKEN_INCOMPLETE_TEXT_BLOCK) {
             holder.highlight(HighlightSeverity.ERROR, "Expecting closing quotes '\"\"\"'")
         }
+        if (element is SmithyShapeId && element.parent !is SmithyImport) {
+            element.namespaceId?.let { namespaceId ->
+                val fix = SmithyOptimizeShapeIdQuickFix(element.project, element)
+                holder.newAnnotation(
+                    HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING,
+                    if (fix.hasImport) "Remove unnecessary qualifier" else "Add import for: ${element.text}"
+                ).range(namespaceId.textRange).highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL).withFix(fix)
+                    .create()
+            }
+        }
+        if (element is SmithyImport && element in SmithyImportOptimizer.unusedImports(element.containingFile)) {
+            holder.newAnnotation(HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING, "Unused import")
+                .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL).withFix(SmithyRemoveUnusedImportsQuickFix)
+                .create()
+        }
         element.reference.let { it as? SmithyShapeReference<*> }?.let {
             if (!it.isSoft && it.resolve() == null) {
                 holder.newAnnotation(HighlightSeverity.ERROR, "Unresolved shape: ${element.text}")
                     .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
-                    .withFix(SmithyImportShapeQuickFix(element.project, element.text))
-                    .create()
+                    .withFix(SmithyImportShapeQuickFix(element.project, element.text)).create()
             }
         }
     }

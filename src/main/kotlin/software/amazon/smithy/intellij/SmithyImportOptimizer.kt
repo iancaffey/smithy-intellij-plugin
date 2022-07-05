@@ -1,0 +1,46 @@
+package software.amazon.smithy.intellij
+
+import com.intellij.lang.ImportOptimizer
+import com.intellij.openapi.command.WriteCommandAction
+import com.intellij.psi.PsiFile
+import com.intellij.psi.util.PsiTreeUtil
+import software.amazon.smithy.intellij.psi.SmithyImport
+import software.amazon.smithy.intellij.psi.SmithyShapeId
+
+/**
+ * An [ImportOptimizer] for [SmithyImport].
+ *
+ * @author Ian Caffey
+ * @since 1.0
+ */
+class SmithyImportOptimizer : ImportOptimizer {
+    companion object {
+        fun unusedImports(file: PsiFile): List<SmithyImport> {
+            if (file !is SmithyFile) return emptyList()
+            val imports = PsiTreeUtil.getChildrenOfTypeAsList(file.model, SmithyImport::class.java)
+            if (imports.isEmpty()) return emptyList()
+            val shapeIds = PsiTreeUtil.collectElementsOfType(file, SmithyShapeId::class.java)
+            return imports.filter { import ->
+                shapeIds.none { shapeId -> shapeId.name == import.shapeId.name && shapeId.parent !is SmithyImport }
+            }
+        }
+
+        fun removeUnusedImports(file: PsiFile) {
+            WriteCommandAction.runWriteCommandAction(file.project) {
+                unusedImports(file).let { unused -> unused.forEach { it.delete() } }
+            }
+        }
+    }
+
+    override fun supports(file: PsiFile) = file is SmithyFile
+    override fun processFile(file: PsiFile) = Runnable {
+        if (file !is SmithyFile) return@Runnable
+        removeUnusedImports(file)
+        val remainingImports = PsiTreeUtil.getChildrenOfTypeAsList(file.model, SmithyImport::class.java)
+        if (remainingImports.isEmpty()) return@Runnable //No imports left
+        val sortedImports = remainingImports.toMutableList().sortedBy { it.shapeId.id }
+        if (remainingImports == sortedImports) return@Runnable //Already sorted
+        remainingImports.forEach { it.delete() }
+        sortedImports.forEach { SmithyElementFactory.addImport(file, it.shapeId.id) }
+    }
+}
