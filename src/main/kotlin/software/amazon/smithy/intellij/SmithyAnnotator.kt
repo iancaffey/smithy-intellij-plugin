@@ -1,5 +1,6 @@
 package software.amazon.smithy.intellij
 
+import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
@@ -41,6 +42,7 @@ class SmithyAnnotator : Annotator {
             SmithyTypes.APPLIED_TRAIT,
             SmithyTypes.CONTROL,
             SmithyTypes.DOCUMENTATION,
+            SmithyTypes.IMPORT,
             SmithyTypes.LIST,
             SmithyTypes.MAP,
             SmithyTypes.METADATA,
@@ -117,6 +119,14 @@ class SmithyAnnotator : Annotator {
         }
         if (element.elementType == SmithyTypes.TOKEN_INCOMPLETE_TEXT_BLOCK) {
             holder.highlight(HighlightSeverity.ERROR, "Expecting closing quotes '\"\"\"'")
+        }
+        element.reference.let { it as? SmithyShapeReference<*> }?.let {
+            if (!it.isSoft && it.resolve() == null) {
+                holder.newAnnotation(HighlightSeverity.ERROR, "Unresolved shape: ${element.text}")
+                    .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
+                    .withFix(SmithyImportShapeQuickFix(element.project, element.text))
+                    .create()
+            }
         }
     }
 

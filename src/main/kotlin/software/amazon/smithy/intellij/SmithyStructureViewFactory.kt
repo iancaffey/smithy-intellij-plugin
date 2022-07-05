@@ -62,7 +62,7 @@ class SmithyStructureViewElement(val element: NavigatablePsiElement) : Structure
     override fun getAlphaSortKey() = element.name ?: ""
     override fun getPresentation() = element.presentation ?: PresentationData()
     override fun getChildren(): Array<out TreeElement> = when (element) {
-        is SmithyFile -> element.model.shapes.map { SmithyStructureViewElement(it) }.toTypedArray()
+        is SmithyFile -> (element.model?.shapes ?: emptyList()).map { SmithyStructureViewElement(it) }.toTypedArray()
         is SmithyAggregateShape -> element.body.members.map { SmithyStructureViewElement(it) }.toTypedArray()
         else -> StructureViewTreeElement.EMPTY_ARRAY
     }

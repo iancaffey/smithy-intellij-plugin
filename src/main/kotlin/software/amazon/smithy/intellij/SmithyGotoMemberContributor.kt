@@ -3,8 +3,6 @@ package software.amazon.smithy.intellij
 import com.intellij.navigation.ChooseByNameContributor
 import com.intellij.navigation.ChooseByNameContributorEx
 import com.intellij.navigation.NavigationItem
-import com.intellij.psi.PsiManager
-import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.Processor
 import com.intellij.util.indexing.FindSymbolParameters
@@ -29,13 +27,14 @@ class SmithyGotoMemberContributor : ChooseByNameContributorEx {
         processMembers(parameters.searchScope) { if (it.name == name) processor.process(it) }
     }
 
-    private fun processMembers(scope: GlobalSearchScope, action: (SmithyMember) -> Unit) =
-        FileTypeIndex.getFiles(SmithyFileType, scope).forEach {
-            val file = PsiManager.getInstance(scope.project!!).findFile(it) as? SmithyFile ?: return@forEach
-            file.model.shapes.forEach { shape ->
-                if (shape is SmithyAggregateShape) {
-                    shape.body.members.forEach(action)
-                }
-            }
+    private fun processMembers(scope: GlobalSearchScope, action: (SmithyMember) -> Unit) {
+        processFile(SmithyPreludeIndex.getPrelude(scope.project!!), action)
+        SmithyFileIndex.forEach(scope) { processFile(it, action) }
+    }
+
+    private fun processFile(file: SmithyFile, action: (SmithyMember) -> Unit) = file.model?.shapes?.forEach { shape ->
+        if (shape is SmithyAggregateShape) {
+            shape.body.members.forEach(action)
         }
+    }
 }

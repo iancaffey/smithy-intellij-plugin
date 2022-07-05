@@ -7,8 +7,6 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.patterns.PlatformPatterns
-import com.intellij.psi.PsiManager
-import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.ProcessingContext
 import software.amazon.smithy.intellij.psi.SmithyAggregateShape
@@ -22,63 +20,18 @@ import software.amazon.smithy.intellij.psi.SmithyTypes
  */
 class SmithyCompletionContributor : CompletionContributor() {
     companion object {
-        private val CONTROL = setOf(
-            "version"
-        )
-        private val KEYWORDS = setOf(
-            SmithyTypes.TOKEN_APPLY,
-            SmithyTypes.TOKEN_LIST,
-            SmithyTypes.TOKEN_MAP,
-            SmithyTypes.TOKEN_METADATA,
-            SmithyTypes.TOKEN_NAMESPACE,
-            SmithyTypes.TOKEN_NULL,
-            SmithyTypes.TOKEN_OPERATION,
-            SmithyTypes.TOKEN_RESOURCE,
-            SmithyTypes.TOKEN_SERVICE,
-            SmithyTypes.TOKEN_SET,
-            SmithyTypes.TOKEN_STRUCTURE,
-            SmithyTypes.TOKEN_UNION,
-            SmithyTypes.TOKEN_USE
-        ).map { it.toString() }
-        private val PRELUDE_TYPES = setOf(
-            "blob",
-            "boolean",
-            "document",
-            "string",
-            "byte",
-            "short",
-            "integer",
-            "long",
-            "float",
-            "double",
-            "bigInteger",
-            "bigDecimal",
-            "timestamp"
-        )
-        private val PRELUDE_SHAPES = setOf(
-            "Blob",
-            "Boolean",
-            "Document",
-            "String",
-            "Byte",
-            "Short",
-            "Integer",
-            "Long",
-            "Float",
-            "Double",
-            "BigInteger",
-            "BigDecimal",
-            "Timestamp",
-            "PrimitiveBoolean",
-            "PrimitiveByte",
-            "PrimitiveShort",
-            "PrimitiveInteger",
-            "PrimitiveLong",
-            "PrimitiveFloat",
-            "PrimitiveDouble",
-            "Unit"
-        )
-        private val GLOBAL_SYMBOLS = arrayOf(CONTROL, KEYWORDS, PRELUDE_SHAPES, PRELUDE_TYPES).flatMap { it }
+        fun shapeElement(namespace: String, name: String) =
+            LookupElementBuilder.create("$namespace#$name", name).withIcon(SmithyIcons.SHAPE)
+                .withTailText("($namespace)").withInsertHandler { context, _ ->
+                    context.file.let { it as? SmithyFile }?.let {
+                        val model = it.model ?: return@let
+                        if (model.namespace == namespace) return@let
+                        SmithyElementFactory.addImport(it, "$namespace#$name")
+                    }
+                }
+
+        fun memberElement(shapeId: String, name: String) =
+            LookupElementBuilder.create("$shapeId$$name", name).withTailText("($shapeId)").withIcon(SmithyIcons.MEMBER)
     }
 
     init {
@@ -89,14 +42,29 @@ class SmithyCompletionContributor : CompletionContributor() {
                     parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet
                 ) {
                     val project = parameters.editor.project!!
-                    GLOBAL_SYMBOLS.forEach { result.addElement(LookupElementBuilder.create(it)) }
-                    FileTypeIndex.getFiles(SmithyFileType, GlobalSearchScope.allScope(project)).forEach {
-                        val file = PsiManager.getInstance(project).findFile(it) as? SmithyFile ?: return@forEach
-                        file.model.shapes.forEach { shape ->
-                            result.addElement(LookupElementBuilder.create(shape.name))
+                    val scope = GlobalSearchScope.allScope(project)
+                    val addFromFile = { it: SmithyFile ->
+                        it.model?.shapes?.forEach { shape ->
+                            result.addElement(shapeElement(shape.namespace, shape.name))
+                            println("Added ${shape.name}")
                             if (shape is SmithyAggregateShape) {
                                 shape.body.members.forEach { member ->
-                                    result.addElement(LookupElementBuilder.create(member.name))
+                                    result.addElement(
+                                        memberElement(shape.shapeId, member.name)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    addFromFile(SmithyPreludeIndex.getPrelude(scope.project!!))
+                    SmithyFileIndex.forEach(scope) { addFromFile(it) }
+                    SmithyAstIndex.forEach(scope) { ast, _ ->
+                        ast.shapes?.forEach { (id, shape) ->
+                            val (namespace, name) = id.split('#', limit = 2)
+                            result.addElement(shapeElement(namespace, name))
+                            if (shape is SmithyAst.AggregateShape) {
+                                shape.members?.forEach {
+                                    result.addElement(memberElement(id, it.key))
                                 }
                             }
                         }

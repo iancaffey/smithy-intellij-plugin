@@ -93,20 +93,26 @@ fun setName(member: SmithyMember, newName: String?) = setName<SmithyMember>(memb
 fun getTextOffset(member: SmithyMember): Int = member.nameIdentifier.textOffset
 fun getName(shape: SmithyShape): String = shape.nameIdentifier.text
 fun setName(shape: SmithyShape, newName: String?) = setName<SmithyShape>(shape, newName)
-fun getNameIdentifier(shape: SmithyShape) = PsiTreeUtil.getChildOfType(shape, SmithyShapeName::class.java)!!
+fun getNameIdentifier(shape: SmithyShape): SmithyShapeName =
+    PsiTreeUtil.getChildOfType(shape, SmithyShapeName::class.java)!!
+
 fun getTextOffset(shape: SmithyShape) = shape.nameIdentifier.textOffset
 fun getName(shapeId: SmithyShapeId): String = shapeId.nameIdentifier.text
 fun setName(shapeId: SmithyShapeId, newName: String?) = setName<SmithyShapeId>(shapeId, newName)
-fun getNameIdentifier(shapeId: SmithyShapeId) = shapeId.shapeName
+fun getNameIdentifier(shapeId: SmithyShapeId): SmithyShapeName = shapeId.shapeName
 fun getTextOffset(shapeId: SmithyShapeId) = shapeId.nameIdentifier.textOffset
 fun getTypeName(shape: SmithySimpleShape): String =
     PsiTreeUtil.getChildOfType(shape, SmithySimpleTypeName::class.java)!!.text
 
-fun getDocumentation(shape: SmithyShape) = PsiTreeUtil.getChildOfType(shape, SmithyDocumentation::class.java)
-fun getNamespace(shape: SmithyShape): String {
-    val namespace = Objects.requireNonNull(PsiTreeUtil.getChildOfType(shape.parent, SmithyNamespace::class.java))
+fun getDocumentation(shape: SmithyShape): SmithyDocumentation? =
+    PsiTreeUtil.getChildOfType(shape, SmithyDocumentation::class.java)
+
+fun getNamespace(model: SmithyModel): String {
+    val namespace = Objects.requireNonNull(PsiTreeUtil.getChildOfType(model, SmithyNamespace::class.java))
     return namespace!!.namespaceId.id
 }
+
+fun getNamespace(shape: SmithyShape) = getNamespace(shape.parent as SmithyModel)
 
 fun getDeclaredNamespace(shapeId: SmithyShapeId): String? {
     val namespaceId = shapeId.namespaceId
@@ -136,6 +142,7 @@ fun getDeclaredTraits(shape: SmithyShape): List<SmithyTrait> =
 fun getShapes(model: SmithyModel): List<SmithyShape> =
     PsiTreeUtil.getChildrenOfTypeAsList(model, SmithyShape::class.java)
 
+fun getShapeId(shape: SmithyShape) = "${shape.namespace}#${shape.name}"
 fun getId(id: SmithyNamespaceId) = id.parts.joinToString(".") { it.text }
 fun getId(id: SmithyShapeId): String {
     val namespaceId = id.namespaceId
@@ -154,12 +161,7 @@ fun getId(id: SmithyShapeId): String {
 
 fun getPresentation(member: SmithyMember) = object : ItemPresentation {
     override fun getPresentableText(): String = member.name + ": " + member.shapeId.id
-
-    override fun getLocationString(): String {
-        val parentShape = member.parent.parent as SmithyShape
-        return parentShape.namespace + "#" + parentShape.name
-    }
-
+    override fun getLocationString() = (member.parent.parent as SmithyShape).shapeId
     override fun getIcon(unused: Boolean) = member.getIcon(0)
 }
 

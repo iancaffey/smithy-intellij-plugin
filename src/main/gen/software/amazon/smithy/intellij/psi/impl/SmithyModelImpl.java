@@ -30,6 +30,12 @@ public class SmithyModelImpl extends SmithyPsiElement implements SmithyModel {
 
   @Override
   @NotNull
+  public String getNamespace() {
+    return SmithyPsiImplUtilKt.getNamespace(this);
+  }
+
+  @Override
+  @NotNull
   public List<SmithyShape> getShapes() {
     return SmithyPsiImplUtilKt.getShapes(this);
   }

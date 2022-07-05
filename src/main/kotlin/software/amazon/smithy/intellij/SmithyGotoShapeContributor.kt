@@ -3,8 +3,6 @@ package software.amazon.smithy.intellij
 import com.intellij.navigation.ChooseByNameContributorEx
 import com.intellij.navigation.GotoClassContributor
 import com.intellij.navigation.NavigationItem
-import com.intellij.psi.PsiManager
-import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.Processor
 import com.intellij.util.indexing.FindSymbolParameters
@@ -19,7 +17,7 @@ import software.amazon.smithy.intellij.psi.SmithyShape
  */
 class SmithyGotoShapeContributor : GotoClassContributor, ChooseByNameContributorEx {
     override fun getQualifiedName(item: NavigationItem) = when (item) {
-        is SmithyShape -> "${item.namespace}#${item.name}"
+        is SmithyShape -> item.shapeId
         else -> item.name
     }
 
@@ -38,9 +36,8 @@ class SmithyGotoShapeContributor : GotoClassContributor, ChooseByNameContributor
         processShapes(parameters.searchScope) { if (it.name == name) processor.process(it) }
     }
 
-    private fun processShapes(scope: GlobalSearchScope, action: (SmithyShape) -> Unit) =
-        FileTypeIndex.getFiles(SmithyFileType, scope).forEach {
-            val file = PsiManager.getInstance(scope.project!!).findFile(it) as? SmithyFile ?: return@forEach
-            file.model.shapes.forEach(action)
-        }
+    private fun processShapes(scope: GlobalSearchScope, action: (SmithyShape) -> Unit) {
+        SmithyPreludeIndex.getPrelude(scope.project!!).model?.shapes?.forEach(action)
+        SmithyFileIndex.forEach(scope) { it.model?.shapes?.forEach(action) }
+    }
 }

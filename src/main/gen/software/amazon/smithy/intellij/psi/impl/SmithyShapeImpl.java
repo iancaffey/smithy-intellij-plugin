@@ -42,6 +42,12 @@ public abstract class SmithyShapeImpl extends SmithyPsiElement implements Smithy
   }
 
   @Override
+  @NotNull
+  public String getShapeId() {
+    return SmithyPsiImplUtilKt.getShapeId(this);
+  }
+
+  @Override
   @Nullable
   public SmithyDocumentation getDocumentation() {
     return SmithyPsiImplUtilKt.getDocumentation(this);

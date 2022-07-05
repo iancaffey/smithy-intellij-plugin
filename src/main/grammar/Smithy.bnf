@@ -67,14 +67,14 @@
 }
 //https://awslabs.github.io/smithy/1.0/spec/core/idl.html
 root ::= model
-model ::= control* metadata* [namespace import* (applied_trait | shape)*] {methods=[getShapes control="" metadata="" namespace="" import="" applied_trait="" shape=""]}
+model ::= control* metadata* [namespace import* (applied_trait | shape)*] {methods=[getNamespace getShapes control="" metadata="" namespace="" import="" applied_trait="" shape=""]}
 control ::= TOKEN_DOLLAR_SIGN key TOKEN_COLON value
 metadata ::= TOKEN_METADATA key TOKEN_EQUALS value
 namespace ::= TOKEN_NAMESPACE namespace_id
 import ::= TOKEN_USE shape_id
 
 //Shapes
-shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {implements=[named_element "com.intellij.psi.NavigatablePsiElement"] methods=[getNamespace getName getDocumentation getDeclaredTraits getNameIdentifier getPresentation getTextOffset setName]}
+shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {implements=[named_element "com.intellij.psi.NavigatablePsiElement"] methods=[getNamespace getName getShapeId getDocumentation getDeclaredTraits getNameIdentifier getPresentation getTextOffset setName]}
 simple_shape ::= [documentation] trait* simple_type_name shape_name {methods=[getTypeName trait="" simple_type_name="" shape_name="" ]}
 list ::= [documentation] trait* TOKEN_LIST shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
 set ::= [documentation] trait* TOKEN_SET shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}

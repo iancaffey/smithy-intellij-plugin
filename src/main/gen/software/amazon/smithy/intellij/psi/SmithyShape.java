@@ -15,6 +15,9 @@ public interface SmithyShape extends SmithyNamedElement, NavigatablePsiElement, 
   @NotNull
   String getName();
 
+  @NotNull
+  String getShapeId();
+
   @Nullable
   SmithyDocumentation getDocumentation();
 

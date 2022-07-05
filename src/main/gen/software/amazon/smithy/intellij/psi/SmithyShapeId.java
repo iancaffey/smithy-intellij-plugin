@@ -4,7 +4,7 @@ package software.amazon.smithy.intellij.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import software.amazon.smithy.intellij.SmithyShapeReference;
+import software.amazon.smithy.intellij.SmithyShapeReference.ById;
 
 public interface SmithyShapeId extends SmithyPrimitive, SmithyNamedElement, SmithyElement {
 
@@ -38,6 +38,6 @@ public interface SmithyShapeId extends SmithyPrimitive, SmithyNamedElement, Smit
   String getEnclosingNamespace();
 
   @NotNull
-  SmithyShapeReference getReference();
+  ById getReference();
 
 }
