@@ -83,6 +83,7 @@ object SmithyShapeResolver {
 data class SmithyExternalShape(
     val ast: SmithyAst, val file: PsiFile, override val shapeId: String, val shape: SmithyAst.Shape
 ) : FakePsiElement(), SmithyShapeDefinition {
+    override val type = shape.type
     override val members = shape.let { it as? SmithyAst.AggregateShape }?.let {
         (it.members ?: emptyMap()).entries.map { (memberName, reference) ->
             SmithyExternalMember(this, memberName, reference)

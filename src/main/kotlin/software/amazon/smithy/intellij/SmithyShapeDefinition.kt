@@ -11,6 +11,7 @@ import software.amazon.smithy.intellij.psi.SmithyShape
  * @see SmithyExternalShape
  */
 interface SmithyShapeDefinition : SmithyDefinition {
+    val type: String
     val shapeId: String
     val namespace: String
     val members: List<@JvmWildcard SmithyMemberDefinition>

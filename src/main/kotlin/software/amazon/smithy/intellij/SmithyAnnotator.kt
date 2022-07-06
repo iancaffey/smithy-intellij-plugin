@@ -24,6 +24,7 @@ import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyKeyword
 import software.amazon.smithy.intellij.psi.SmithyList
 import software.amazon.smithy.intellij.psi.SmithyMap
+import software.amazon.smithy.intellij.psi.SmithyMember
 import software.amazon.smithy.intellij.psi.SmithyMemberName
 import software.amazon.smithy.intellij.psi.SmithyNull
 import software.amazon.smithy.intellij.psi.SmithySet
@@ -142,6 +143,12 @@ class SmithyAnnotator : Annotator {
                 holder.highlight(HighlightSeverity.ERROR, "Missing 'key'")
             } else if (value == null) {
                 holder.highlight(HighlightSeverity.ERROR, "Missing 'value'")
+            }
+        }
+        if (element is SmithyMember && element.name == "key" && element.enclosingShape is SmithyMap) {
+            val target = element.shapeId.reference.resolve()
+            if (target != null && target.type != "string") {
+                holder.highlight(HighlightSeverity.ERROR, "'key' must target a string shape")
             }
         }
         if (element is SmithyShapeId && element.parent !is SmithyImport) {

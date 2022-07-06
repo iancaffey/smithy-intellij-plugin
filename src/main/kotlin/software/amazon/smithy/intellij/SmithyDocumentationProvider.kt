@@ -4,11 +4,9 @@ import com.intellij.lang.documentation.AbstractDocumentationProvider
 import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiDocCommentBase
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.util.PsiTreeUtil
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
@@ -42,11 +40,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
         }
         is SmithyShape -> buildString {
             element.declaredTraits.forEach { append(getQuickNavigateInfo(it, it)).append("<br/>") }
-            //Note: the previous non-whitespace element is the "type" (e.g. service, operation, etc.)
-            val type = generateSequence(element.nameIdentifier.prevSibling) { it.prevSibling }.first {
-                it !is PsiWhiteSpace && it !is PsiComment
-            }
-            HtmlSyntaxInfoUtil.appendStyledSpan(this, SmithyColorSettings.KEYWORD, type.text, 1f)
+            HtmlSyntaxInfoUtil.appendStyledSpan(this, SmithyColorSettings.KEYWORD, element.type, 1f)
             append(" ").append(element.name)
         }
         is SmithyTrait -> buildString {

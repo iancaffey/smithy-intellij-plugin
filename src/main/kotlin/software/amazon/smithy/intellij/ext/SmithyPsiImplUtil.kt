@@ -2,11 +2,14 @@ package software.amazon.smithy.intellij.ext
 
 import com.intellij.navigation.ItemPresentation
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.siblings
 import software.amazon.smithy.intellij.SmithyFile
 import software.amazon.smithy.intellij.SmithyShapeDefinition
 import software.amazon.smithy.intellij.SmithyShapeReference
@@ -144,6 +147,10 @@ fun getDeclaredTraits(shape: SmithyShape): List<SmithyTrait> =
 
 fun getShapes(model: SmithyModel): List<SmithyShape> =
     PsiTreeUtil.getChildrenOfTypeAsList(model, SmithyShape::class.java)
+
+fun getType(shape: SmithyShape): String = shape.nameIdentifier.siblings(forward = false, withSelf = false).first {
+    it !is PsiWhiteSpace && it !is PsiComment
+}.text
 
 fun hasTrait(shape: SmithyShape, id: String): Boolean = shape.declaredTraits.any {
     if (it.shapeId.id == id) return@any true
