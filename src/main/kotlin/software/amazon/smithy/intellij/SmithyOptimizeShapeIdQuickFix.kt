@@ -28,17 +28,20 @@ class SmithyOptimizeShapeIdQuickFix(val project: Project, val shapeId: SmithySha
         if (requiresImport) "Add import for \"${shapeId}\"" else "Remove unnecessary qualifier for \"${shapeId.name}\""
 
     override fun getFamilyName() = if (requiresImport) "Add import" else "Remove unnecessary qualifier"
-    override fun isAvailable(project: Project, editor: Editor?, file: com.intellij.psi.PsiFile?) =
+    override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?) =
         file is SmithyFile && shapeId.declaredNamespace != null
 
     override fun invoke(project: Project, editor: Editor, f: PsiFile?) {
         if (shapeId.declaredNamespace == null) return
         val file = shapeId.containingFile as? SmithyFile ?: return
+        val shapeIds = PsiTreeUtil.collectElementsOfType(file, SmithyShapeId::class.java).filter {
+            it.id == shapeId.id && it.parent !is SmithyImport
+        }
         WriteCommandAction.runWriteCommandAction(project) {
             if (requiresImport) {
                 SmithyElementFactory.addImport(file, shapeId.id)
             }
-            shapeId.replace(SmithyElementFactory.createShapeId(project, shapeId.name))
+            shapeIds.forEach { it.replace(SmithyElementFactory.createShapeId(project, it.name)) }
         }
     }
 }
