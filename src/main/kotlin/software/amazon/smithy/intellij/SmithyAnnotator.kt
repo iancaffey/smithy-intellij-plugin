@@ -22,8 +22,12 @@ import software.amazon.smithy.intellij.psi.SmithyIncompleteEntry
 import software.amazon.smithy.intellij.psi.SmithyIncompleteMember
 import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyKeyword
+import software.amazon.smithy.intellij.psi.SmithyList
+import software.amazon.smithy.intellij.psi.SmithyMap
 import software.amazon.smithy.intellij.psi.SmithyMemberName
 import software.amazon.smithy.intellij.psi.SmithyNull
+import software.amazon.smithy.intellij.psi.SmithySet
+import software.amazon.smithy.intellij.psi.SmithyShape
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 import software.amazon.smithy.intellij.psi.SmithySimpleTypeName
 import software.amazon.smithy.intellij.psi.SmithyString
@@ -125,6 +129,20 @@ class SmithyAnnotator : Annotator {
         }
         if (element is SmithyIncompleteEntry || element is SmithyIncompleteMember) {
             holder.highlight(HighlightSeverity.ERROR, "Missing shape id")
+        }
+        if ((element is SmithyList || element is SmithySet) && (element as SmithyShape).members.none { it.name == "member" }) {
+            holder.highlight(HighlightSeverity.ERROR, "Missing 'member'")
+        }
+        if (element is SmithyMap) {
+            val key = element.members.find { it.name == "key" }
+            val value = element.members.find { it.name == "value" }
+            if (key == null && value == null) {
+                holder.highlight(HighlightSeverity.ERROR, "Missing 'key' and 'value'")
+            } else if (key == null) {
+                holder.highlight(HighlightSeverity.ERROR, "Missing 'key'")
+            } else if (value == null) {
+                holder.highlight(HighlightSeverity.ERROR, "Missing 'value'")
+            }
         }
         if (element is SmithyShapeId && element.parent !is SmithyImport) {
             element.namespaceId?.let { namespaceId ->
