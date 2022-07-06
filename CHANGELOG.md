@@ -2,6 +2,15 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [1.5.1]
+### Added
+- Added navigation bar support with the ability to navigate to any shape in the current file (similar to the structure view).
+
+### Changed
+- Expanded support in the import optimizer for detecting redundant imports to shapes within the enclosing namespace.
+- Improved the shape id optimizer to replace all occurrences of the shape ids in the file being replaced with an import at once.
+- Improved the parsing logic when adding new entries to an object, shape, or trait to avoid intermittently breaking parsing state until the entry has been completed (to keep syntax highlighting working the entire time).
+
 ## [1.5.0]
 ### Added
 - Expanded shape reference resolution to support dependencies (incl. pre-built models from JSON AST).
