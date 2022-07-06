@@ -66,5 +66,6 @@
         <gotoSymbolContributor implementation="software.amazon.smithy.intellij.SmithyGotoMemberContributor"/>
         <iconProvider implementation="software.amazon.smithy.intellij.SmithyIconProvider"/>
         <liveTemplateContext implementation="software.amazon.smithy.intellij.SmithyContextType"/>
+        <navbar implementation="software.amazon.smithy.intellij.SmithyNavBar"/>
     </extensions>
 </idea-plugin>
