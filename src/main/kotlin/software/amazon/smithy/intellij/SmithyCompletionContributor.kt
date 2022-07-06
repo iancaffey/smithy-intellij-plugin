@@ -46,7 +46,6 @@ class SmithyCompletionContributor : CompletionContributor() {
                     val addFromFile = { it: SmithyFile ->
                         it.model?.shapes?.forEach { shape ->
                             result.addElement(shapeElement(shape.namespace, shape.name))
-                            println("Added ${shape.name}")
                             if (shape is SmithyAggregateShape) {
                                 shape.body.members.forEach { member ->
                                     result.addElement(

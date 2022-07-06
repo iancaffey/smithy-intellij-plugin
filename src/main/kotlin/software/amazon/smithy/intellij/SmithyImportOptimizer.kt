@@ -21,13 +21,15 @@ class SmithyImportOptimizer : ImportOptimizer {
             if (imports.isEmpty()) return emptyList()
             val shapeIds = PsiTreeUtil.collectElementsOfType(file, SmithyShapeId::class.java)
             return imports.filter { import ->
-                shapeIds.none { shapeId -> shapeId.name == import.shapeId.name && shapeId.parent !is SmithyImport }
+                import.shapeId.declaredNamespace == import.shapeId.enclosingNamespace || shapeIds.none { shapeId ->
+                    shapeId.name == import.shapeId.name && shapeId.parent !is SmithyImport
+                }
             }
         }
 
         fun removeUnusedImports(file: PsiFile) {
             WriteCommandAction.runWriteCommandAction(file.project) {
-                unusedImports(file).let { unused -> unused.forEach { it.delete() } }
+                unusedImports(file).forEach { it.delete() }
             }
         }
     }
@@ -37,9 +39,9 @@ class SmithyImportOptimizer : ImportOptimizer {
         if (file !is SmithyFile) return@Runnable
         removeUnusedImports(file)
         val remainingImports = PsiTreeUtil.getChildrenOfTypeAsList(file.model, SmithyImport::class.java)
-        if (remainingImports.isEmpty()) return@Runnable //No imports left
+        if (remainingImports.isEmpty()) return@Runnable
         val sortedImports = remainingImports.toMutableList().sortedBy { it.shapeId.id }
-        if (remainingImports == sortedImports) return@Runnable //Already sorted
+        if (remainingImports == sortedImports) return@Runnable
         remainingImports.forEach { it.delete() }
         sortedImports.forEach { SmithyElementFactory.addImport(file, it.shapeId.id) }
     }
