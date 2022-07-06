@@ -1,16 +1,13 @@
 package software.amazon.smithy.intellij
 
 import com.intellij.openapi.fileEditor.FileDocumentManager
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.impl.FakePsiElement
-import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiModificationTracker
@@ -41,79 +38,11 @@ sealed class SmithyShapeReference<T : PsiElement>(
         operator fun invoke(name: SmithyShapeName) = ByName(name)
         operator fun invoke(entry: SmithyEntry) = ByMember(entry)
         operator fun invoke(key: SmithyKey) = ByKey(key)
-
-        fun shapeIdOf(target: PsiElement) = when (target) {
-            is SmithyShape -> target.shapeId
-            is ExternalShape -> target.id
-            else -> null
-        }
-
-        fun resolve(project: Project, id: String, exact: Boolean = true) = resolve(
-            ResolveContext(project, id, id.split('#', limit = 2)[0], null, exact)
-        )
-
-        fun resolve(shapeId: SmithyShapeId) = resolve(
-            ResolveContext(shapeId.project, shapeId.id, shapeId.enclosingNamespace, shapeId.declaredNamespace, true)
-        )
-
-        fun resolve(ctx: ResolveContext): List<PsiElement> {
-            val results = mutableListOf<PsiElement>()
-            val shapeName = if (ctx.shapeId.contains('#')) ctx.shapeId.split('#', limit = 2)[1] else ctx.shapeId
-            val manager = PsiManager.getInstance(ctx.project)
-            val scope = GlobalSearchScope.allScope(ctx.project)
-            //Attempt to find the shape within the project IDL
-            SmithyFileIndex.forEach(scope) { file ->
-                file.model?.shapes?.forEach { shape ->
-                    if (results.none { shape.shapeId == shapeIdOf(it) } && matches(ctx, shape.namespace, shape.name)) {
-                        results.add(shape)
-                    }
-                }
-            }
-            //Attempt to find the shape within any project AST
-            SmithyAstIndex.forEach(scope) { ast, file ->
-                ast.shapes?.forEach { (id, shape) ->
-                    val (namespace, name) = id.split('#', limit = 2)
-                    if (results.none { id == shapeIdOf(it) } && matches(ctx, namespace, name)) {
-                        results.add(ExternalShape(ast, manager.findFile(file)!!, id, shape))
-                    }
-                }
-            }
-            //Attempt to find the shape within the bundled prelude
-            val declaredNamespace = ctx.declaredNamespace
-            if ("smithy.api" == declaredNamespace || (declaredNamespace == null && (!ctx.exact || results.isEmpty()))) {
-                val prelude = SmithyPreludeIndex.getPrelude(ctx.project)
-                prelude.model?.shapes?.forEach { shape ->
-                    val shapeId = "${shape.namespace}#${shape.name}"
-                    if (shape.name == shapeName && results.none { shapeId == shapeIdOf(shape) }) results.add(shape)
-                }
-            }
-            return results
-        }
-
-        private fun matches(ctx: ResolveContext, namespace: String, name: String): Boolean {
-            if (!ctx.exact) return name == ctx.shapeName
-            val declaredNamespace = ctx.declaredNamespace
-            val enclosingNamespace = ctx.enclosingNamespace
-            //Note: for ambiguous shape ids (which lack a declared namespace), matching can fallback to the enclosing
-            //namespace to match the model file merging logic of normal Smithy builds
-            return name == ctx.shapeName && (namespace == declaredNamespace || (declaredNamespace == null && namespace == enclosingNamespace))
-        }
-
     }
 
     abstract val id: String?
     abstract val parent: PsiElement?
     override fun isSoft() = parent == null
-
-    data class ResolveContext(
-        val project: Project,
-        val shapeId: String,
-        val enclosingNamespace: String,
-        val declaredNamespace: String?,
-        val exact: Boolean
-    ) {
-        val shapeName = if (shapeId.contains('#')) shapeId.split('#', limit = 2)[1] else shapeId
-    }
 
     /**
      * A [PsiReference] from a [SmithyShapeId] to its original [SmithyShape].
@@ -125,7 +54,7 @@ sealed class SmithyShapeReference<T : PsiElement>(
         companion object {
             private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
             private fun resolver(shapeId: SmithyShapeId) = CachedValueProvider {
-                val results = resolve(shapeId)
+                val results = SmithyShapeResolver.resolve(shapeId)
                 CachedValueProvider.Result.create(if (results.size == 1) results.first() else null, dependencies)
             }
         }
@@ -194,7 +123,7 @@ sealed class SmithyShapeReference<T : PsiElement>(
                 }
 
                 operator fun invoke(name: String) = object : MemberPath {
-                    override fun find(shape: ExternalShape): PsiElement? {
+                    override fun find(shape: SmithyExternalShape): PsiElement? {
                         val target = if (shape.shape is SmithyAst.Map) "value" else name
                         return shape.members.find { it.name == target }
                     }
@@ -208,16 +137,16 @@ sealed class SmithyShapeReference<T : PsiElement>(
                 }
             }
 
-            fun find(shape: ExternalShape): PsiElement?
+            fun find(shape: SmithyExternalShape): PsiElement?
             fun find(shape: SmithyAggregateShape): PsiElement?
             fun find(element: PsiElement) = when (element) {
                 is SmithyAggregateShape -> find(element)
-                is ExternalShape -> find(element)
+                is SmithyExternalShape -> find(element)
                 else -> null
             }
 
             fun andThen(next: MemberPath) = object : MemberPath {
-                override fun find(shape: ExternalShape) = this@MemberPath.find(shape)?.let {
+                override fun find(shape: SmithyExternalShape) = this@MemberPath.find(shape)?.let {
                     next.find(resolveShape(it))
                 }
 
@@ -229,8 +158,8 @@ sealed class SmithyShapeReference<T : PsiElement>(
 
                 private fun resolveShape(element: PsiElement): PsiElement {
                     val resolved = when (element) {
-                        is SmithyMember -> resolve(element.shapeId)
-                        is ExternalShapeMember -> resolve(element.project, element.reference.target)
+                        is SmithyMember -> SmithyShapeResolver.resolve(element.shapeId)
+                        is SmithyExternalMember -> SmithyShapeResolver.resolve(element.project, element.reference.target)
                         else -> emptyList()
                     }
                     return if (resolved.size == 1) resolved.first() else element
@@ -258,31 +187,5 @@ sealed class SmithyShapeReference<T : PsiElement>(
             PsiDocumentManager.getInstance(myElement.project).commitDocument(document)
             return myElement
         }
-    }
-
-    data class ExternalShape(
-        val ast: SmithyAst, val file: PsiFile, val id: String, val shape: SmithyAst.Shape
-    ) : FakePsiElement() {
-        val members = shape.let { it as? SmithyAst.AggregateShape }?.let {
-            (it.members ?: emptyMap()).entries.map { (memberName, reference) ->
-                ExternalShapeMember(this, memberName, reference)
-            }
-        } ?: emptyList()
-
-        override fun getName() = id.split('#', limit = 2)[1]
-        override fun getParent() = file
-        override fun getLocationString(): String = id.split('#', limit = 2)[0]
-        override fun getIcon(unused: Boolean) = SmithyIcons.SHAPE
-        override fun toString() = id
-    }
-
-    data class ExternalShapeMember(
-        val parent: ExternalShape, val memberName: String, val reference: SmithyAst.Reference
-    ) : FakePsiElement() {
-        override fun getName() = memberName
-        override fun getParent(): PsiElement = parent
-        override fun getLocationString(): String = parent.locationString
-        override fun getIcon(unused: Boolean) = SmithyIcons.MEMBER
-        override fun toString() = "$parent$$memberName"
     }
 }

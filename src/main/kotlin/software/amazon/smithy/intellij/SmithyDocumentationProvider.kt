@@ -75,12 +75,12 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 }
             }
         }
-        is SmithyShapeReference.ExternalShapeMember -> buildString {
+        is SmithyExternalMember -> buildString {
             append(renderTraitDocumentation(element.project, element.reference.traits))
             HtmlSyntaxInfoUtil.appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
             append(": ${element.reference.target.split('#', limit = 2)[1]}")
         }
-        is SmithyShapeReference.ExternalShape -> buildString {
+        is SmithyExternalShape -> buildString {
             append(renderTraitDocumentation(element.project, element.shape.traits))
             HtmlSyntaxInfoUtil.appendStyledSpan(this, SmithyColorSettings.KEYWORD, element.shape.type, 1f)
             append(" ").append(element.name)
@@ -97,7 +97,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             element.documentation?.let { append(generateRenderedDoc(it)) }
             append(getQuickNavigateInfo(element, originalElement))
         }
-        is SmithyShapeReference.ExternalShapeMember -> buildString {
+        is SmithyExternalMember -> buildString {
             element.reference.traits?.get(DOCUMENTATION)
                 ?.let { append(renderDocumentation(it.toString())).append("<br/>") }
             append(getQuickNavigateInfo(element, originalElement))
@@ -111,7 +111,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 append(renderAdditionalInfo(additionalInfo))
             }
         }
-        is SmithyShapeReference.ExternalShape -> buildString {
+        is SmithyExternalShape -> buildString {
             element.shape.traits?.get(DOCUMENTATION)?.let { append(renderDocumentation(it.toString())).append("<br/>") }
             append(getQuickNavigateInfo(element, originalElement))
             val additionalInfo = mutableMapOf<String, String>()

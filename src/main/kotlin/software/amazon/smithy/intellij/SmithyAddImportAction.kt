@@ -23,7 +23,7 @@ class SmithyAddImportAction(
     override fun execute(): Boolean {
         val step = object : BaseListPopupStep<PsiElement>("Imports", options) {
             override fun onChosen(selectedValue: PsiElement?, finalChoice: Boolean): PopupStep<*>? {
-                val selectedShapeId = selectedValue?.let { SmithyShapeReference.shapeIdOf(it) }
+                val selectedShapeId = selectedValue?.let { SmithyShapeResolver.shapeIdOf(it) }
                 if (finalChoice && selectedShapeId != null) {
                     doFinalStep {
                         WriteCommandAction.runWriteCommandAction(project) {
