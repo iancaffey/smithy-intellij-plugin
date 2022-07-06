@@ -55,7 +55,6 @@ class SmithyCompletionContributor : CompletionContributor() {
                             }
                         }
                     }
-                    addFromFile(SmithyPreludeIndex.getPrelude(scope.project!!))
                     SmithyFileIndex.forEach(scope) { addFromFile(it) }
                     SmithyAstIndex.forEach(scope) { ast, _ ->
                         ast.shapes?.forEach { (id, shape) ->

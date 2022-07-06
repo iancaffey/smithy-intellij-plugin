@@ -37,7 +37,6 @@ class SmithyGotoShapeContributor : GotoClassContributor, ChooseByNameContributor
     }
 
     private fun processShapes(scope: GlobalSearchScope, action: (SmithyShape) -> Unit) {
-        SmithyPreludeIndex.getPrelude(scope.project!!).model?.shapes?.forEach(action)
         SmithyFileIndex.forEach(scope) { it.model?.shapes?.forEach(action) }
     }
 }

@@ -28,7 +28,6 @@ class SmithyGotoMemberContributor : ChooseByNameContributorEx {
     }
 
     private fun processMembers(scope: GlobalSearchScope, action: (SmithyMember) -> Unit) {
-        processFile(SmithyPreludeIndex.getPrelude(scope.project!!), action)
         SmithyFileIndex.forEach(scope) { processFile(it, action) }
     }
 

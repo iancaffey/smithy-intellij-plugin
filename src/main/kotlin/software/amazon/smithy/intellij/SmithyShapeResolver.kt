@@ -28,7 +28,6 @@ object SmithyShapeResolver {
 
     private fun resolve(ctx: ResolveContext): List<SmithyShapeDefinition> {
         val results = mutableListOf<SmithyShapeDefinition>()
-        val shapeName = if (ctx.shapeId.contains('#')) ctx.shapeId.split('#', limit = 2)[1] else ctx.shapeId
         val manager = PsiManager.getInstance(ctx.project)
         val scope = GlobalSearchScope.allScope(ctx.project)
         //Attempt to find the shape within the project IDL
@@ -48,13 +47,14 @@ object SmithyShapeResolver {
                 }
             }
         }
-        //Attempt to find the shape within the bundled prelude
-        val declaredNamespace = ctx.declaredNamespace
-        if ("smithy.api" == declaredNamespace || (declaredNamespace == null && (!ctx.exact || results.isEmpty()))) {
-            val prelude = SmithyPreludeIndex.getPrelude(ctx.project)
-            prelude.model?.shapes?.forEach { shape ->
-                val shapeId = "${shape.namespace}#${shape.name}"
-                if (shape.name == shapeName && results.none { shapeId == shape.shapeId }) results.add(shape)
+        //Attempt to find the shape within the prelude by name, if not explicitly scoped to a namespace and no previous matches were found
+        if (ctx.exact && ctx.declaredNamespace == null && results.isEmpty()) {
+            SmithyFileIndex.forEach(scope) { file ->
+                file.model?.shapes?.forEach { shape ->
+                    if (shape.namespace == "smithy.api" && shape.name == ctx.shapeName && results.none { shape.shapeId == it.shapeId }) {
+                        results.add(shape)
+                    }
+                }
             }
         }
         return results
