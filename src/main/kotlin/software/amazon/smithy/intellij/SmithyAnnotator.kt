@@ -151,6 +151,12 @@ class SmithyAnnotator : Annotator {
                 holder.highlight(HighlightSeverity.ERROR, "'key' must target a string shape")
             }
         }
+        if (element is SmithyTrait) {
+            val target = element.shapeId.reference.resolve()
+            if (target != null && !target.hasTrait("smithy.api#trait")) {
+                holder.highlight(HighlightSeverity.ERROR, "${element.shapeId.shapeName} cannot be used as a trait")
+            }
+        }
         if (element is SmithyShapeId && element.parent !is SmithyImport) {
             element.namespaceId?.let { namespaceId ->
                 val fix = SmithyOptimizeShapeIdQuickFix(element.project, element)
