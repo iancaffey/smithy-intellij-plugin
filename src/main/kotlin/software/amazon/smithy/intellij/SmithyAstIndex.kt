@@ -41,7 +41,8 @@ class SmithyAstIndex : SingleEntryFileBasedIndexExtension<SmithyAst>() {
     override fun getName() = NAME
     override fun getIndexer() = object : SingleEntryIndexer<SmithyAst>(false) {
         override fun computeValue(inputData: FileContent) = try {
-            inputData.content.inputStream().use { SmithyAst.parse(it) }
+            //Note: all AST will have a "smithy" version field, so we can quickly ignore irrelevant files without parsing the JSON
+            inputData.contentAsText.takeIf { "\"smithy\"" in it }?.let { SmithyAst.parse(it.toString()) }
         } catch (e: Exception) {
             //Note: there's no way to filter down to only Smithy AST JSON files, so any parsing exception will be
             //treated as an invalid or irrelevant JSON file
