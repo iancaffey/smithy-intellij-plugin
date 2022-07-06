@@ -34,4 +34,10 @@ public class SmithyAggregateShapeImpl extends SmithyShapeImpl implements SmithyA
     return findNotNullChildByClass(SmithyShapeBody.class);
   }
 
+  @Override
+  @NotNull
+  public List<SmithyMember> getMembers() {
+    return SmithyPsiImplUtilKt.getMembers(this);
+  }
+
 }

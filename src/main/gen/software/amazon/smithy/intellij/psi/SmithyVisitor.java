@@ -5,7 +5,8 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
-import com.intellij.psi.NavigatablePsiElement;
+import software.amazon.smithy.intellij.SmithyMemberDefinition;
+import software.amazon.smithy.intellij.SmithyShapeDefinition;
 import com.intellij.psi.PsiDocCommentBase;
 
 public class SmithyVisitor extends PsiElementVisitor {
@@ -94,7 +95,7 @@ public class SmithyVisitor extends PsiElementVisitor {
 
   public void visitMember(@NotNull SmithyMember o) {
     visitNamedElement(o);
-    // visitNavigatablePsiElement(o);
+    // visitMemberDefinition(o);
     // visitElement(o);
   }
 
@@ -166,7 +167,7 @@ public class SmithyVisitor extends PsiElementVisitor {
 
   public void visitShape(@NotNull SmithyShape o) {
     visitNamedElement(o);
-    // visitNavigatablePsiElement(o);
+    // visitShapeDefinition(o);
     // visitElement(o);
   }
 

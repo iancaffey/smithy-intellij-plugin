@@ -34,4 +34,10 @@ public class SmithyMapImpl extends SmithyAggregateShapeImpl implements SmithyMap
     return findChildByClass(SmithyDocumentation.class);
   }
 
+  @Override
+  @Nullable
+  public SmithyMember getMember(@NotNull String name) {
+    return SmithyPsiImplUtilKt.getMember(this, name);
+  }
+
 }

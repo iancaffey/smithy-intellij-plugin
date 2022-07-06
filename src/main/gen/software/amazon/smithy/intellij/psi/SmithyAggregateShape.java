@@ -10,4 +10,7 @@ public interface SmithyAggregateShape extends SmithyShape, SmithyElement {
   @NotNull
   SmithyShapeBody getBody();
 
+  @NotNull
+  List<SmithyMember> getMembers();
+
 }

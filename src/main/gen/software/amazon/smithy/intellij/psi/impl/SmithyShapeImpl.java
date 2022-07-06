@@ -82,4 +82,16 @@ public abstract class SmithyShapeImpl extends SmithyPsiElement implements Smithy
     return SmithyPsiImplUtilKt.setName(this, newName);
   }
 
+  @Override
+  @Nullable
+  public SmithyMember getMember(@NotNull String name) {
+    return SmithyPsiImplUtilKt.getMember(this, name);
+  }
+
+  @Override
+  @NotNull
+  public List<SmithyMember> getMembers() {
+    return SmithyPsiImplUtilKt.getMembers(this);
+  }
+
 }

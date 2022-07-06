@@ -9,7 +9,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.PopupStep
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep
-import com.intellij.psi.PsiElement
 
 /**
  * A [QuestionAction] for selecting one of many resolved options for a [SmithyShapeReference].
@@ -18,16 +17,15 @@ import com.intellij.psi.PsiElement
  * @since 1.0
  */
 class SmithyAddImportAction(
-    val project: Project, val editor: Editor, val file: SmithyFile, val options: List<PsiElement>
+    val project: Project, val editor: Editor, val file: SmithyFile, val options: List<SmithyShapeDefinition>
 ) : QuestionAction {
     override fun execute(): Boolean {
-        val step = object : BaseListPopupStep<PsiElement>("Imports", options) {
-            override fun onChosen(selectedValue: PsiElement?, finalChoice: Boolean): PopupStep<*>? {
-                val selectedShapeId = selectedValue?.let { SmithyShapeResolver.shapeIdOf(it) }
-                if (finalChoice && selectedShapeId != null) {
+        val step = object : BaseListPopupStep<SmithyShapeDefinition>("Imports", options) {
+            override fun onChosen(selectedValue: SmithyShapeDefinition?, finalChoice: Boolean): PopupStep<*>? {
+                if (finalChoice && selectedValue != null) {
                     doFinalStep {
                         WriteCommandAction.runWriteCommandAction(project) {
-                            SmithyElementFactory.addImport(file, selectedShapeId)
+                            SmithyElementFactory.addImport(file, selectedValue.shapeId)
                         }
                     }
                 }

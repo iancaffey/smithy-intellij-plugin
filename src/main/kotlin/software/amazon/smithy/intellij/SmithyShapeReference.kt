@@ -4,19 +4,15 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceBase
-import com.intellij.psi.impl.FakePsiElement
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.psi.util.PsiTreeUtil
-import software.amazon.smithy.intellij.psi.SmithyAggregateShape
 import software.amazon.smithy.intellij.psi.SmithyArray
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyKey
-import software.amazon.smithy.intellij.psi.SmithyMap
 import software.amazon.smithy.intellij.psi.SmithyMember
 import software.amazon.smithy.intellij.psi.SmithyShape
 import software.amazon.smithy.intellij.psi.SmithyShapeId
@@ -42,6 +38,7 @@ sealed class SmithyShapeReference<T : PsiElement>(
 
     abstract val id: String?
     abstract val parent: PsiElement?
+    abstract override fun resolve(): SmithyDefinition?
     override fun isSoft() = parent == null
 
     /**
@@ -63,7 +60,8 @@ sealed class SmithyShapeReference<T : PsiElement>(
         override val parent: PsiElement? = shapeId.parent
         override fun handleElementRename(newElementName: String) = myElement.setName(newElementName)
         override fun getAbsoluteRange(): TextRange = myElement.textRange
-        override fun resolve(): PsiElement? = CachedValuesManager.getCachedValue(myElement, resolver(myElement))
+        override fun resolve(): SmithyShapeDefinition? =
+            CachedValuesManager.getCachedValue(myElement, resolver(myElement))
     }
 
     /**
@@ -98,14 +96,13 @@ sealed class SmithyShapeReference<T : PsiElement>(
         private val delegate = PsiTreeUtil.findFirstParent(entry) { it is SmithyTrait }?.let {
             ById((it as SmithyTrait).shapeId)
         }
-        private val path = if (delegate != null) MemberPath.build(entry) else null
+        val path = if (delegate != null) MemberPath.build(entry) else null
         override val id = delegate?.id
         override val parent = delegate?.parent
         override fun handleElementRename(newElementName: String) = myElement.setName(newElementName)
         override fun getAbsoluteRange(): TextRange = myElement.textRange
-        override fun resolve() = if (path != null) delegate?.resolve()?.let {
-            path.find(it)
-        } else null
+        override fun resolve(): SmithyMemberDefinition? =
+            if (path != null) delegate?.resolve()?.let { path.find(it) } else null
 
         interface MemberPath {
             companion object {
@@ -123,47 +120,19 @@ sealed class SmithyShapeReference<T : PsiElement>(
                 }
 
                 operator fun invoke(name: String) = object : MemberPath {
-                    override fun find(shape: SmithyExternalShape): PsiElement? {
-                        val target = if (shape.shape is SmithyAst.Map) "value" else name
-                        return shape.members.find { it.name == target }
-                    }
-
-                    override fun find(shape: SmithyAggregateShape): PsiElement? {
-                        val target = if (shape is SmithyMap) "value" else name
-                        return shape.body.members.find { it.name == target }
-                    }
-
+                    override fun find(shape: SmithyShapeDefinition) = shape.getMember(name)
                     override fun toString() = name
                 }
             }
 
-            fun find(shape: SmithyExternalShape): PsiElement?
-            fun find(shape: SmithyAggregateShape): PsiElement?
-            fun find(element: PsiElement) = when (element) {
-                is SmithyAggregateShape -> find(element)
-                is SmithyExternalShape -> find(element)
-                else -> null
-            }
-
+            fun find(shape: SmithyShapeDefinition): SmithyMemberDefinition?
             fun andThen(next: MemberPath) = object : MemberPath {
-                override fun find(shape: SmithyExternalShape) = this@MemberPath.find(shape)?.let {
-                    next.find(resolveShape(it))
-                }
-
-                override fun find(shape: SmithyAggregateShape) = this@MemberPath.find(shape)?.let {
-                    next.find(resolveShape(it))
+                override fun find(shape: SmithyShapeDefinition) = this@MemberPath.find(shape)?.let {
+                    val results = SmithyShapeResolver.resolve(it)
+                    if (results.size == 1) next.find(results.first()) else null
                 }
 
                 override fun toString() = "${this@MemberPath}.$next"
-
-                private fun resolveShape(element: PsiElement): PsiElement {
-                    val resolved = when (element) {
-                        is SmithyMember -> SmithyShapeResolver.resolve(element.shapeId)
-                        is SmithyExternalMember -> SmithyShapeResolver.resolve(element.project, element.reference.target)
-                        else -> emptyList()
-                    }
-                    return if (resolved.size == 1) resolved.first() else element
-                }
             }
         }
     }
@@ -176,6 +145,7 @@ sealed class SmithyShapeReference<T : PsiElement>(
      */
     class ByKey(key: SmithyKey) : SmithyShapeReference<SmithyKey>(key) {
         private val delegate = (myElement.parent as? SmithyEntry)?.let { ByMember(it) }
+        val path = delegate?.path
         override val id = delegate?.id
         override val parent = delegate?.parent
         override fun getAbsoluteRange(): TextRange = myElement.textRange

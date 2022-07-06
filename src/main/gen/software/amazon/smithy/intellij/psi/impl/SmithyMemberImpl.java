@@ -76,4 +76,16 @@ public class SmithyMemberImpl extends SmithyPsiElement implements SmithyMember {
     return SmithyPsiImplUtilKt.setName(this, newName);
   }
 
+  @Override
+  @NotNull
+  public SmithyAggregateShape getEnclosingShape() {
+    return SmithyPsiImplUtilKt.getEnclosingShape(this);
+  }
+
+  @Override
+  @NotNull
+  public String getTargetShapeId() {
+    return SmithyPsiImplUtilKt.getTargetShapeId(this);
+  }
+
 }

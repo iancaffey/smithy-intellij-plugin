@@ -4,10 +4,10 @@ package software.amazon.smithy.intellij.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.NavigatablePsiElement;
+import software.amazon.smithy.intellij.SmithyMemberDefinition;
 import com.intellij.navigation.ItemPresentation;
 
-public interface SmithyMember extends SmithyNamedElement, NavigatablePsiElement, SmithyElement {
+public interface SmithyMember extends SmithyNamedElement, SmithyMemberDefinition, SmithyElement {
 
   @Nullable
   SmithyDocumentation getDocumentation();
@@ -31,5 +31,11 @@ public interface SmithyMember extends SmithyNamedElement, NavigatablePsiElement,
 
   @NotNull
   SmithyMember setName(@Nullable String newName);
+
+  @NotNull
+  SmithyAggregateShape getEnclosingShape();
+
+  @NotNull
+  String getTargetShapeId();
 
 }

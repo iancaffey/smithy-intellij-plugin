@@ -10,4 +10,7 @@ public interface SmithyMap extends SmithyAggregateShape, SmithyElement {
   @Nullable
   SmithyDocumentation getDocumentation();
 
+  @Nullable
+  SmithyMember getMember(@NotNull String name);
+
 }

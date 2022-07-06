@@ -24,10 +24,8 @@ class SmithyImportShapeQuickFix(val project: Project, val shapeId: String) : Bas
         if (options.isEmpty()) return
         val file = f as? SmithyFile ?: return
         if (options.size == 1) {
-            SmithyShapeResolver.shapeIdOf(options.first())?.let {
-                WriteCommandAction.runWriteCommandAction(project) {
-                    SmithyElementFactory.addImport(file, it)
-                }
+            WriteCommandAction.runWriteCommandAction(project) {
+                SmithyElementFactory.addImport(file, options.first().shapeId)
             }
         } else {
             SmithyAddImportAction(project, editor, file, options).execute()

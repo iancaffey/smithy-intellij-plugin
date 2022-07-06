@@ -1,12 +1,10 @@
 package software.amazon.smithy.intellij
 
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.impl.FakePsiElement
 import com.intellij.psi.search.GlobalSearchScope
-import software.amazon.smithy.intellij.psi.SmithyShape
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 
 /**
@@ -16,11 +14,7 @@ import software.amazon.smithy.intellij.psi.SmithyShapeId
  * @since 1.0
  */
 object SmithyShapeResolver {
-    fun shapeIdOf(target: PsiElement) = when (target) {
-        is SmithyShape -> target.shapeId
-        is SmithyExternalShape -> target.id
-        else -> null
-    }
+    fun resolve(member: SmithyMemberDefinition) = resolve(member.project, member.targetShapeId)
 
     fun resolve(project: Project, id: String, exact: Boolean = true) = resolve(
         ResolveContext(project, id, id.split('#', limit = 2)[0], null, exact)
@@ -32,15 +26,15 @@ object SmithyShapeResolver {
         )
     )
 
-    private fun resolve(ctx: ResolveContext): List<PsiElement> {
-        val results = mutableListOf<PsiElement>()
+    private fun resolve(ctx: ResolveContext): List<SmithyShapeDefinition> {
+        val results = mutableListOf<SmithyShapeDefinition>()
         val shapeName = if (ctx.shapeId.contains('#')) ctx.shapeId.split('#', limit = 2)[1] else ctx.shapeId
         val manager = PsiManager.getInstance(ctx.project)
         val scope = GlobalSearchScope.allScope(ctx.project)
         //Attempt to find the shape within the project IDL
         SmithyFileIndex.forEach(scope) { file ->
             file.model?.shapes?.forEach { shape ->
-                if (results.none { shape.shapeId == shapeIdOf(it) } && matches(ctx, shape.namespace, shape.name)) {
+                if (results.none { shape.shapeId == it.shapeId } && matches(ctx, shape.namespace, shape.name)) {
                     results.add(shape)
                 }
             }
@@ -49,7 +43,7 @@ object SmithyShapeResolver {
         SmithyAstIndex.forEach(scope) { ast, file ->
             ast.shapes?.forEach { (id, shape) ->
                 val (namespace, name) = id.split('#', limit = 2)
-                if (results.none { id == shapeIdOf(it) } && matches(ctx, namespace, name)) {
+                if (results.none { id == it.shapeId } && matches(ctx, namespace, name)) {
                     results.add(SmithyExternalShape(ast, manager.findFile(file)!!, id, shape))
                 }
             }
@@ -60,7 +54,7 @@ object SmithyShapeResolver {
             val prelude = SmithyPreludeIndex.getPrelude(ctx.project)
             prelude.model?.shapes?.forEach { shape ->
                 val shapeId = "${shape.namespace}#${shape.name}"
-                if (shape.name == shapeName && results.none { shapeId == shapeIdOf(shape) }) results.add(shape)
+                if (shape.name == shapeName && results.none { shapeId == shape.shapeId }) results.add(shape)
             }
         }
         return results
@@ -87,27 +81,33 @@ object SmithyShapeResolver {
 }
 
 data class SmithyExternalShape(
-    val ast: SmithyAst, val file: PsiFile, val id: String, val shape: SmithyAst.Shape
-) : FakePsiElement() {
-    val members = shape.let { it as? SmithyAst.AggregateShape }?.let {
+    val ast: SmithyAst, val file: PsiFile, override val shapeId: String, val shape: SmithyAst.Shape
+) : FakePsiElement(), SmithyShapeDefinition {
+    override val members = shape.let { it as? SmithyAst.AggregateShape }?.let {
         (it.members ?: emptyMap()).entries.map { (memberName, reference) ->
             SmithyExternalMember(this, memberName, reference)
         }
     } ?: emptyList()
+    override val namespace = shapeId.split('#', limit = 2)[0]
+    override fun getName() = shapeId.split('#', limit = 2)[1]
+    override fun getMember(name: String): SmithyExternalMember? {
+        val key = if (shape is SmithyAst.Map) "value" else name
+        return members.find { it.name == key }
+    }
 
-    override fun getName() = id.split('#', limit = 2)[1]
     override fun getParent() = file
-    override fun getLocationString(): String = id.split('#', limit = 2)[0]
+    override fun getLocationString() = namespace
     override fun getIcon(unused: Boolean) = SmithyIcons.SHAPE
-    override fun toString() = id
+    override fun toString() = shapeId
 }
 
 data class SmithyExternalMember(
-    val parent: SmithyExternalShape, val memberName: String, val reference: SmithyAst.Reference
-) : FakePsiElement() {
+    override val enclosingShape: SmithyExternalShape, val memberName: String, val reference: SmithyAst.Reference
+) : FakePsiElement(), SmithyMemberDefinition {
+    override val targetShapeId = reference.target
     override fun getName() = memberName
-    override fun getParent(): PsiElement = parent
-    override fun getLocationString(): String = parent.locationString
+    override fun getParent(): SmithyExternalShape = enclosingShape
+    override fun getLocationString(): String = enclosingShape.locationString
     override fun getIcon(unused: Boolean) = SmithyIcons.MEMBER
     override fun toString() = "$parent$$memberName"
 }

@@ -74,18 +74,18 @@ namespace ::= TOKEN_NAMESPACE namespace_id
 import ::= TOKEN_USE shape_id
 
 //Shapes
-shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {implements=[named_element "com.intellij.psi.NavigatablePsiElement"] methods=[getNamespace getName getShapeId getDocumentation getDeclaredTraits getNameIdentifier getPresentation getTextOffset setName]}
+shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {implements=[named_element "software.amazon.smithy.intellij.SmithyShapeDefinition"] methods=[getNamespace getName getShapeId getDocumentation getDeclaredTraits getNameIdentifier getPresentation getTextOffset setName getMember getMembers]}
 simple_shape ::= [documentation] trait* simple_type_name shape_name {methods=[getTypeName trait="" simple_type_name="" shape_name="" ]}
 list ::= [documentation] trait* TOKEN_LIST shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
 set ::= [documentation] trait* TOKEN_SET shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
-map ::= [documentation] trait* TOKEN_MAP shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
+map ::= [documentation] trait* TOKEN_MAP shape_name shape_body {methods=[trait="" shape_name="" body="shape_body" getMember]}
 structure ::= [documentation] trait* TOKEN_STRUCTURE shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
 union ::= [documentation] trait* TOKEN_UNION shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
 service ::= [documentation] trait* TOKEN_SERVICE shape_name object {methods=[trait="" shape_name="" body="object"]}
 operation ::= [documentation] trait* TOKEN_OPERATION shape_name object {methods=[trait="" shape_name="" body="object"]}
 resource ::= [documentation] trait* TOKEN_RESOURCE shape_name object {methods=[trait="" shape_name="" body="object"]}
 shape_body ::= TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA] [incomplete_member]] TOKEN_CLOSE_BRACE {methods=[members="member" incomplete_member=""]}
-member ::= [documentation] trait* member_name TOKEN_COLON shape_id {implements=[named_element "com.intellij.psi.NavigatablePsiElement"] methods=[declared_traits="trait" name_identifier="member_name" getName getPresentation getTextOffset setName]}
+member ::= [documentation] trait* member_name TOKEN_COLON shape_id {implements=[named_element "software.amazon.smithy.intellij.SmithyMemberDefinition"] methods=[declared_traits="trait" name_identifier="member_name" getName getPresentation getTextOffset setName getEnclosingShape getTargetShapeId]}
 
 
 //Traits
@@ -128,6 +128,6 @@ documentation ::= TOKEN_DOCUMENTATION_LINE+ {implements="com.intellij.psi.PsiDoc
 //Fake rules (for introducing superinterfaces into the AST)
 fake element ::=
 fake container ::=
-fake aggregate_shape ::= shape_body {methods=[body="shape_body"]}
+fake aggregate_shape ::= shape_body {methods=[body="shape_body" getMembers]}
 fake named_element ::= {implements="com.intellij.psi.PsiNameIdentifierOwner"}
 fake keyed_element ::= key {implements=named_element methods=[getName setName getNameIdentifier getTextOffset]}

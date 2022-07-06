@@ -12,6 +12,7 @@ import software.amazon.smithy.intellij.SmithyShapeReference
 import software.amazon.smithy.intellij.SmithyShapeReference.ByKey
 import software.amazon.smithy.intellij.SmithyShapeReference.ByMember
 import software.amazon.smithy.intellij.SmithyShapeReference.ByName
+import software.amazon.smithy.intellij.psi.SmithyAggregateShape
 import software.amazon.smithy.intellij.psi.SmithyBoolean
 import software.amazon.smithy.intellij.psi.SmithyDocumentation
 import software.amazon.smithy.intellij.psi.SmithyEntry
@@ -19,6 +20,7 @@ import software.amazon.smithy.intellij.psi.SmithyId
 import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyKeyedElement
+import software.amazon.smithy.intellij.psi.SmithyMap
 import software.amazon.smithy.intellij.psi.SmithyMember
 import software.amazon.smithy.intellij.psi.SmithyMemberName
 import software.amazon.smithy.intellij.psi.SmithyModel
@@ -142,7 +144,16 @@ fun getDeclaredTraits(shape: SmithyShape): List<SmithyTrait> =
 fun getShapes(model: SmithyModel): List<SmithyShape> =
     PsiTreeUtil.getChildrenOfTypeAsList(model, SmithyShape::class.java)
 
+fun getMember(shape: SmithyShape, name: String): SmithyMember? = shape.members.find { it.name == name }
+fun getMember(shape: SmithyMap, name: String): SmithyMember? = shape.members.find { it.name == "value" }
+fun getMembers(shape: SmithyShape): List<SmithyMember> = emptyList()
+fun getMembers(shape: SmithyAggregateShape): List<SmithyMember> = shape.body.members
 fun getShapeId(shape: SmithyShape) = "${shape.namespace}#${shape.name}"
+fun getEnclosingShape(member: SmithyMember): SmithyAggregateShape = PsiTreeUtil.findFirstParent(member) {
+    it is SmithyAggregateShape
+} as SmithyAggregateShape
+
+fun getTargetShapeId(member: SmithyMember): String = member.shapeId.id
 fun getId(id: SmithyNamespaceId) = id.parts.joinToString(".") { it.text }
 fun getId(id: SmithyShapeId): String {
     val namespaceId = id.namespaceId
