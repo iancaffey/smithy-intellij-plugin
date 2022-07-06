@@ -208,6 +208,44 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // key [TOKEN_COLON]
+  public static boolean incomplete_entry(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "incomplete_entry")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, INCOMPLETE_ENTRY, "<incomplete entry>");
+    r = key(b, l + 1);
+    r = r && incomplete_entry_1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // [TOKEN_COLON]
+  private static boolean incomplete_entry_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "incomplete_entry_1")) return false;
+    consumeToken(b, TOKEN_COLON);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // member_name [TOKEN_COLON]
+  public static boolean incomplete_member(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "incomplete_member")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, INCOMPLETE_MEMBER, "<incomplete member>");
+    r = member_name(b, l + 1);
+    r = r && incomplete_member_1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // [TOKEN_COLON]
+  private static boolean incomplete_member_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "incomplete_member_1")) return false;
+    consumeToken(b, TOKEN_COLON);
+    return true;
+  }
+
+  /* ********************************************************** */
   // id | string
   public static boolean key(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "key")) return false;
@@ -523,7 +561,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TOKEN_OPEN_BRACE [entry (TOKEN_COMMA entry)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE
+  // TOKEN_OPEN_BRACE [entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_entry]] TOKEN_CLOSE_BRACE
   public static boolean object(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "object")) return false;
     if (!nextTokenIs(b, TOKEN_OPEN_BRACE)) return false;
@@ -536,14 +574,14 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // [entry (TOKEN_COMMA entry)* [TOKEN_COMMA]]
+  // [entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_entry]]
   private static boolean object_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "object_1")) return false;
     object_1_0(b, l + 1);
     return true;
   }
 
-  // entry (TOKEN_COMMA entry)* [TOKEN_COMMA]
+  // entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_entry]
   private static boolean object_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "object_1_0")) return false;
     boolean r;
@@ -551,6 +589,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     r = entry(b, l + 1);
     r = r && object_1_0_1(b, l + 1);
     r = r && object_1_0_2(b, l + 1);
+    r = r && object_1_0_3(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -581,6 +620,13 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   private static boolean object_1_0_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "object_1_0_2")) return false;
     consumeToken(b, TOKEN_COMMA);
+    return true;
+  }
+
+  // [incomplete_entry]
+  private static boolean object_1_0_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "object_1_0_3")) return false;
+    incomplete_entry(b, l + 1);
     return true;
   }
 
@@ -758,7 +804,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE
+  // TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA] [incomplete_member]] TOKEN_CLOSE_BRACE
   public static boolean shape_body(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "shape_body")) return false;
     if (!nextTokenIs(b, TOKEN_OPEN_BRACE)) return false;
@@ -771,14 +817,14 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // [member (TOKEN_COMMA member)* [TOKEN_COMMA]]
+  // [member (TOKEN_COMMA member)* [TOKEN_COMMA] [incomplete_member]]
   private static boolean shape_body_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "shape_body_1")) return false;
     shape_body_1_0(b, l + 1);
     return true;
   }
 
-  // member (TOKEN_COMMA member)* [TOKEN_COMMA]
+  // member (TOKEN_COMMA member)* [TOKEN_COMMA] [incomplete_member]
   private static boolean shape_body_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "shape_body_1_0")) return false;
     boolean r;
@@ -786,6 +832,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     r = member(b, l + 1);
     r = r && shape_body_1_0_1(b, l + 1);
     r = r && shape_body_1_0_2(b, l + 1);
+    r = r && shape_body_1_0_3(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -816,6 +863,13 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   private static boolean shape_body_1_0_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "shape_body_1_0_2")) return false;
     consumeToken(b, TOKEN_COMMA);
+    return true;
+  }
+
+  // [incomplete_member]
+  private static boolean shape_body_1_0_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shape_body_1_0_3")) return false;
+    incomplete_member(b, l + 1);
     return true;
   }
 
@@ -1014,7 +1068,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TOKEN_OPEN_PAREN ([trait_values | value]) TOKEN_CLOSE_PAREN
+  // TOKEN_OPEN_PAREN [trait_values | value] TOKEN_CLOSE_PAREN
   public static boolean trait_body(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "trait_body")) return false;
     if (!nextTokenIs(b, TOKEN_OPEN_PAREN)) return false;
@@ -1044,7 +1098,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // entry (TOKEN_COMMA entry)* [TOKEN_COMMA]
+  // entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_entry]
   static boolean trait_values(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "trait_values")) return false;
     boolean r;
@@ -1052,6 +1106,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     r = entry(b, l + 1);
     r = r && trait_values_1(b, l + 1);
     r = r && trait_values_2(b, l + 1);
+    r = r && trait_values_3(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1082,6 +1137,13 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   private static boolean trait_values_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "trait_values_2")) return false;
     consumeToken(b, TOKEN_COMMA);
+    return true;
+  }
+
+  // [incomplete_entry]
+  private static boolean trait_values_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "trait_values_3")) return false;
+    incomplete_entry(b, l + 1);
     return true;
   }
 

@@ -18,6 +18,8 @@ import software.amazon.smithy.intellij.psi.SmithyBoolean
 import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyId
 import software.amazon.smithy.intellij.psi.SmithyImport
+import software.amazon.smithy.intellij.psi.SmithyIncompleteEntry
+import software.amazon.smithy.intellij.psi.SmithyIncompleteMember
 import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyKeyword
 import software.amazon.smithy.intellij.psi.SmithyMemberName
@@ -120,6 +122,9 @@ class SmithyAnnotator : Annotator {
         }
         if (element.elementType == SmithyTypes.TOKEN_INCOMPLETE_TEXT_BLOCK) {
             holder.highlight(HighlightSeverity.ERROR, "Expecting closing quotes '\"\"\"'")
+        }
+        if (element is SmithyIncompleteEntry || element is SmithyIncompleteMember) {
+            holder.highlight(HighlightSeverity.ERROR, "Missing shape id")
         }
         if (element is SmithyShapeId && element.parent !is SmithyImport) {
             element.namespaceId?.let { namespaceId ->

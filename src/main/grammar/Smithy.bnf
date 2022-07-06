@@ -84,21 +84,22 @@ union ::= [documentation] trait* TOKEN_UNION shape_name shape_body {methods=[tra
 service ::= [documentation] trait* TOKEN_SERVICE shape_name object {methods=[trait="" shape_name="" body="object"]}
 operation ::= [documentation] trait* TOKEN_OPERATION shape_name object {methods=[trait="" shape_name="" body="object"]}
 resource ::= [documentation] trait* TOKEN_RESOURCE shape_name object {methods=[trait="" shape_name="" body="object"]}
-shape_body ::= TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE {methods=[members="member"]}
+shape_body ::= TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA] [incomplete_member]] TOKEN_CLOSE_BRACE {methods=[members="member" incomplete_member=""]}
 member ::= [documentation] trait* member_name TOKEN_COLON shape_id {implements=[named_element "com.intellij.psi.NavigatablePsiElement"] methods=[declared_traits="trait" name_identifier="member_name" getName getPresentation getTextOffset setName]}
+
 
 //Traits
 applied_trait ::= TOKEN_APPLY shape_id trait
 trait ::= TOKEN_AT shape_id [trait_body] {methods=[body="trait_body"]}
-trait_body ::= TOKEN_OPEN_PAREN ([trait_values | value]) TOKEN_CLOSE_PAREN {methods=[values="entry"]}
-private trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA]
+trait_body ::= TOKEN_OPEN_PAREN [trait_values | value] TOKEN_CLOSE_PAREN {methods=[values="entry" incomplete_entry=""]}
+private trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_entry]
 
 //Node values
 key ::= id | string {methods=[getReference]}
 value ::= array | object | primitive
 entry ::= key TOKEN_COLON value {methods=[getReference]}
 array ::= TOKEN_OPEN_BRACKET [value (TOKEN_COMMA value)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACKET {methods=[values="value"]}
-object ::= TOKEN_OPEN_BRACE [entry (TOKEN_COMMA entry)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE {methods=[fields="entry"]}
+object ::= TOKEN_OPEN_BRACE [entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_entry]] TOKEN_CLOSE_BRACE {methods=[fields="entry" incomplete_entry=""]}
 primitive ::= null | boolean | number | string | text_block | shape_id
 
 //Shape ID
@@ -107,6 +108,11 @@ namespace_id ::= id (TOKEN_PERIOD id)* {methods=[parts="id" getId toString]}
 shape_name ::= id {methods=[id="" getReference toString]}
 member_name ::= id {methods=[toString id=""]}
 id ::= symbol | keyword | null | boolean | simple_type_name {methods=[toString null="" boolean=""]}
+
+//Incomplete/intermediate elements which allow for a seamless parsing experience when typing out new entries in higher-level nodes
+//Without these "incomplete" members, the entire file would lose its parser state (and all syntax highlighting/annotations) until the member/entry was completed
+incomplete_member ::= member_name [TOKEN_COLON]
+incomplete_entry ::= key [TOKEN_COLON]
 
 //Re-declared tokens which will receive a dedicated AST node instead of raw PsiElement (since they are used in a meaningful way, like as a variant within another AST node)
 null ::= TOKEN_NULL {methods=[TOKEN_NULL=""]}
