@@ -2,6 +2,20 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [1.5.2]
+### Added
+- Added support for annotating @deprecated shape usage as a warning.
+- Added support for annotating @unstable shape usage as a warning.
+- Added support for annotating @private shape usage outside the declared namespace as an error.
+- Added support for annotating list/set/map shape declarations which are missing required members as an error.
+- Added support for annotating map keys which do not target string shapes as errors.
+- Added support for annotating traits which target non-trait shapes as errors.
+- Added support for omitting imports for prelude shapes which do not conflict with existing shapes in the current namespace.
+
+### Changed
+- Removed the bundled Smithy prelude (shape resolution will now resolve to the current version of the prelude bundled in Smithy build tooling)
+- Improved the indexing speed of Smithy JSON AST
+
 ## [1.5.1]
 ### Added
 - Added navigation bar support with the ability to navigate to any shape in the current file (similar to the structure view).
