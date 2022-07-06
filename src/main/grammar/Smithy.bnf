@@ -74,7 +74,7 @@ namespace ::= TOKEN_NAMESPACE namespace_id
 import ::= TOKEN_USE shape_id
 
 //Shapes
-shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {implements=[named_element "software.amazon.smithy.intellij.SmithyShapeDefinition"] methods=[getNamespace getName getShapeId getDocumentation getDeclaredTraits getNameIdentifier getPresentation getTextOffset setName getMember getMembers]}
+shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {implements=[named_element "software.amazon.smithy.intellij.SmithyShapeDefinition"] methods=[getNamespace getName getShapeId getDocumentation getDeclaredTraits getNameIdentifier getPresentation getTextOffset setName hasTrait getMember getMembers]}
 simple_shape ::= [documentation] trait* simple_type_name shape_name {methods=[getTypeName trait="" simple_type_name="" shape_name="" ]}
 list ::= [documentation] trait* TOKEN_LIST shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
 set ::= [documentation] trait* TOKEN_SET shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}

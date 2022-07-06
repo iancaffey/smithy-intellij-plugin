@@ -83,6 +83,11 @@ public abstract class SmithyShapeImpl extends SmithyPsiElement implements Smithy
   }
 
   @Override
+  public boolean hasTrait(@NotNull String id) {
+    return SmithyPsiImplUtilKt.hasTrait(this, id);
+  }
+
+  @Override
   @Nullable
   public SmithyMember getMember(@NotNull String name) {
     return SmithyPsiImplUtilKt.getMember(this, name);

@@ -132,20 +132,32 @@ class SmithyAnnotator : Annotator {
                 holder.newAnnotation(
                     HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING,
                     if (fix.hasImport) "Remove unnecessary qualifier" else "Add import for: ${element.text}"
-                ).range(namespaceId.textRange).highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL).withFix(fix)
+                ).range(namespaceId.textRange)
+                    .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL)
+                    .withFix(fix)
                     .create()
             }
         }
         if (element is SmithyImport && element in SmithyImportOptimizer.unusedImports(element.containingFile)) {
             holder.newAnnotation(HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING, "Unused import")
-                .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL).withFix(SmithyRemoveUnusedImportsQuickFix)
+                .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL)
+                .withFix(SmithyRemoveUnusedImportsQuickFix)
                 .create()
         }
         element.reference.let { it as? SmithyShapeReference<*> }?.let {
-            if (!it.isSoft && it.resolve() == null) {
+            val file = element.containingFile as? SmithyFile ?: return@let
+            val model = file.model ?: return@let
+            val target = it.resolve()
+            if (target == null && !it.isSoft) {
                 holder.newAnnotation(HighlightSeverity.ERROR, "Unresolved shape: ${element.text}")
                     .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
-                    .withFix(SmithyImportShapeQuickFix(element.project, element.text)).create()
+                    .withFix(SmithyImportShapeQuickFix(element.project, element.text))
+                    .create()
+            }
+            if (target is SmithyShapeDefinition && target.namespace != model.namespace && target.hasTrait("smithy.api#private")) {
+                holder.newAnnotation(
+                    HighlightSeverity.ERROR, "${element.text} cannot be referenced outside ${target.namespace}"
+                ).highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL).create()
             }
         }
     }

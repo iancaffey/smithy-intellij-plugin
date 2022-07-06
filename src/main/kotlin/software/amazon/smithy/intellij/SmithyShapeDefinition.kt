@@ -14,5 +14,6 @@ interface SmithyShapeDefinition : SmithyDefinition {
     val shapeId: String
     val namespace: String
     val members: List<@JvmWildcard SmithyMemberDefinition>
+    fun hasTrait(id: String): Boolean
     fun getMember(name: String): SmithyMemberDefinition? = members.find { it.name == name }
 }

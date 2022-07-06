@@ -8,6 +8,7 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.PsiTreeUtil
 import software.amazon.smithy.intellij.SmithyFile
+import software.amazon.smithy.intellij.SmithyShapeDefinition
 import software.amazon.smithy.intellij.SmithyShapeReference
 import software.amazon.smithy.intellij.SmithyShapeReference.ByKey
 import software.amazon.smithy.intellij.SmithyShapeReference.ByMember
@@ -143,6 +144,13 @@ fun getDeclaredTraits(shape: SmithyShape): List<SmithyTrait> =
 
 fun getShapes(model: SmithyModel): List<SmithyShape> =
     PsiTreeUtil.getChildrenOfTypeAsList(model, SmithyShape::class.java)
+
+fun hasTrait(shape: SmithyShape, id: String): Boolean = shape.declaredTraits.any {
+    if (it.shapeId.id == id) return@any true
+    if (it.shapeId.declaredNamespace != null) return@any false
+    val target = it.shapeId.reference.resolve()
+    target is SmithyShapeDefinition && id == target.shapeId
+}
 
 fun getMember(shape: SmithyShape, name: String): SmithyMember? = shape.members.find { it.name == name }
 fun getMember(shape: SmithyMap, name: String): SmithyMember? = shape.members.find { it.name == "value" }

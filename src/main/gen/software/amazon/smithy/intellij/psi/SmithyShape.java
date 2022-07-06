@@ -35,6 +35,8 @@ public interface SmithyShape extends SmithyNamedElement, SmithyShapeDefinition, 
   @NotNull
   SmithyShape setName(@Nullable String newName);
 
+  boolean hasTrait(@NotNull String id);
+
   @Nullable
   SmithyMember getMember(@NotNull String name);
 
