@@ -145,6 +145,15 @@ class SmithyAnnotator : Annotator {
                 holder.highlight(HighlightSeverity.ERROR, "Missing 'value'")
             }
         }
+        if (element is SmithyShapeId) {
+            val target = element.reference.resolve()
+            if (target is SmithyShapeDefinition && target.hasTrait("smithy.api#unstable")) {
+                holder.newAnnotation(
+                    HighlightSeverity.WARNING,
+                    "${element.text} is marked as @unstable and could change in the future"
+                ).highlightType(ProblemHighlightType.WARNING).create()
+            }
+        }
         if (element is SmithyMember && element.name == "key" && element.enclosingShape is SmithyMap) {
             val target = element.shapeId.reference.resolve()
             if (target != null && target.type != "string") {
