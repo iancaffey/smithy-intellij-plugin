@@ -76,7 +76,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
         }
         is SmithyExternalShape -> buildString {
             append(renderTraitDocumentation(element.project, element.shape.traits))
-            HtmlSyntaxInfoUtil.appendStyledSpan(this, SmithyColorSettings.KEYWORD, element.shape.type, 1f)
+            HtmlSyntaxInfoUtil.appendStyledSpan(this, SmithyColorSettings.KEYWORD, element.type, 1f)
             append(" ").append(element.name)
         }
         else -> null
@@ -86,6 +86,13 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
         is SmithyMember -> buildString {
             element.documentation?.let { append(generateRenderedDoc(it)) }
             append(getQuickNavigateInfo(element, originalElement))
+            val additionalInfo = mutableMapOf<String, String>()
+            element.resolve()?.let { target ->
+                additionalInfo["Type"] = HtmlSyntaxInfoUtil.getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
+            }
+            if (additionalInfo.isNotEmpty()) {
+                append(renderAdditionalInfo(additionalInfo))
+            }
         }
         is SmithyShape -> buildString {
             element.documentation?.let { append(generateRenderedDoc(it)) }
@@ -96,6 +103,9 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 ?.let { append(renderDocumentation(it.toString())).append("<br/>") }
             append(getQuickNavigateInfo(element, originalElement))
             val additionalInfo = mutableMapOf<String, String>()
+            element.resolve()?.let { target ->
+                additionalInfo["Type"] = HtmlSyntaxInfoUtil.getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
+            }
             element.reference.traits?.get(EXTERNAL_DOCUMENTATION)?.let {
                 additionalInfo["See also"] = (it as Map<*, *>).entries.joinToString(
                     "<span>, </span>", "<div>", "</div>"
@@ -131,8 +141,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
     private fun renderAdditionalInfo(info: Map<String, String>) = buildString {
         append("<table class='sections'>")
         info.forEach { (key, value) ->
-            append("<td valign='top' class='section'>$key: </td>")
-            append("<td valign='top'>$value</td>")
+            append("<tr><td valign='top' class='section'>$key: </td><td valign='top'>$value</td></tr>")
         }
         append("</table>")
     }
