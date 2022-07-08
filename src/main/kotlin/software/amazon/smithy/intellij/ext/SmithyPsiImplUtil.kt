@@ -174,19 +174,10 @@ fun resolve(entry: SmithyEntry): SmithyMemberDefinition? = entry.key.reference.r
 fun resolve(member: SmithyMember): SmithyShapeDefinition? = member.shapeId.reference.resolve()
 fun resolve(member: SmithyTrait): SmithyShapeDefinition? = member.shapeId.reference.resolve()
 fun getId(id: SmithyNamespaceId) = id.parts.joinToString(".") { it.text }
-fun getId(id: SmithyShapeId): String {
-    val namespaceId = id.namespaceId
-    val shapeName = id.shapeName
-    val memberName = id.memberName
-    val builder = StringBuilder()
-    if (namespaceId != null) {
-        builder.append(namespaceId.id).append("#")
-    }
-    builder.append(shapeName.text)
-    if (memberName != null) {
-        builder.append("$").append(memberName.text)
-    }
-    return builder.toString()
+fun getId(id: SmithyShapeId): String = buildString {
+    id.declaredNamespace?.let { append(it).append("#") }
+    append(id.shapeName.text)
+    id.memberName?.let { append("$").append(it.text) }
 }
 
 fun getPresentation(member: SmithyMember) = object : ItemPresentation {
