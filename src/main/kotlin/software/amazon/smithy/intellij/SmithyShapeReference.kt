@@ -96,7 +96,7 @@ sealed class SmithyShapeReference<T : PsiElement>(
         private val delegate = PsiTreeUtil.findFirstParent(entry) { it is SmithyTrait }?.let {
             ById((it as SmithyTrait).shapeId)
         }
-        val path = if (delegate != null) MemberPath.build(entry) else null
+        private val path = if (delegate != null) MemberPath.build(entry) else null
         override val id = delegate?.id
         override val parent = delegate?.parent
         override fun handleElementRename(newElementName: String) = myElement.setName(newElementName)
@@ -145,7 +145,6 @@ sealed class SmithyShapeReference<T : PsiElement>(
      */
     class ByKey(key: SmithyKey) : SmithyShapeReference<SmithyKey>(key) {
         private val delegate = (myElement.parent as? SmithyEntry)?.let { ByMember(it) }
-        val path = delegate?.path
         override val id = delegate?.id
         override val parent = delegate?.parent
         override fun getAbsoluteRange(): TextRange = myElement.textRange

@@ -147,13 +147,13 @@ class SmithyAnnotator : Annotator {
             }
         }
         if (element is SmithyMember && element.name == "key" && element.enclosingShape is SmithyMap) {
-            val target = element.shapeId.reference.resolve()
+            val target = element.resolve()
             if (target != null && target.type != "string") {
                 holder.highlight(HighlightSeverity.ERROR, "'key' must target a string shape")
             }
         }
         if (element is SmithyTrait) {
-            val target = element.shapeId.reference.resolve()
+            val target = element.resolve()
             if (target != null && !target.hasTrait("smithy.api#trait")) {
                 holder.highlight(HighlightSeverity.ERROR, "${element.shapeId.shapeName} cannot be used as a trait")
             }

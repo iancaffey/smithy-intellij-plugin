@@ -4,6 +4,7 @@ package software.amazon.smithy.intellij.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import software.amazon.smithy.intellij.SmithyShapeDefinition;
 
 public interface SmithyTrait extends SmithyElement {
 
@@ -12,5 +13,8 @@ public interface SmithyTrait extends SmithyElement {
 
   @Nullable
   SmithyTraitBody getBody();
+
+  @Nullable
+  SmithyShapeDefinition resolve();
 
 }

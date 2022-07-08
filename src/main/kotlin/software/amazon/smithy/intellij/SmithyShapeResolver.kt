@@ -5,6 +5,9 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.impl.FakePsiElement
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
+import com.intellij.psi.util.PsiModificationTracker
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 
 /**
@@ -106,10 +109,19 @@ data class SmithyExternalShape(
 data class SmithyExternalMember(
     override val enclosingShape: SmithyExternalShape, val memberName: String, val reference: SmithyAst.Reference
 ) : FakePsiElement(), SmithyMemberDefinition {
+    companion object {
+        private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
+        private fun resolver(member: SmithyExternalMember) = CachedValueProvider {
+            val results = SmithyShapeResolver.resolve(member)
+            CachedValueProvider.Result.create(if (results.size == 1) results.first() else null, dependencies)
+        }
+    }
+
     override val targetShapeId = reference.target
     override fun getName() = memberName
     override fun getParent(): SmithyExternalShape = enclosingShape
     override fun getLocationString(): String = enclosingShape.locationString
     override fun getIcon(unused: Boolean) = SmithyIcons.MEMBER
+    override fun resolve(): SmithyShapeDefinition? = CachedValuesManager.getCachedValue(this, resolver(this))
     override fun toString() = "$parent$$memberName"
 }

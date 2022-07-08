@@ -10,6 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
 import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
+import software.amazon.smithy.intellij.SmithyMemberDefinition;
 import software.amazon.smithy.intellij.SmithyShapeReference.ByMember;
 
 public class SmithyEntryImpl extends SmithyKeyedElementImpl implements SmithyEntry {
@@ -39,6 +40,12 @@ public class SmithyEntryImpl extends SmithyKeyedElementImpl implements SmithyEnt
   @NotNull
   public ByMember getReference() {
     return SmithyPsiImplUtilKt.getReference(this);
+  }
+
+  @Override
+  @Nullable
+  public SmithyMemberDefinition resolve() {
+    return SmithyPsiImplUtilKt.resolve(this);
   }
 
 }

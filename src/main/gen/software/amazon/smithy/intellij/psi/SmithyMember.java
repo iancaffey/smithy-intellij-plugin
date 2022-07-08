@@ -6,6 +6,7 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import software.amazon.smithy.intellij.SmithyMemberDefinition;
 import com.intellij.navigation.ItemPresentation;
+import software.amazon.smithy.intellij.SmithyShapeDefinition;
 
 public interface SmithyMember extends SmithyNamedElement, SmithyMemberDefinition, SmithyElement {
 
@@ -37,5 +38,8 @@ public interface SmithyMember extends SmithyNamedElement, SmithyMemberDefinition
 
   @NotNull
   String getTargetShapeId();
+
+  @Nullable
+  SmithyShapeDefinition resolve();
 
 }

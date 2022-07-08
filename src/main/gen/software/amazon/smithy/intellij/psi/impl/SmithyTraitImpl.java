@@ -11,6 +11,7 @@ import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.ext.SmithyPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
+import software.amazon.smithy.intellij.SmithyShapeDefinition;
 
 public class SmithyTraitImpl extends SmithyPsiElement implements SmithyTrait {
 
@@ -38,6 +39,12 @@ public class SmithyTraitImpl extends SmithyPsiElement implements SmithyTrait {
   @Nullable
   public SmithyTraitBody getBody() {
     return findChildByClass(SmithyTraitBody.class);
+  }
+
+  @Override
+  @Nullable
+  public SmithyShapeDefinition resolve() {
+    return SmithyPsiImplUtilKt.resolve(this);
   }
 
 }

@@ -11,6 +11,7 @@ import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.siblings
 import software.amazon.smithy.intellij.SmithyFile
+import software.amazon.smithy.intellij.SmithyMemberDefinition
 import software.amazon.smithy.intellij.SmithyShapeDefinition
 import software.amazon.smithy.intellij.SmithyShapeReference
 import software.amazon.smithy.intellij.SmithyShapeReference.ByKey
@@ -155,7 +156,7 @@ fun getType(shape: SmithyShape): String = shape.nameIdentifier.siblings(forward 
 fun hasTrait(shape: SmithyShape, id: String): Boolean = shape.declaredTraits.any {
     if (it.shapeId.id == id) return@any true
     if (it.shapeId.declaredNamespace != null) return@any false
-    val target = it.shapeId.reference.resolve()
+    val target = it.resolve()
     target is SmithyShapeDefinition && id == target.shapeId
 }
 
@@ -169,6 +170,9 @@ fun getEnclosingShape(member: SmithyMember): SmithyAggregateShape = PsiTreeUtil.
 } as SmithyAggregateShape
 
 fun getTargetShapeId(member: SmithyMember): String = member.shapeId.id
+fun resolve(entry: SmithyEntry): SmithyMemberDefinition? = entry.key.reference.resolve()
+fun resolve(member: SmithyMember): SmithyShapeDefinition? = member.shapeId.reference.resolve()
+fun resolve(member: SmithyTrait): SmithyShapeDefinition? = member.shapeId.reference.resolve()
 fun getId(id: SmithyNamespaceId) = id.parts.joinToString(".") { it.text }
 fun getId(id: SmithyShapeId): String {
     val namespaceId = id.namespaceId

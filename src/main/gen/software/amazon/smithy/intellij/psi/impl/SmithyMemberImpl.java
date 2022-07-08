@@ -12,6 +12,7 @@ import software.amazon.smithy.intellij.ext.SmithyPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 import com.intellij.navigation.ItemPresentation;
+import software.amazon.smithy.intellij.SmithyShapeDefinition;
 
 public class SmithyMemberImpl extends SmithyPsiElement implements SmithyMember {
 
@@ -86,6 +87,12 @@ public class SmithyMemberImpl extends SmithyPsiElement implements SmithyMember {
   @NotNull
   public String getTargetShapeId() {
     return SmithyPsiImplUtilKt.getTargetShapeId(this);
+  }
+
+  @Override
+  @Nullable
+  public SmithyShapeDefinition resolve() {
+    return SmithyPsiImplUtilKt.resolve(this);
   }
 
 }
