@@ -11,6 +11,7 @@ import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.ext.SmithyPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
+import software.amazon.smithy.intellij.SmithyShapeReference;
 
 public abstract class SmithyValueImpl extends SmithyPsiElement implements SmithyValue {
 
@@ -26,6 +27,12 @@ public abstract class SmithyValueImpl extends SmithyPsiElement implements Smithy
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SmithyVisitor) accept((SmithyVisitor)visitor);
     else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public SmithyShapeReference getReference() {
+    return SmithyPsiImplUtilKt.getReference(this);
   }
 
 }

@@ -4,9 +4,9 @@ package software.amazon.smithy.intellij.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import software.amazon.smithy.intellij.SmithyShapeReference.ById;
+import software.amazon.smithy.intellij.SmithyShapeReference;
 
-public interface SmithyShapeId extends SmithyPrimitive, SmithyNamedElement, SmithyElement {
+public interface SmithyShapeId extends SmithyPrimitive, SmithyElement {
 
   @Nullable
   SmithyMemberName getMemberName();
@@ -15,21 +15,10 @@ public interface SmithyShapeId extends SmithyPrimitive, SmithyNamedElement, Smit
   SmithyNamespaceId getNamespaceId();
 
   @NotNull
-  SmithyShapeName getShapeName();
-
-  @NotNull
   String getId();
 
   @NotNull
-  String getName();
-
-  @NotNull
-  SmithyShapeId setName(@Nullable String newName);
-
-  @NotNull
-  SmithyShapeName getNameIdentifier();
-
-  int getTextOffset();
+  String getShapeName();
 
   @Nullable
   String getDeclaredNamespace();
@@ -38,6 +27,6 @@ public interface SmithyShapeId extends SmithyPrimitive, SmithyNamedElement, Smit
   String getEnclosingNamespace();
 
   @NotNull
-  ById getReference();
+  SmithyShapeReference getReference();
 
 }

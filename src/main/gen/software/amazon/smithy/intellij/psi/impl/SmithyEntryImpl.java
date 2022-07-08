@@ -11,7 +11,6 @@ import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
 import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 import software.amazon.smithy.intellij.SmithyMemberDefinition;
-import software.amazon.smithy.intellij.SmithyShapeReference.ByMember;
 
 public class SmithyEntryImpl extends SmithyKeyedElementImpl implements SmithyEntry {
 
@@ -34,12 +33,6 @@ public class SmithyEntryImpl extends SmithyKeyedElementImpl implements SmithyEnt
   @NotNull
   public SmithyValue getValue() {
     return findNotNullChildByClass(SmithyValue.class);
-  }
-
-  @Override
-  @NotNull
-  public ByMember getReference() {
-    return SmithyPsiImplUtilKt.getReference(this);
   }
 
   @Override

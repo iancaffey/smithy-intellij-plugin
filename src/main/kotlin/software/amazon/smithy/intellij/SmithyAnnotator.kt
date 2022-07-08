@@ -16,6 +16,7 @@ import com.intellij.psi.util.nextLeaf
 import com.intellij.psi.util.nextLeafs
 import software.amazon.smithy.intellij.psi.SmithyBoolean
 import software.amazon.smithy.intellij.psi.SmithyControl
+import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyId
 import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyIncompleteEntry
@@ -30,12 +31,13 @@ import software.amazon.smithy.intellij.psi.SmithyNull
 import software.amazon.smithy.intellij.psi.SmithySet
 import software.amazon.smithy.intellij.psi.SmithyShape
 import software.amazon.smithy.intellij.psi.SmithyShapeId
-import software.amazon.smithy.intellij.psi.SmithyShapeName
 import software.amazon.smithy.intellij.psi.SmithySimpleTypeName
 import software.amazon.smithy.intellij.psi.SmithyString
 import software.amazon.smithy.intellij.psi.SmithyTextBlock
 import software.amazon.smithy.intellij.psi.SmithyTrait
+import software.amazon.smithy.intellij.psi.SmithyTraitBody
 import software.amazon.smithy.intellij.psi.SmithyTypes
+import software.amazon.smithy.intellij.psi.SmithyValue
 
 /**
  * An [Annotator] which provides annotations to [Smithy](https://awslabs.github.io/smithy) model files.
@@ -176,7 +178,7 @@ class SmithyAnnotator : Annotator {
                 .withFix(SmithyRemoveUnusedImportsQuickFix)
                 .create()
         }
-        if (element is SmithyShapeName) {
+        if (element is SmithyShapeId) {
             val reference = element.reference
             val target = reference.resolve()
             if (target == null && !reference.isSoft) {

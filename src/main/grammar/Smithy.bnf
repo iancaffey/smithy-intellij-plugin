@@ -96,18 +96,18 @@ private trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_en
 
 //Node values
 key ::= id | string {methods=[getReference]}
-value ::= array | object | primitive
-entry ::= key TOKEN_COLON value {methods=[getReference resolve]}
+value ::= array | object | primitive {methods=[getReference]}
+entry ::= key TOKEN_COLON value {methods=[resolve]}
 array ::= TOKEN_OPEN_BRACKET [value (TOKEN_COMMA value)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACKET {methods=[values="value"]}
 object ::= TOKEN_OPEN_BRACE [entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_entry]] TOKEN_CLOSE_BRACE {methods=[fields="entry" incomplete_entry=""]}
 primitive ::= null | boolean | number | string | text_block | shape_id
 
 //Shape ID
-shape_id ::= [namespace_id TOKEN_HASH] shape_name [TOKEN_DOLLAR_SIGN member_name] {implements=named_element methods=[getId getName setName getNameIdentifier getTextOffset getDeclaredNamespace getEnclosingNamespace getReference toString]}
+shape_id ::= [namespace_id TOKEN_HASH] id [TOKEN_DOLLAR_SIGN member_name] {methods=[id="" getId getShapeName getDeclaredNamespace getEnclosingNamespace getReference toString]}
 namespace_id ::= id (TOKEN_PERIOD id)* {methods=[parts="id" getId toString]}
-shape_name ::= id {methods=[id="" getReference toString]}
-member_name ::= id {methods=[toString id=""]}
-id ::= symbol | keyword | null | boolean | simple_type_name {methods=[toString null="" boolean=""]}
+shape_name ::= id {methods=[id="" toString]}
+member_name ::= id {methods=[id="" toString]}
+id ::= symbol | keyword | null | boolean | simple_type_name {methods=[null="" boolean="" toString]}
 
 //Incomplete/intermediate elements which allow for a seamless parsing experience when typing out new entries in higher-level nodes
 //Without these "incomplete" members, the entire file would lose its parser state (and all syntax highlighting/annotations) until the member/entry was completed

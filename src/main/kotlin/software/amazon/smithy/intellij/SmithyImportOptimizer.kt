@@ -22,7 +22,7 @@ class SmithyImportOptimizer : ImportOptimizer {
             val shapeIds = PsiTreeUtil.collectElementsOfType(file, SmithyShapeId::class.java)
             return imports.filter { import ->
                 import.shapeId.declaredNamespace == import.shapeId.enclosingNamespace || shapeIds.none { shapeId ->
-                    shapeId.name == import.shapeId.name && shapeId.parent !is SmithyImport
+                    shapeId.shapeName == import.shapeId.shapeName && shapeId.parent !is SmithyImport
                 }
             }
         }

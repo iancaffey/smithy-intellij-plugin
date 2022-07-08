@@ -11,7 +11,7 @@ import com.intellij.openapi.ui.popup.PopupStep
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 
 /**
- * A [QuestionAction] for selecting one of many resolved options for a [SmithyShapeReference].
+ * A [QuestionAction] for selecting one of many [SmithyShapeDefinition] options for a [SmithyShapeReference].
  *
  * @author Ian Caffey
  * @since 1.0

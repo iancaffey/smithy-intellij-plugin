@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 
 /**
- * An [IntentionAction] to add imports for unresolved [SmithyShapeReference].
+ * An [IntentionAction] to add imports for unresolved [SmithyReference].
  *
  * @author Ian Caffey
  * @since 1.0

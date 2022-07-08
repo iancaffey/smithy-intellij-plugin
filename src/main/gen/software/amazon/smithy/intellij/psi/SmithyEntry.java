@@ -5,15 +5,11 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import software.amazon.smithy.intellij.SmithyMemberDefinition;
-import software.amazon.smithy.intellij.SmithyShapeReference.ByMember;
 
 public interface SmithyEntry extends SmithyKeyedElement, SmithyElement {
 
   @NotNull
   SmithyValue getValue();
-
-  @NotNull
-  ByMember getReference();
 
   @Nullable
   SmithyMemberDefinition resolve();

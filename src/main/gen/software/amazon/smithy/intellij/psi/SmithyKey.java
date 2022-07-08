@@ -4,7 +4,7 @@ package software.amazon.smithy.intellij.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import software.amazon.smithy.intellij.SmithyShapeReference.ByKey;
+import software.amazon.smithy.intellij.SmithyMemberReference;
 
 public interface SmithyKey extends SmithyElement {
 
@@ -15,6 +15,6 @@ public interface SmithyKey extends SmithyElement {
   SmithyString getString();
 
   @NotNull
-  ByKey getReference();
+  SmithyMemberReference getReference();
 
 }

@@ -874,13 +874,13 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // [namespace_id TOKEN_HASH] shape_name [TOKEN_DOLLAR_SIGN member_name]
+  // [namespace_id TOKEN_HASH] id [TOKEN_DOLLAR_SIGN member_name]
   public static boolean shape_id(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "shape_id")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, SHAPE_ID, "<shape id>");
     r = shape_id_0(b, l + 1);
-    r = r && shape_name(b, l + 1);
+    r = r && id(b, l + 1);
     r = r && shape_id_2(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;

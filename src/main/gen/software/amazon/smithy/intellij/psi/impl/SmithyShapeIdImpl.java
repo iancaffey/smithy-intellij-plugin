@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
 import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
-import software.amazon.smithy.intellij.SmithyShapeReference.ById;
+import software.amazon.smithy.intellij.SmithyShapeReference;
 
 public class SmithyShapeIdImpl extends SmithyPrimitiveImpl implements SmithyShapeId {
 
@@ -43,37 +43,14 @@ public class SmithyShapeIdImpl extends SmithyPrimitiveImpl implements SmithyShap
 
   @Override
   @NotNull
-  public SmithyShapeName getShapeName() {
-    return findNotNullChildByClass(SmithyShapeName.class);
-  }
-
-  @Override
-  @NotNull
   public String getId() {
     return SmithyPsiImplUtilKt.getId(this);
   }
 
   @Override
   @NotNull
-  public String getName() {
-    return SmithyPsiImplUtilKt.getName(this);
-  }
-
-  @Override
-  @NotNull
-  public SmithyShapeId setName(@Nullable String newName) {
-    return SmithyPsiImplUtilKt.setName(this, newName);
-  }
-
-  @Override
-  @NotNull
-  public SmithyShapeName getNameIdentifier() {
-    return SmithyPsiImplUtilKt.getNameIdentifier(this);
-  }
-
-  @Override
-  public int getTextOffset() {
-    return SmithyPsiImplUtilKt.getTextOffset(this);
+  public String getShapeName() {
+    return SmithyPsiImplUtilKt.getShapeName(this);
   }
 
   @Override
@@ -90,7 +67,7 @@ public class SmithyShapeIdImpl extends SmithyPrimitiveImpl implements SmithyShap
 
   @Override
   @NotNull
-  public ById getReference() {
+  public SmithyShapeReference getReference() {
     return SmithyPsiImplUtilKt.getReference(this);
   }
 
