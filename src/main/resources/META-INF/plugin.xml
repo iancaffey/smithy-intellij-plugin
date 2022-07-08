@@ -43,10 +43,10 @@
                                     implementationClass="software.amazon.smithy.intellij.SmithyDocumentationProvider"/>
         <lang.foldingBuilder language="Smithy"
                              implementationClass="software.amazon.smithy.intellij.SmithyFoldingBuilder"/>
-        <lang.importOptimizer language="Smithy"
-                              implementationClass="software.amazon.smithy.intellij.SmithyImportOptimizer"/>
         <lang.formatter language="Smithy"
                         implementationClass="software.amazon.smithy.intellij.SmithyFormattingModelBuilder"/>
+        <lang.importOptimizer language="Smithy"
+                              implementationClass="software.amazon.smithy.intellij.SmithyImportOptimizer"/>
         <lang.parserDefinition language="Smithy"
                                implementationClass="software.amazon.smithy.intellij.SmithyParserDefinition"/>
         <lang.psiStructureViewFactory language="Smithy"

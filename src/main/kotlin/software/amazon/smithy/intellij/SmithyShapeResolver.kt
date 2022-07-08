@@ -1,6 +1,5 @@
 package software.amazon.smithy.intellij
 
-import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.impl.FakePsiElement
@@ -8,6 +7,8 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiModificationTracker
+import com.intellij.psi.util.PsiTreeUtil
+import software.amazon.smithy.intellij.psi.SmithyNamespace
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 
 /**
@@ -17,22 +18,35 @@ import software.amazon.smithy.intellij.psi.SmithyShapeId
  * @since 1.0
  */
 object SmithyShapeResolver {
-    fun resolve(member: SmithyMemberDefinition) = resolve(member.project, member.targetShapeId)
-
-    fun resolve(project: Project, id: String, exact: Boolean = true) = resolve(
-        ResolveContext(project, id, id.split('#', limit = 2)[0], null, exact)
+    fun resolve(member: SmithyMemberDefinition) = resolve(
+        member.targetShapeId,
+        member.containingFile
     )
+
+    fun resolve(id: String, file: PsiFile, exact: Boolean = true): List<SmithyShapeDefinition> =
+        if ('#' in id) {
+            val declaredNamespace = id.split('#', limit = 2)[0]
+            resolve(ResolveContext(id, file, declaredNamespace, declaredNamespace, exact))
+        } else {
+            val enclosingNamespace = (file as? SmithyFile)?.let {
+                PsiTreeUtil.getChildOfType(it.model, SmithyNamespace::class.java)?.namespaceId?.id
+            }
+            resolve(ResolveContext(id, file, enclosingNamespace, null, exact))
+        }
 
     fun resolve(shapeId: SmithyShapeId) = resolve(
         ResolveContext(
-            shapeId.project, shapeId.id, shapeId.enclosingNamespace, shapeId.declaredNamespace, true
+            shapeId.id,
+            shapeId.containingFile,
+            shapeId.enclosingNamespace,
+            shapeId.declaredNamespace
         )
     )
 
     private fun resolve(ctx: ResolveContext): List<SmithyShapeDefinition> {
         val results = mutableListOf<SmithyShapeDefinition>()
-        val manager = PsiManager.getInstance(ctx.project)
-        val scope = GlobalSearchScope.allScope(ctx.project)
+        val manager = PsiManager.getInstance(ctx.enclosingFile.project)
+        val scope = GlobalSearchScope.allScope(ctx.enclosingFile.project)
         //Attempt to find the shape within the project IDL
         SmithyFileIndex.forEach(scope) { file ->
             file.model?.shapes?.forEach { shape ->
@@ -73,11 +87,11 @@ object SmithyShapeResolver {
     }
 
     private data class ResolveContext(
-        val project: Project,
         val shapeId: String,
-        val enclosingNamespace: String,
+        val enclosingFile: PsiFile,
+        val enclosingNamespace: String?,
         val declaredNamespace: String?,
-        val exact: Boolean
+        val exact: Boolean = true
     ) {
         val shapeName = if (shapeId.contains('#')) shapeId.split('#', limit = 2)[1] else shapeId
     }

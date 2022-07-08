@@ -13,8 +13,8 @@ import com.intellij.psi.PsiFile
  * @author Ian Caffey
  * @since 1.0
  */
-class SmithyImportShapeQuickFix(val project: Project, val shapeId: String) : BaseIntentionAction() {
-    private val options = SmithyShapeResolver.resolve(project, shapeId, exact = false)
+class SmithyImportShapeQuickFix(val shapeId: String, val file: PsiFile) : BaseIntentionAction() {
+    private val options = SmithyShapeResolver.resolve(shapeId, file, exact = false)
     override fun getText() = "Import \"$shapeId\""
     override fun getFamilyName() = "Import"
     override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?) =

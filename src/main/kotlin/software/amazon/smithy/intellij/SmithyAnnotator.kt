@@ -182,7 +182,7 @@ class SmithyAnnotator : Annotator {
             if (target == null && !reference.isSoft) {
                 holder.newAnnotation(HighlightSeverity.ERROR, "Unresolved shape: ${element.text}")
                     .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
-                    .withFix(SmithyImportShapeQuickFix(element.project, element.text))
+                    .withFix(SmithyImportShapeQuickFix(element.text, element.containingFile))
                     .create()
             }
             val enclosingNamespace = (element.containingFile as? SmithyFile)?.model?.namespace
