@@ -11,15 +11,16 @@ import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.ext.SmithyPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
+import software.amazon.smithy.intellij.SmithyMemberReference;
 
-public class SmithyAppliedTraitImpl extends SmithyPsiElement implements SmithyAppliedTrait {
+public class SmithyMemberIdImpl extends SmithyPsiElement implements SmithyMemberId {
 
-  public SmithyAppliedTraitImpl(@NotNull ASTNode node) {
+  public SmithyMemberIdImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SmithyVisitor visitor) {
-    visitor.visitAppliedTrait(this);
+    visitor.visitMemberId(this);
   }
 
   @Override
@@ -29,21 +30,33 @@ public class SmithyAppliedTraitImpl extends SmithyPsiElement implements SmithyAp
   }
 
   @Override
-  @Nullable
-  public SmithyMemberId getMemberId() {
-    return findChildByClass(SmithyMemberId.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyShapeId getShapeId() {
-    return findChildByClass(SmithyShapeId.class);
+  @NotNull
+  public SmithyMemberName getMemberName() {
+    return findNotNullChildByClass(SmithyMemberName.class);
   }
 
   @Override
   @NotNull
-  public SmithyTrait getTrait() {
-    return findNotNullChildByClass(SmithyTrait.class);
+  public SmithyShapeId getShapeId() {
+    return findNotNullChildByClass(SmithyShapeId.class);
+  }
+
+  @Override
+  @NotNull
+  public String getId() {
+    return SmithyPsiImplUtilKt.getId(this);
+  }
+
+  @Override
+  @NotNull
+  public SmithyMemberReference getReference() {
+    return SmithyPsiImplUtilKt.getReference(this);
+  }
+
+  @Override
+  @NotNull
+  public String toString() {
+    return SmithyPsiImplUtilKt.toString(this);
   }
 
 }

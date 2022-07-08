@@ -25,6 +25,7 @@ public interface SmithyTypes {
   IElementType LIST = new SmithyElementType("LIST");
   IElementType MAP = new SmithyElementType("MAP");
   IElementType MEMBER = new SmithyElementType("MEMBER");
+  IElementType MEMBER_ID = new SmithyElementType("MEMBER_ID");
   IElementType MEMBER_NAME = new SmithyElementType("MEMBER_NAME");
   IElementType METADATA = new SmithyElementType("METADATA");
   IElementType MODEL = new SmithyElementType("MODEL");
@@ -137,6 +138,9 @@ public interface SmithyTypes {
       }
       else if (type == MEMBER) {
         return new SmithyMemberImpl(node);
+      }
+      else if (type == MEMBER_ID) {
+        return new SmithyMemberIdImpl(node);
       }
       else if (type == MEMBER_NAME) {
         return new SmithyMemberNameImpl(node);

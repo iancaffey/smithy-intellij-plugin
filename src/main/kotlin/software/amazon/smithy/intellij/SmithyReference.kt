@@ -13,6 +13,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import software.amazon.smithy.intellij.psi.SmithyArray
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyKey
+import software.amazon.smithy.intellij.psi.SmithyMemberId
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 import software.amazon.smithy.intellij.psi.SmithyTrait
 import software.amazon.smithy.intellij.psi.SmithyTraitBody
@@ -23,6 +24,7 @@ import software.amazon.smithy.intellij.psi.SmithyValue
  *
  * @author Ian Caffey
  * @since 1.0
+ * @see SmithyKeyReference
  * @see SmithyMemberReference
  * @see SmithyShapeReference
  */
@@ -33,12 +35,14 @@ sealed class SmithyReference<T : PsiElement>(
 }
 
 /**
- * A [PsiReference] to a [SmithyMemberDefinition].
+ * A [PsiReference] from a [SmithyKey] to a [SmithyMemberDefinition].
+ *
+ * [SmithyKey] from fields within a [SmithyTrait] are resolved to their corresponding nested member.
  *
  * @author Ian Caffey
  * @since 1.0
  */
-class SmithyMemberReference(key: SmithyKey) : SmithyReference<SmithyKey>(key, key.parent !is SmithyEntry) {
+class SmithyKeyReference(key: SmithyKey) : SmithyReference<SmithyKey>(key, key.parent !is SmithyEntry) {
     private val entry = key.parent as? SmithyEntry
     private val delegate = PsiTreeUtil.findFirstParent(entry) { it is SmithyTrait }?.let {
         SmithyShapeReference((it as SmithyTrait).shapeId)
@@ -84,6 +88,27 @@ class SmithyMemberReference(key: SmithyKey) : SmithyReference<SmithyKey>(key, ke
 
             override fun toString() = "${this@MemberPath}.$next"
         }
+    }
+}
+
+/**
+ * A [PsiReference] from a [SmithyMemberId] to a [SmithyMemberDefinition].
+ *
+ * [SmithyKey] from fields within a [SmithyTrait] are resolved to their corresponding nested member.
+ *
+ * @author Ian Caffey
+ * @since 1.0
+ */
+class SmithyMemberReference(id: SmithyMemberId) : SmithyReference<SmithyMemberId>(id, false) {
+    private val delegate = SmithyShapeReference(id.shapeId)
+    override fun getAbsoluteRange(): TextRange = myElement.textRange
+    override fun resolve() = delegate.resolve()?.getMember(myElement.memberName.text)
+    override fun handleElementRename(newElementName: String): SmithyMemberId {
+        val textRange = myElement.textRange
+        val document = FileDocumentManager.getInstance().getDocument(myElement.containingFile.virtualFile)
+        document!!.replaceString(textRange.startOffset, textRange.endOffset, newElementName)
+        PsiDocumentManager.getInstance(myElement.project).commitDocument(document)
+        return myElement
     }
 }
 

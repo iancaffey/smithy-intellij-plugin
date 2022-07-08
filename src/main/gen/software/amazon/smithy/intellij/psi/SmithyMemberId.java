@@ -4,16 +4,20 @@ package software.amazon.smithy.intellij.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import software.amazon.smithy.intellij.SmithyMemberReference;
 
-public interface SmithyAppliedTrait extends SmithyElement {
+public interface SmithyMemberId extends SmithyElement {
 
-  @Nullable
-  SmithyMemberId getMemberId();
+  @NotNull
+  SmithyMemberName getMemberName();
 
-  @Nullable
+  @NotNull
   SmithyShapeId getShapeId();
 
   @NotNull
-  SmithyTrait getTrait();
+  String getId();
+
+  @NotNull
+  SmithyMemberReference getReference();
 
 }

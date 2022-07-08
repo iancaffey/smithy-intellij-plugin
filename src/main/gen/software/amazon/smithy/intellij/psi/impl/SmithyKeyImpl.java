@@ -11,7 +11,7 @@ import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.ext.SmithyPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
-import software.amazon.smithy.intellij.SmithyMemberReference;
+import software.amazon.smithy.intellij.SmithyKeyReference;
 
 public class SmithyKeyImpl extends SmithyPsiElement implements SmithyKey {
 
@@ -43,7 +43,7 @@ public class SmithyKeyImpl extends SmithyPsiElement implements SmithyKey {
 
   @Override
   @NotNull
-  public SmithyMemberReference getReference() {
+  public SmithyKeyReference getReference() {
     return SmithyPsiImplUtilKt.getReference(this);
   }
 

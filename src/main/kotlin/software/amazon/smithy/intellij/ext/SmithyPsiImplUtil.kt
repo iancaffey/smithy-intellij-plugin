@@ -11,6 +11,7 @@ import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.siblings
 import software.amazon.smithy.intellij.SmithyFile
+import software.amazon.smithy.intellij.SmithyKeyReference
 import software.amazon.smithy.intellij.SmithyMemberDefinition
 import software.amazon.smithy.intellij.SmithyMemberReference
 import software.amazon.smithy.intellij.SmithyShapeDefinition
@@ -25,6 +26,7 @@ import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyKeyedElement
 import software.amazon.smithy.intellij.psi.SmithyMap
 import software.amazon.smithy.intellij.psi.SmithyMember
+import software.amazon.smithy.intellij.psi.SmithyMemberId
 import software.amazon.smithy.intellij.psi.SmithyMemberName
 import software.amazon.smithy.intellij.psi.SmithyModel
 import software.amazon.smithy.intellij.psi.SmithyNamedElement
@@ -72,8 +74,9 @@ fun toDocString(documentation: SmithyDocumentation) =
     }
 
 fun toString(id: SmithyId): String = id.text
+fun toString(id: SmithyMemberId): String = id.text
 fun toString(name: SmithyMemberName): String = name.text
-fun toString(id: SmithyShapeId) = id.id
+fun toString(id: SmithyShapeId) = id.text
 fun toString(name: SmithyShapeName): String = name.text
 fun toString(namespaceId: SmithyNamespaceId): String = namespaceId.parts.joinToString(".")
 fun getName(element: SmithyKeyedElement): String = element.key.text
@@ -155,10 +158,10 @@ fun resolve(entry: SmithyEntry): SmithyMemberDefinition? = entry.key.reference.r
 fun resolve(member: SmithyMember): SmithyShapeDefinition? = member.shapeId.reference.resolve()
 fun resolve(member: SmithyTrait): SmithyShapeDefinition? = member.shapeId.reference.resolve()
 fun getId(id: SmithyNamespaceId) = id.parts.joinToString(".") { it.text }
+fun getId(id: SmithyMemberId): String = "${id.shapeId.id}$${id.memberName.text}"
 fun getId(id: SmithyShapeId): String = buildString {
     id.declaredNamespace?.let { append(it).append("#") }
     append(id.shapeName)
-    id.memberName?.let { append("$").append(it.text) }
 }
 
 fun getPresentation(member: SmithyMember) = object : ItemPresentation {
@@ -173,8 +176,8 @@ fun getPresentation(shape: SmithyShape) = object : ItemPresentation {
     override fun getIcon(unused: Boolean) = shape.getIcon(0)
 }
 
-fun getReference(name: SmithyShapeName): SmithyShapeReference? = (name.parent as? SmithyShapeId)?.reference
-fun getReference(key: SmithyKey) = SmithyMemberReference(key)
+fun getReference(key: SmithyKey) = SmithyKeyReference(key)
+fun getReference(id: SmithyMemberId) = SmithyMemberReference(id)
 fun getReference(value: SmithyValue) = SmithyShapeReference(value)
 
 private fun <T : SmithyNamedElement> setName(element: T, newName: String?): T {

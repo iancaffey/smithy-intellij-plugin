@@ -99,6 +99,10 @@ public class SmithyVisitor extends PsiElementVisitor {
     // visitElement(o);
   }
 
+  public void visitMemberId(@NotNull SmithyMemberId o) {
+    visitElement(o);
+  }
+
   public void visitMemberName(@NotNull SmithyMemberName o) {
     visitElement(o);
   }

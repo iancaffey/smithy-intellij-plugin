@@ -10,6 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
 import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
+import com.intellij.openapi.util.NlsSafe;
 import software.amazon.smithy.intellij.SmithyShapeReference;
 
 public class SmithyShapeIdImpl extends SmithyPrimitiveImpl implements SmithyShapeId {
@@ -27,12 +28,6 @@ public class SmithyShapeIdImpl extends SmithyPrimitiveImpl implements SmithyShap
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SmithyVisitor) accept((SmithyVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public SmithyMemberName getMemberName() {
-    return findChildByClass(SmithyMemberName.class);
   }
 
   @Override
@@ -72,8 +67,7 @@ public class SmithyShapeIdImpl extends SmithyPrimitiveImpl implements SmithyShap
   }
 
   @Override
-  @NotNull
-  public String toString() {
+  public @NlsSafe String toString() {
     return SmithyPsiImplUtilKt.toString(this);
   }
 
