@@ -41,6 +41,8 @@
         <lang.commenter language="Smithy" implementationClass="software.amazon.smithy.intellij.SmithyCommenter"/>
         <lang.documentationProvider language="Smithy"
                                     implementationClass="software.amazon.smithy.intellij.SmithyDocumentationProvider"/>
+        <lang.findUsagesProvider language="Smithy"
+                                 implementationClass="software.amazon.smithy.intellij.SmithyFindUsagesProvider"/>
         <lang.foldingBuilder language="Smithy"
                              implementationClass="software.amazon.smithy.intellij.SmithyFoldingBuilder"/>
         <lang.formatter language="Smithy"
