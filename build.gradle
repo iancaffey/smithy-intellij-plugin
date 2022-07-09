@@ -64,4 +64,5 @@ task generateSmithyParser(type: GenerateParser, dependsOn: generateSmithyLexer) 
 
 compileKotlin {
     dependsOn generateSmithyParser
+    kotlinOptions.freeCompilerArgs += ["-Xjvm-default=all-compatibility"]
 }
