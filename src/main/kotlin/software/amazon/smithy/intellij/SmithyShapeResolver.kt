@@ -2,13 +2,12 @@ package software.amazon.smithy.intellij
 
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
-import com.intellij.psi.impl.FakePsiElement
 import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.util.CachedValueProvider
-import com.intellij.psi.util.CachedValuesManager
-import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.psi.util.PsiTreeUtil
+import software.amazon.smithy.intellij.psi.SmithyAstShape
+import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
 import software.amazon.smithy.intellij.psi.SmithyNamespace
+import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 
 /**
@@ -60,7 +59,7 @@ object SmithyShapeResolver {
             ast.shapes?.forEach { (id, shape) ->
                 val (namespace, name) = id.split('#', limit = 2)
                 if (results.none { id == it.shapeId } && matches(ctx, namespace, name)) {
-                    results.add(SmithyExternalShape(ast, manager.findFile(file)!!, id, shape))
+                    results.add(SmithyAstShape(ast, manager.findFile(file)!!, id, shape))
                 }
             }
         }
@@ -95,47 +94,4 @@ object SmithyShapeResolver {
     ) {
         val shapeName = if (shapeId.contains('#')) shapeId.split('#', limit = 2)[1] else shapeId
     }
-}
-
-data class SmithyExternalShape(
-    val ast: SmithyAst, val file: PsiFile, override val shapeId: String, val shape: SmithyAst.Shape
-) : FakePsiElement(), SmithyShapeDefinition {
-    override val type = shape.type
-    override val members = shape.let { it as? SmithyAst.AggregateShape }?.let {
-        (it.members ?: emptyMap()).entries.map { (memberName, reference) ->
-            SmithyExternalMember(this, memberName, reference)
-        }
-    } ?: emptyList()
-    override val namespace = shapeId.split('#', limit = 2)[0]
-    override fun getName() = shapeId.split('#', limit = 2)[1]
-    override fun hasTrait(id: String) = shape.traits?.keys?.any { it == id } == true
-    override fun getMember(name: String): SmithyExternalMember? {
-        val key = if (shape is SmithyAst.Map) "value" else name
-        return members.find { it.name == key }
-    }
-
-    override fun getParent() = file
-    override fun getLocationString() = namespace
-    override fun getIcon(unused: Boolean) = SmithyIcons.SHAPE
-    override fun toString() = shapeId
-}
-
-data class SmithyExternalMember(
-    override val enclosingShape: SmithyExternalShape, val memberName: String, val reference: SmithyAst.Reference
-) : FakePsiElement(), SmithyMemberDefinition {
-    companion object {
-        private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
-        private fun resolver(member: SmithyExternalMember) = CachedValueProvider {
-            val results = SmithyShapeResolver.resolve(member)
-            CachedValueProvider.Result.create(if (results.size == 1) results.first() else null, dependencies)
-        }
-    }
-
-    override val targetShapeId = reference.target
-    override fun getName() = memberName
-    override fun getParent(): SmithyExternalShape = enclosingShape
-    override fun getLocationString(): String = enclosingShape.locationString
-    override fun getIcon(unused: Boolean) = SmithyIcons.MEMBER
-    override fun resolve(): SmithyShapeDefinition? = CachedValuesManager.getCachedValue(this, resolver(this))
-    override fun toString() = "$parent$$memberName"
 }

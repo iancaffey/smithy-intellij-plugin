@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.PopupStep
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep
+import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 
 /**
  * A [QuestionAction] for selecting one of many [SmithyShapeDefinition] options for a [SmithyShapeReference].

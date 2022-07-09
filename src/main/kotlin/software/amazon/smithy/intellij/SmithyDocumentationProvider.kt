@@ -11,6 +11,8 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
+import software.amazon.smithy.intellij.psi.SmithyAstMember
+import software.amazon.smithy.intellij.psi.SmithyAstShape
 import software.amazon.smithy.intellij.psi.SmithyDocumentation
 import software.amazon.smithy.intellij.psi.SmithyMember
 import software.amazon.smithy.intellij.psi.SmithyShape
@@ -69,12 +71,12 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 }
             }
         }
-        is SmithyExternalMember -> buildString {
+        is SmithyAstMember -> buildString {
             append(renderTraitDocumentation(element.project, element.reference.traits))
             HtmlSyntaxInfoUtil.appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
             append(": ${element.reference.target.split('#', limit = 2)[1]}")
         }
-        is SmithyExternalShape -> buildString {
+        is SmithyAstShape -> buildString {
             append(renderTraitDocumentation(element.project, element.shape.traits))
             HtmlSyntaxInfoUtil.appendStyledSpan(this, SmithyColorSettings.KEYWORD, element.type, 1f)
             append(" ").append(element.name)
@@ -100,7 +102,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             append(getQuickNavigateInfo(element, originalElement))
             append(renderAdditionalInfo(mapOf("Namespace" to element.namespace)))
         }
-        is SmithyExternalMember -> buildString {
+        is SmithyAstMember -> buildString {
             element.reference.traits?.get(DOCUMENTATION)
                 ?.let { append(renderDocumentation(it.toString())).append("<br/>") }
             append(getQuickNavigateInfo(element, originalElement))
@@ -118,7 +120,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             }
             append(renderAdditionalInfo(additionalInfo))
         }
-        is SmithyExternalShape -> buildString {
+        is SmithyAstShape -> buildString {
             element.shape.traits?.get(DOCUMENTATION)?.let { append(renderDocumentation(it.toString())).append("<br/>") }
             append(getQuickNavigateInfo(element, originalElement))
             val additionalInfo = mutableMapOf("Namespace" to element.namespace)

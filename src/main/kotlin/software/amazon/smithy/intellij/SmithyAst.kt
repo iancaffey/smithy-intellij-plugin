@@ -157,6 +157,7 @@ data class SmithyAst(
     ) : Collection {
         @JsonIgnore
         override val type = "list"
+
         @JsonIgnore
         override val members = mapOf("member" to member)
     }
@@ -166,6 +167,7 @@ data class SmithyAst(
     ) : Collection {
         @JsonIgnore
         override val type = "set"
+
         @JsonIgnore
         override val members = mapOf("member" to member)
     }
@@ -177,6 +179,7 @@ data class SmithyAst(
     ) : AggregateShape {
         @JsonIgnore
         override val type = "map"
+
         @JsonIgnore
         override val members = mapOf("key" to key, "value" to value)
     }

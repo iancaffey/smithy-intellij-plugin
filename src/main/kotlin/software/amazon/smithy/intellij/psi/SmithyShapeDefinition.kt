@@ -1,6 +1,4 @@
-package software.amazon.smithy.intellij
-
-import software.amazon.smithy.intellij.psi.SmithyShape
+package software.amazon.smithy.intellij.psi
 
 /**
  * A [shape](https://awslabs.github.io/smithy/1.0/spec/core/model.html#shapes) definition (either in an AST or IDL) in [Smithy](https://awslabs.github.io/smithy).
@@ -8,7 +6,7 @@ import software.amazon.smithy.intellij.psi.SmithyShape
  * @author Ian Caffey
  * @since 1.0
  * @see SmithyShape
- * @see SmithyExternalShape
+ * @see SmithyAstShape
  */
 interface SmithyShapeDefinition : SmithyDefinition {
     val type: String

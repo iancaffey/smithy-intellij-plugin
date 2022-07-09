@@ -1,7 +1,7 @@
 {
     parserClass="software.amazon.smithy.intellij.SmithyParser"
     parserUtilClass="com.intellij.lang.parser.GeneratedParserUtilBase"
-    extends="software.amazon.smithy.intellij.ext.SmithyPsiElement"
+    extends="software.amazon.smithy.intellij.psi.SmithyPsiElement"
     psiClassPrefix="Smithy"
     psiImplClassSuffix="Impl"
     psiPackage="software.amazon.smithy.intellij.psi"
@@ -55,8 +55,8 @@
         TOKEN_INCOMPLETE_STRING="regexp:\"((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF]))+"
         TOKEN_INCOMPLETE_TEXT_BLOCK="regexp:\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))+"
     ]
-    implements("^(?!.*element).*")="software.amazon.smithy.intellij.ext.SmithyElement"
-    implements("array|object|shape_body|trait_body")="software.amazon.smithy.intellij.ext.SmithyContainer"
+    implements("^(?!.*element).*")="software.amazon.smithy.intellij.psi.SmithyElement"
+    implements("array|object|shape_body|trait_body")="software.amazon.smithy.intellij.psi.SmithyContainer"
     extends("array|object|primitive")=value
     extends("null|boolean|number|string|text_block|shape_id")=primitive
     extends("symbol|keyword|null|boolean|simple_type_name")=id
@@ -68,30 +68,30 @@
 root ::= model
 model ::= control* metadata* [namespace import* (applied_trait | incomplete_applied_trait | shape)*] {
     methods=[control="" metadata="" namespace="" import="" applied_trait="" incomplete_applied_trait="" shape=""]
-    implements="software.amazon.smithy.intellij.ext.SmithyModelExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyModelMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyModelExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyModelMixin"
 }
 control ::= TOKEN_DOLLAR_SIGN key TOKEN_COLON value {
-    implements="software.amazon.smithy.intellij.ext.SmithyControlExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyControlMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyControlExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyControlMixin"
 }
 metadata ::= TOKEN_METADATA key TOKEN_EQUALS value {
-    implements="software.amazon.smithy.intellij.ext.SmithyMetadataExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyMetadataMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyMetadataExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyMetadataMixin"
 }
 namespace ::= TOKEN_NAMESPACE namespace_id {
-    implements="software.amazon.smithy.intellij.ext.SmithyNamespaceExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyNamespaceMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyNamespaceExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyNamespaceMixin"
 }
 import ::= TOKEN_USE shape_id {
-    implements="software.amazon.smithy.intellij.ext.SmithyImportExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyImportMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyImportExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyImportMixin"
 }
 
 //Shapes
 shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {
-    implements="software.amazon.smithy.intellij.ext.SmithyShapeExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyShapeMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyShapeExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyShapeMixin"
 }
 simple_shape ::= [documentation] trait* simple_type_name shape_name {
     methods=[trait="" simple_type_name="" shape_name="" ]
@@ -104,7 +104,7 @@ set ::= [documentation] trait* TOKEN_SET shape_name shape_body {
 }
 map ::= [documentation] trait* TOKEN_MAP shape_name shape_body {
     methods=[trait="" shape_name="" body="shape_body"]
-    mixin="software.amazon.smithy.intellij.ext.SmithyMapMixin"
+    mixin="software.amazon.smithy.intellij.psi.SmithyMapMixin"
 }
 structure ::= [documentation] trait* TOKEN_STRUCTURE shape_name shape_body {
     methods=[trait="" shape_name="" body="shape_body"]
@@ -126,19 +126,19 @@ shape_body ::= TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA] [inc
 }
 member ::= [documentation] trait* member_name TOKEN_COLON shape_id {
     methods=[declared_traits="trait" name_identifier="member_name"]
-    implements="software.amazon.smithy.intellij.ext.SmithyMemberExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyMemberMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyMemberExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyMemberMixin"
 }
 
 //Traits
 applied_trait ::= TOKEN_APPLY (member_id | shape_id) trait {
-    implements="software.amazon.smithy.intellij.ext.SmithyAppliedTraitExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyAppliedTraitMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyAppliedTraitExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyAppliedTraitMixin"
 }
 trait ::= TOKEN_AT shape_id [trait_body] {
     methods=[body="trait_body"]
-    implements=["software.amazon.smithy.intellij.ext.SmithyTraitExt"]
-    mixin="software.amazon.smithy.intellij.ext.SmithyTraitMixin"
+    implements=["software.amazon.smithy.intellij.psi.SmithyTraitExt"]
+    mixin="software.amazon.smithy.intellij.psi.SmithyTraitMixin"
 }
 trait_body ::= TOKEN_OPEN_PAREN [trait_values | value] TOKEN_CLOSE_PAREN {
     methods=[values="entry" incomplete_entry=""]
@@ -147,16 +147,16 @@ private trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_en
 
 //Node values
 key ::= id | string {
-    implements="software.amazon.smithy.intellij.ext.SmithyKeyExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyKeyMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyKeyExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyKeyMixin"
 }
 value ::= array | object | primitive {
-    implements="software.amazon.smithy.intellij.ext.SmithyValueExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyValueMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyValueExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyValueMixin"
 }
 entry ::= key TOKEN_COLON value {
-    implements="software.amazon.smithy.intellij.ext.SmithyEntryExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyEntryMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyEntryExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyEntryMixin"
 }
 array ::= TOKEN_OPEN_BRACKET [value (TOKEN_COMMA value)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACKET {
     methods=[values="value"]
@@ -169,17 +169,17 @@ primitive ::= null | boolean | number | string | text_block | shape_id
 //Shape ID
 shape_id ::= [namespace_id TOKEN_HASH] id {
     methods=[id=""]
-    implements="software.amazon.smithy.intellij.ext.SmithyShapeIdExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyShapeIdMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyShapeIdExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyShapeIdMixin"
 }
 member_id ::= shape_id TOKEN_DOLLAR_SIGN member_name {
-    implements="software.amazon.smithy.intellij.ext.SmithyMemberIdExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyMemberIdMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyMemberIdExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyMemberIdMixin"
 }
 namespace_id ::= id (TOKEN_PERIOD id)* {
     methods=[parts="id"]
-    implements="software.amazon.smithy.intellij.ext.SmithyNamespaceIdExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyNamespaceIdMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyNamespaceIdExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyNamespaceIdMixin"
 }
 shape_name ::= id {methods=[id=""]}
 member_name ::= id {methods=[id=""]}
@@ -188,8 +188,8 @@ id ::= symbol | keyword | null | boolean | simple_type_name {methods=[null="" bo
 //Incomplete/intermediate elements which allow for a seamless parsing experience when typing out new entries in higher-level nodes
 //Without these "incomplete" members, the entire file would lose its parser state (and all syntax highlighting/annotations) until the member/entry was completed
 incomplete_applied_trait ::= TOKEN_APPLY (member_id | shape_id){
-    implements="software.amazon.smithy.intellij.ext.SmithyIncompleteAppliedTraitExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyIncompleteAppliedTraitMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyIncompleteAppliedTraitExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyIncompleteAppliedTraitMixin"
 }
 incomplete_member ::= member_name [TOKEN_COLON]
 incomplete_entry ::= key [TOKEN_COLON]
@@ -198,13 +198,13 @@ incomplete_entry ::= key [TOKEN_COLON]
 null ::= TOKEN_NULL {methods=[TOKEN_NULL=""]}
 boolean ::= TOKEN_BOOLEAN {
     methods=[TOKEN_BOOLEAN=""]
-    implements="software.amazon.smithy.intellij.ext.SmithyBooleanExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyBooleanMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyBooleanExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyBooleanMixin"
 }
 number ::= TOKEN_NUMBER {
     methods=[TOKEN_NUMBER=""]
-    implements="software.amazon.smithy.intellij.ext.SmithyNumberExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyNumberMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyNumberExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyNumberMixin"
 }
 string ::= TOKEN_STRING {methods=[TOKEN_STRING=""]}
 text_block ::= TOKEN_TEXT_BLOCK {methods=[TOKEN_TEXT_BLOCK=""]}
@@ -212,15 +212,15 @@ symbol ::= TOKEN_SYMBOL {methods=[TOKEN_SYMBOL=""]}
 simple_type_name ::= TOKEN_SIMPLE_TYPE_NAME {methods=[TOKEN_SIMPLE_TYPE_NAME=""]}
 keyword ::= TOKEN_APPLY | TOKEN_USE | TOKEN_LIST | TOKEN_SET | TOKEN_MAP | TOKEN_METADATA | TOKEN_NAMESPACE | TOKEN_STRUCTURE | TOKEN_UNION | TOKEN_SERVICE | TOKEN_OPERATION | TOKEN_RESOURCE
 documentation ::= TOKEN_DOCUMENTATION_LINE+ {
-    implements="software.amazon.smithy.intellij.ext.SmithyDocumentationExt"
-    mixin="software.amazon.smithy.intellij.ext.SmithyDocumentationMixin"
+    implements="software.amazon.smithy.intellij.psi.SmithyDocumentationExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyDocumentationMixin"
 }
 //Fake rules (for introducing superinterfaces into the AST)
 fake aggregate_shape ::= shape_body {
     methods=[body="shape_body"]
-    mixin="software.amazon.smithy.intellij.ext.SmithyAggregateShapeMixin"
+    mixin="software.amazon.smithy.intellij.psi.SmithyAggregateShapeMixin"
 }
 fake keyed_element ::= key {
-    implements=["software.amazon.smithy.intellij.ext.SmithyKeyedElementExt"]
-    mixin="software.amazon.smithy.intellij.ext.SmithyKeyedElementMixin"
+    implements=["software.amazon.smithy.intellij.psi.SmithyKeyedElementExt"]
+    mixin="software.amazon.smithy.intellij.psi.SmithyKeyedElementMixin"
 }

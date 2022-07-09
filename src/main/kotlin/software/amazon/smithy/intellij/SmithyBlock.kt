@@ -12,8 +12,8 @@ import com.intellij.psi.PsiComment
 import com.intellij.psi.TokenType
 import com.intellij.psi.formatter.common.AbstractBlock
 import com.intellij.psi.tree.TokenSet
-import software.amazon.smithy.intellij.ext.SmithyContainer
-import software.amazon.smithy.intellij.ext.SmithyElement
+import software.amazon.smithy.intellij.psi.SmithyContainer
+import software.amazon.smithy.intellij.psi.SmithyElement
 import software.amazon.smithy.intellij.psi.SmithyModel
 import software.amazon.smithy.intellij.psi.SmithyTraitBody
 

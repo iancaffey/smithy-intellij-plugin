@@ -14,7 +14,6 @@ import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.nextLeaf
 import com.intellij.psi.util.nextLeafs
-import software.amazon.smithy.intellij.ext.SmithyStatement
 import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyIncompleteAppliedTrait
@@ -29,6 +28,7 @@ import software.amazon.smithy.intellij.psi.SmithyModel
 import software.amazon.smithy.intellij.psi.SmithySet
 import software.amazon.smithy.intellij.psi.SmithyShape
 import software.amazon.smithy.intellij.psi.SmithyShapeId
+import software.amazon.smithy.intellij.psi.SmithyStatement
 import software.amazon.smithy.intellij.psi.SmithyString
 import software.amazon.smithy.intellij.psi.SmithyTextBlock
 import software.amazon.smithy.intellij.psi.SmithyTrait

@@ -12,10 +12,13 @@ import com.intellij.psi.util.CachedValuesManager.getCachedValue
 import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import software.amazon.smithy.intellij.psi.SmithyArray
+import software.amazon.smithy.intellij.psi.SmithyDefinition
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyKey
+import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
 import software.amazon.smithy.intellij.psi.SmithyMemberId
 import software.amazon.smithy.intellij.psi.SmithyObject
+import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 import software.amazon.smithy.intellij.psi.SmithyTrait
 import software.amazon.smithy.intellij.psi.SmithyTraitBody

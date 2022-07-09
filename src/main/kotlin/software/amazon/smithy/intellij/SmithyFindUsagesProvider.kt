@@ -4,11 +4,11 @@ import com.intellij.lang.cacheBuilder.DefaultWordsScanner
 import com.intellij.lang.findUsages.FindUsagesProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.TokenSet
-import software.amazon.smithy.intellij.ext.SmithyNamedElement
 import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyMember
 import software.amazon.smithy.intellij.psi.SmithyMetadata
+import software.amazon.smithy.intellij.psi.SmithyNamedElement
 import software.amazon.smithy.intellij.psi.SmithyShape
 import software.amazon.smithy.intellij.psi.SmithyTypes
 

@@ -2,8 +2,8 @@ package software.amazon.smithy.intellij
 
 import com.intellij.ide.navigationToolbar.NavBarModelExtension
 import com.intellij.ide.navigationToolbar.StructureAwareNavBarModelExtension
-import software.amazon.smithy.intellij.ext.SmithyElement
-import software.amazon.smithy.intellij.ext.SmithyNamedElement
+import software.amazon.smithy.intellij.psi.SmithyElement
+import software.amazon.smithy.intellij.psi.SmithyNamedElement
 
 /**
  * A [NavBarModelExtension] for [Smithy](https://awslabs.github.io/smithy).
