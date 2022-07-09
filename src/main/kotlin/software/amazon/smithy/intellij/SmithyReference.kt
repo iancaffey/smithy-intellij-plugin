@@ -121,7 +121,7 @@ data class SmithyShapeReference(val value: SmithyValue) : SmithyReference<Smithy
     private val ref = shapeId?.let { Ref(it, if (value is SmithyShapeId) null else ValuePath.buildTo(value)) }
     override fun isSoft() = ref == null
     override fun getAbsoluteRange(): TextRange = myElement.textRange
-    override fun resolve() = ref?.let { getCachedValue(it, resolver(it)) }
+    override fun resolve() = ref?.let { getCachedValue(if (value is SmithyShapeId) value else it, resolver(it)) }
     override fun handleElementRename(newElementName: String): SmithyValue {
         val textRange = myElement.textRange
         val document = FileDocumentManager.getInstance().getDocument(myElement.containingFile.virtualFile)
