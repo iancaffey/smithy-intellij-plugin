@@ -16,7 +16,6 @@ import com.intellij.psi.util.nextLeaf
 import com.intellij.psi.util.nextLeafs
 import software.amazon.smithy.intellij.psi.SmithyBoolean
 import software.amazon.smithy.intellij.psi.SmithyControl
-import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyId
 import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyIncompleteEntry
@@ -35,9 +34,7 @@ import software.amazon.smithy.intellij.psi.SmithySimpleTypeName
 import software.amazon.smithy.intellij.psi.SmithyString
 import software.amazon.smithy.intellij.psi.SmithyTextBlock
 import software.amazon.smithy.intellij.psi.SmithyTrait
-import software.amazon.smithy.intellij.psi.SmithyTraitBody
 import software.amazon.smithy.intellij.psi.SmithyTypes
-import software.amazon.smithy.intellij.psi.SmithyValue
 
 /**
  * An [Annotator] which provides annotations to [Smithy](https://awslabs.github.io/smithy) model files.
@@ -154,6 +151,11 @@ class SmithyAnnotator : Annotator {
                 holder.highlight(HighlightSeverity.ERROR, "'key' must target a string shape")
             }
         }
+        if (element is SmithyMember && element.parent.children.any { it is SmithyMember && it != element && it.name == element.name }) {
+            holder.newAnnotation(HighlightSeverity.ERROR, "'${element.name}' is already defined")
+                .withFix(SmithyRemoveMemberQuickFix(element))
+                .create()
+        }
         if (element is SmithyTrait) {
             val target = element.resolve()
             if (target != null && !target.hasTrait("smithy.api#trait")) {
@@ -242,6 +244,10 @@ class SmithyAnnotator : Annotator {
 
     private fun AnnotationHolder.highlight(severity: HighlightSeverity, message: String) =
         newAnnotation(severity, message).create()
+
+    private fun AnnotationHolder.highlight(
+        severity: HighlightSeverity, message: String, range: TextRange
+    ) = newAnnotation(severity, message).range(range).create()
 
     private fun AnnotationHolder.highlight(
         severity: HighlightSeverity, message: String, key: TextAttributesKey, range: TextRange
