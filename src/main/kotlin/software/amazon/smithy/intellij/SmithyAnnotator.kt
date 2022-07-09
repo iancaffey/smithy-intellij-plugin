@@ -11,6 +11,7 @@ import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.tree.TokenSet
+import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.nextLeaf
 import com.intellij.psi.util.nextLeafs
@@ -27,6 +28,7 @@ import software.amazon.smithy.intellij.psi.SmithyList
 import software.amazon.smithy.intellij.psi.SmithyMap
 import software.amazon.smithy.intellij.psi.SmithyMember
 import software.amazon.smithy.intellij.psi.SmithyMemberName
+import software.amazon.smithy.intellij.psi.SmithyModel
 import software.amazon.smithy.intellij.psi.SmithyNull
 import software.amazon.smithy.intellij.psi.SmithySet
 import software.amazon.smithy.intellij.psi.SmithyShape
@@ -171,14 +173,19 @@ class SmithyAnnotator : Annotator {
         }
         if (element is SmithyShapeId && element.parent !is SmithyImport) {
             element.namespaceId?.let { namespaceId ->
-                val fix = SmithyOptimizeShapeIdQuickFix(element.project, element)
-                holder.newAnnotation(
-                    HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING,
-                    if (fix.hasImport) "Remove unnecessary qualifier" else "Add import for: ${element.shapeName}"
-                ).range(namespaceId.textRange)
-                    .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL)
-                    .withFix(fix)
-                    .create()
+                val conflicts = getParentOfType(element, SmithyModel::class.java)?.shapes?.any {
+                    it.name == element.shapeName
+                } == true
+                if (!conflicts) {
+                    val fix = SmithyOptimizeShapeIdQuickFix(element.project, element)
+                    holder.newAnnotation(
+                        HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING,
+                        if (fix.hasImport) "Remove unnecessary qualifier" else "Add import for: ${element.shapeName}"
+                    ).range(namespaceId.textRange)
+                        .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL)
+                        .withFix(fix)
+                        .create()
+                }
             }
         }
         if (element is SmithyImport && element in SmithyImportOptimizer.unusedImports(element.containingFile)) {
