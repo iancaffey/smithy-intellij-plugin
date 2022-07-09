@@ -4,14 +4,12 @@ package software.amazon.smithy.intellij.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import software.amazon.smithy.intellij.SmithyMemberDefinition;
+import software.amazon.smithy.intellij.ext.SmithyEntryExt;
+import software.amazon.smithy.intellij.ext.SmithyElement;
 
-public interface SmithyEntry extends SmithyKeyedElement, SmithyElement {
+public interface SmithyEntry extends SmithyKeyedElement, SmithyEntryExt, SmithyElement {
 
   @NotNull
   SmithyValue getValue();
-
-  @Nullable
-  SmithyMemberDefinition resolve();
 
 }

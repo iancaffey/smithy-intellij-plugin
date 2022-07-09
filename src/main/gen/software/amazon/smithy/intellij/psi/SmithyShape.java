@@ -4,46 +4,9 @@ package software.amazon.smithy.intellij.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import software.amazon.smithy.intellij.SmithyShapeDefinition;
-import com.intellij.navigation.ItemPresentation;
+import software.amazon.smithy.intellij.ext.SmithyShapeExt;
+import software.amazon.smithy.intellij.ext.SmithyElement;
 
-public interface SmithyShape extends SmithyNamedElement, SmithyShapeDefinition, SmithyElement {
-
-  @NotNull
-  String getNamespace();
-
-  @NotNull
-  String getName();
-
-  @NotNull
-  String getShapeId();
-
-  @Nullable
-  SmithyDocumentation getDocumentation();
-
-  @NotNull
-  List<SmithyTrait> getDeclaredTraits();
-
-  @NotNull
-  SmithyShapeName getNameIdentifier();
-
-  @NotNull
-  ItemPresentation getPresentation();
-
-  int getTextOffset();
-
-  @NotNull
-  SmithyShape setName(@Nullable String newName);
-
-  @NotNull
-  String getType();
-
-  boolean hasTrait(@NotNull String id);
-
-  @Nullable
-  SmithyMember getMember(@NotNull String name);
-
-  @NotNull
-  List<SmithyMember> getMembers();
+public interface SmithyShape extends SmithyShapeExt, SmithyElement {
 
 }

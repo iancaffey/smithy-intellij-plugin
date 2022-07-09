@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyList extends SmithyAggregateShape, SmithyElement {
+public interface SmithyList extends SmithyAggregateShape {
 
   @Nullable
   SmithyDocumentation getDocumentation();

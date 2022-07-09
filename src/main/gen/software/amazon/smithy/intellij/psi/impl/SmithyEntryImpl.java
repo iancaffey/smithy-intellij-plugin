@@ -8,11 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
+import software.amazon.smithy.intellij.ext.SmithyEntryMixin;
 import software.amazon.smithy.intellij.psi.*;
-import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
-import software.amazon.smithy.intellij.SmithyMemberDefinition;
 
-public class SmithyEntryImpl extends SmithyKeyedElementImpl implements SmithyEntry {
+public class SmithyEntryImpl extends SmithyEntryMixin implements SmithyEntry {
 
   public SmithyEntryImpl(@NotNull ASTNode node) {
     super(node);
@@ -33,12 +32,6 @@ public class SmithyEntryImpl extends SmithyKeyedElementImpl implements SmithyEnt
   @NotNull
   public SmithyValue getValue() {
     return findNotNullChildByClass(SmithyValue.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyMemberDefinition resolve() {
-    return SmithyPsiImplUtilKt.resolve(this);
   }
 
 }

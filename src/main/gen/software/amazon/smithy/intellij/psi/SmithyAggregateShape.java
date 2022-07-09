@@ -5,12 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmithyAggregateShape extends SmithyShape, SmithyElement {
+public interface SmithyAggregateShape extends SmithyShape {
 
   @NotNull
   SmithyShapeBody getBody();
-
-  @NotNull
-  List<SmithyMember> getMembers();
 
 }

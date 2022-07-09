@@ -8,12 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
-import software.amazon.smithy.intellij.ext.SmithyPsiElement;
+import software.amazon.smithy.intellij.ext.SmithyTraitMixin;
 import software.amazon.smithy.intellij.psi.*;
-import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
-import software.amazon.smithy.intellij.SmithyShapeDefinition;
 
-public class SmithyTraitImpl extends SmithyPsiElement implements SmithyTrait {
+public class SmithyTraitImpl extends SmithyTraitMixin implements SmithyTrait {
 
   public SmithyTraitImpl(@NotNull ASTNode node) {
     super(node);
@@ -39,12 +37,6 @@ public class SmithyTraitImpl extends SmithyPsiElement implements SmithyTrait {
   @Nullable
   public SmithyTraitBody getBody() {
     return findChildByClass(SmithyTraitBody.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyShapeDefinition resolve() {
-    return SmithyPsiImplUtilKt.resolve(this);
   }
 
 }

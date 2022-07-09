@@ -8,10 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
+import software.amazon.smithy.intellij.ext.SmithyMapMixin;
 import software.amazon.smithy.intellij.psi.*;
-import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 
-public class SmithyMapImpl extends SmithyAggregateShapeImpl implements SmithyMap {
+public class SmithyMapImpl extends SmithyMapMixin implements SmithyMap {
 
   public SmithyMapImpl(@NotNull ASTNode node) {
     super(node);
@@ -32,12 +32,6 @@ public class SmithyMapImpl extends SmithyAggregateShapeImpl implements SmithyMap
   @Nullable
   public SmithyDocumentation getDocumentation() {
     return findChildByClass(SmithyDocumentation.class);
-  }
-
-  @Override
-  @Nullable
-  public SmithyMember getMember(@NotNull String name) {
-    return SmithyPsiImplUtilKt.getMember(this, name);
   }
 
 }

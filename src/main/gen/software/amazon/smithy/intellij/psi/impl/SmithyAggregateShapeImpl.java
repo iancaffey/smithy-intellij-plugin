@@ -8,10 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
+import software.amazon.smithy.intellij.ext.SmithyAggregateShapeMixin;
 import software.amazon.smithy.intellij.psi.*;
-import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 
-public class SmithyAggregateShapeImpl extends SmithyShapeImpl implements SmithyAggregateShape {
+public class SmithyAggregateShapeImpl extends SmithyAggregateShapeMixin implements SmithyAggregateShape {
 
   public SmithyAggregateShapeImpl(@NotNull ASTNode node) {
     super(node);
@@ -32,12 +32,6 @@ public class SmithyAggregateShapeImpl extends SmithyShapeImpl implements SmithyA
   @NotNull
   public SmithyShapeBody getBody() {
     return findNotNullChildByClass(SmithyShapeBody.class);
-  }
-
-  @Override
-  @NotNull
-  public List<SmithyMember> getMembers() {
-    return SmithyPsiImplUtilKt.getMembers(this);
   }
 
 }

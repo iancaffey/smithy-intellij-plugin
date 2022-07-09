@@ -8,10 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
+import software.amazon.smithy.intellij.ext.SmithyBooleanMixin;
 import software.amazon.smithy.intellij.psi.*;
-import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 
-public class SmithyBooleanImpl extends SmithyPrimitiveImpl implements SmithyBoolean {
+public class SmithyBooleanImpl extends SmithyBooleanMixin implements SmithyBoolean {
 
   public SmithyBooleanImpl(@NotNull ASTNode node) {
     super(node);
@@ -26,11 +26,6 @@ public class SmithyBooleanImpl extends SmithyPrimitiveImpl implements SmithyBool
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SmithyVisitor) accept((SmithyVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  public boolean booleanValue() {
-    return SmithyPsiImplUtilKt.booleanValue(this);
   }
 
 }

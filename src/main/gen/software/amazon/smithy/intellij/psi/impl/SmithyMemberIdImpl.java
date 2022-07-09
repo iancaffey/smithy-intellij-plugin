@@ -8,12 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
-import software.amazon.smithy.intellij.ext.SmithyPsiElement;
+import software.amazon.smithy.intellij.ext.SmithyMemberIdMixin;
 import software.amazon.smithy.intellij.psi.*;
-import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
-import software.amazon.smithy.intellij.SmithyMemberReference;
 
-public class SmithyMemberIdImpl extends SmithyPsiElement implements SmithyMemberId {
+public class SmithyMemberIdImpl extends SmithyMemberIdMixin implements SmithyMemberId {
 
   public SmithyMemberIdImpl(@NotNull ASTNode node) {
     super(node);
@@ -39,24 +37,6 @@ public class SmithyMemberIdImpl extends SmithyPsiElement implements SmithyMember
   @NotNull
   public SmithyShapeId getShapeId() {
     return findNotNullChildByClass(SmithyShapeId.class);
-  }
-
-  @Override
-  @NotNull
-  public String getId() {
-    return SmithyPsiImplUtilKt.getId(this);
-  }
-
-  @Override
-  @NotNull
-  public SmithyMemberReference getReference() {
-    return SmithyPsiImplUtilKt.getReference(this);
-  }
-
-  @Override
-  @NotNull
-  public String toString() {
-    return SmithyPsiImplUtilKt.toString(this);
   }
 
 }

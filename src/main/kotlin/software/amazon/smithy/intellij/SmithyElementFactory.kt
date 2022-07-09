@@ -3,7 +3,6 @@ package software.amazon.smithy.intellij
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.util.PsiTreeUtil
-import software.amazon.smithy.intellij.psi.SmithyElement
 import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyNamespace
 

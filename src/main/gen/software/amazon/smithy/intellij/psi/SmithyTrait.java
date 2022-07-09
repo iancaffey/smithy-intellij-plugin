@@ -4,17 +4,15 @@ package software.amazon.smithy.intellij.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import software.amazon.smithy.intellij.SmithyShapeDefinition;
+import software.amazon.smithy.intellij.ext.SmithyTraitExt;
+import software.amazon.smithy.intellij.ext.SmithyElement;
 
-public interface SmithyTrait extends SmithyElement {
+public interface SmithyTrait extends SmithyTraitExt, SmithyElement {
 
   @NotNull
   SmithyShapeId getShapeId();
 
   @Nullable
   SmithyTraitBody getBody();
-
-  @Nullable
-  SmithyShapeDefinition resolve();
 
 }

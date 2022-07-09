@@ -4,16 +4,27 @@ package software.amazon.smithy.intellij.psi;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiNameIdentifierOwner;
-import software.amazon.smithy.intellij.SmithyMemberDefinition;
-import software.amazon.smithy.intellij.SmithyShapeDefinition;
-import com.intellij.psi.PsiDocCommentBase;
+import software.amazon.smithy.intellij.ext.SmithyElement;
+import software.amazon.smithy.intellij.ext.SmithyNumberExt;
+import software.amazon.smithy.intellij.ext.SmithyContainer;
+import software.amazon.smithy.intellij.ext.SmithyMemberExt;
+import software.amazon.smithy.intellij.ext.SmithyTraitExt;
+import software.amazon.smithy.intellij.ext.SmithyModelExt;
+import software.amazon.smithy.intellij.ext.SmithyValueExt;
+import software.amazon.smithy.intellij.ext.SmithyKeyExt;
+import software.amazon.smithy.intellij.ext.SmithyMemberIdExt;
+import software.amazon.smithy.intellij.ext.SmithyKeyedElementExt;
+import software.amazon.smithy.intellij.ext.SmithyShapeExt;
+import software.amazon.smithy.intellij.ext.SmithyDocumentationExt;
+import software.amazon.smithy.intellij.ext.SmithyEntryExt;
+import software.amazon.smithy.intellij.ext.SmithyBooleanExt;
+import software.amazon.smithy.intellij.ext.SmithyNamespaceIdExt;
+import software.amazon.smithy.intellij.ext.SmithyShapeIdExt;
 
 public class SmithyVisitor extends PsiElementVisitor {
 
   public void visitAggregateShape(@NotNull SmithyAggregateShape o) {
     visitShape(o);
-    // visitElement(o);
   }
 
   public void visitAppliedTrait(@NotNull SmithyAppliedTrait o) {
@@ -22,17 +33,12 @@ public class SmithyVisitor extends PsiElementVisitor {
 
   public void visitArray(@NotNull SmithyArray o) {
     visitValue(o);
-    // visitElement(o);
     // visitContainer(o);
   }
 
   public void visitBoolean(@NotNull SmithyBoolean o) {
     visitPrimitive(o);
-    // visitElement(o);
-  }
-
-  public void visitContainer(@NotNull SmithyContainer o) {
-    visitElement(o);
+    // visitBooleanExt(o);
   }
 
   public void visitControl(@NotNull SmithyControl o) {
@@ -41,16 +47,13 @@ public class SmithyVisitor extends PsiElementVisitor {
   }
 
   public void visitDocumentation(@NotNull SmithyDocumentation o) {
-    visitPsiDocCommentBase(o);
+    visitDocumentationExt(o);
     // visitElement(o);
-  }
-
-  public void visitElement(@NotNull SmithyElement o) {
-    visitPsiElement(o);
   }
 
   public void visitEntry(@NotNull SmithyEntry o) {
     visitKeyedElement(o);
+    // visitEntryExt(o);
     // visitElement(o);
   }
 
@@ -75,36 +78,34 @@ public class SmithyVisitor extends PsiElementVisitor {
   }
 
   public void visitKey(@NotNull SmithyKey o) {
-    visitElement(o);
+    visitKeyExt(o);
+    // visitElement(o);
   }
 
   public void visitKeyedElement(@NotNull SmithyKeyedElement o) {
-    visitNamedElement(o);
+    visitKeyedElementExt(o);
   }
 
   public void visitKeyword(@NotNull SmithyKeyword o) {
     visitId(o);
-    // visitElement(o);
   }
 
   public void visitList(@NotNull SmithyList o) {
     visitAggregateShape(o);
-    // visitElement(o);
   }
 
   public void visitMap(@NotNull SmithyMap o) {
     visitAggregateShape(o);
-    // visitElement(o);
   }
 
   public void visitMember(@NotNull SmithyMember o) {
-    visitNamedElement(o);
-    // visitMemberDefinition(o);
+    visitMemberExt(o);
     // visitElement(o);
   }
 
   public void visitMemberId(@NotNull SmithyMemberId o) {
-    visitElement(o);
+    visitMemberIdExt(o);
+    // visitElement(o);
   }
 
   public void visitMemberName(@NotNull SmithyMemberName o) {
@@ -117,11 +118,8 @@ public class SmithyVisitor extends PsiElementVisitor {
   }
 
   public void visitModel(@NotNull SmithyModel o) {
-    visitElement(o);
-  }
-
-  public void visitNamedElement(@NotNull SmithyNamedElement o) {
-    visitPsiNameIdentifierOwner(o);
+    visitModelExt(o);
+    // visitElement(o);
   }
 
   public void visitNamespace(@NotNull SmithyNamespace o) {
@@ -129,53 +127,46 @@ public class SmithyVisitor extends PsiElementVisitor {
   }
 
   public void visitNamespaceId(@NotNull SmithyNamespaceId o) {
-    visitElement(o);
+    visitNamespaceIdExt(o);
+    // visitElement(o);
   }
 
   public void visitNull(@NotNull SmithyNull o) {
     visitPrimitive(o);
-    // visitElement(o);
   }
 
   public void visitNumber(@NotNull SmithyNumber o) {
     visitPrimitive(o);
-    // visitElement(o);
+    // visitNumberExt(o);
   }
 
   public void visitObject(@NotNull SmithyObject o) {
     visitValue(o);
-    // visitElement(o);
     // visitContainer(o);
   }
 
   public void visitOperation(@NotNull SmithyOperation o) {
     visitShape(o);
-    // visitElement(o);
   }
 
   public void visitPrimitive(@NotNull SmithyPrimitive o) {
     visitValue(o);
-    // visitElement(o);
   }
 
   public void visitResource(@NotNull SmithyResource o) {
     visitShape(o);
-    // visitElement(o);
   }
 
   public void visitService(@NotNull SmithyService o) {
     visitShape(o);
-    // visitElement(o);
   }
 
   public void visitSet(@NotNull SmithySet o) {
     visitAggregateShape(o);
-    // visitElement(o);
   }
 
   public void visitShape(@NotNull SmithyShape o) {
-    visitNamedElement(o);
-    // visitShapeDefinition(o);
+    visitShapeExt(o);
     // visitElement(o);
   }
 
@@ -186,7 +177,7 @@ public class SmithyVisitor extends PsiElementVisitor {
 
   public void visitShapeId(@NotNull SmithyShapeId o) {
     visitPrimitive(o);
-    // visitElement(o);
+    // visitShapeIdExt(o);
   }
 
   public void visitShapeName(@NotNull SmithyShapeName o) {
@@ -195,36 +186,31 @@ public class SmithyVisitor extends PsiElementVisitor {
 
   public void visitSimpleShape(@NotNull SmithySimpleShape o) {
     visitShape(o);
-    // visitElement(o);
   }
 
   public void visitSimpleTypeName(@NotNull SmithySimpleTypeName o) {
     visitId(o);
-    // visitElement(o);
   }
 
   public void visitString(@NotNull SmithyString o) {
     visitPrimitive(o);
-    // visitElement(o);
   }
 
   public void visitStructure(@NotNull SmithyStructure o) {
     visitAggregateShape(o);
-    // visitElement(o);
   }
 
   public void visitSymbol(@NotNull SmithySymbol o) {
     visitId(o);
-    // visitElement(o);
   }
 
   public void visitTextBlock(@NotNull SmithyTextBlock o) {
     visitPrimitive(o);
-    // visitElement(o);
   }
 
   public void visitTrait(@NotNull SmithyTrait o) {
-    visitElement(o);
+    visitTraitExt(o);
+    // visitElement(o);
   }
 
   public void visitTraitBody(@NotNull SmithyTraitBody o) {
@@ -234,19 +220,55 @@ public class SmithyVisitor extends PsiElementVisitor {
 
   public void visitUnion(@NotNull SmithyUnion o) {
     visitAggregateShape(o);
-    // visitElement(o);
   }
 
   public void visitValue(@NotNull SmithyValue o) {
-    visitElement(o);
+    visitValueExt(o);
+    // visitElement(o);
   }
 
-  public void visitPsiDocCommentBase(@NotNull PsiDocCommentBase o) {
-    visitElement(o);
+  public void visitDocumentationExt(@NotNull SmithyDocumentationExt o) {
+    visitPsiElement(o);
   }
 
-  public void visitPsiNameIdentifierOwner(@NotNull PsiNameIdentifierOwner o) {
-    visitElement(o);
+  public void visitElement(@NotNull SmithyElement o) {
+    visitPsiElement(o);
+  }
+
+  public void visitKeyExt(@NotNull SmithyKeyExt o) {
+    visitPsiElement(o);
+  }
+
+  public void visitKeyedElementExt(@NotNull SmithyKeyedElementExt o) {
+    visitPsiElement(o);
+  }
+
+  public void visitMemberExt(@NotNull SmithyMemberExt o) {
+    visitPsiElement(o);
+  }
+
+  public void visitMemberIdExt(@NotNull SmithyMemberIdExt o) {
+    visitPsiElement(o);
+  }
+
+  public void visitModelExt(@NotNull SmithyModelExt o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNamespaceIdExt(@NotNull SmithyNamespaceIdExt o) {
+    visitPsiElement(o);
+  }
+
+  public void visitShapeExt(@NotNull SmithyShapeExt o) {
+    visitPsiElement(o);
+  }
+
+  public void visitTraitExt(@NotNull SmithyTraitExt o) {
+    visitPsiElement(o);
+  }
+
+  public void visitValueExt(@NotNull SmithyValueExt o) {
+    visitPsiElement(o);
   }
 
   public void visitPsiElement(@NotNull PsiElement o) {

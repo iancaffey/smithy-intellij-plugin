@@ -8,11 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
-import software.amazon.smithy.intellij.ext.SmithyPsiElement;
+import software.amazon.smithy.intellij.ext.SmithyKeyedElementMixin;
 import software.amazon.smithy.intellij.psi.*;
-import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 
-public class SmithyKeyedElementImpl extends SmithyPsiElement implements SmithyKeyedElement {
+public class SmithyKeyedElementImpl extends SmithyKeyedElementMixin implements SmithyKeyedElement {
 
   public SmithyKeyedElementImpl(@NotNull ASTNode node) {
     super(node);
@@ -32,29 +31,6 @@ public class SmithyKeyedElementImpl extends SmithyPsiElement implements SmithyKe
   @NotNull
   public SmithyKey getKey() {
     return findNotNullChildByClass(SmithyKey.class);
-  }
-
-  @Override
-  @NotNull
-  public String getName() {
-    return SmithyPsiImplUtilKt.getName(this);
-  }
-
-  @Override
-  @NotNull
-  public SmithyKeyedElement setName(@Nullable String newName) {
-    return SmithyPsiImplUtilKt.setName(this, newName);
-  }
-
-  @Override
-  @NotNull
-  public SmithyKey getNameIdentifier() {
-    return SmithyPsiImplUtilKt.getNameIdentifier(this);
-  }
-
-  @Override
-  public int getTextOffset() {
-    return SmithyPsiImplUtilKt.getTextOffset(this);
   }
 
 }

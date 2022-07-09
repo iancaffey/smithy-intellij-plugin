@@ -8,11 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
-import software.amazon.smithy.intellij.ext.SmithyPsiElement;
+import software.amazon.smithy.intellij.ext.SmithyNamespaceIdMixin;
 import software.amazon.smithy.intellij.psi.*;
-import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 
-public class SmithyNamespaceIdImpl extends SmithyPsiElement implements SmithyNamespaceId {
+public class SmithyNamespaceIdImpl extends SmithyNamespaceIdMixin implements SmithyNamespaceId {
 
   public SmithyNamespaceIdImpl(@NotNull ASTNode node) {
     super(node);
@@ -32,18 +31,6 @@ public class SmithyNamespaceIdImpl extends SmithyPsiElement implements SmithyNam
   @NotNull
   public List<SmithyId> getParts() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyId.class);
-  }
-
-  @Override
-  @NotNull
-  public String getId() {
-    return SmithyPsiImplUtilKt.getId(this);
-  }
-
-  @Override
-  @NotNull
-  public String toString() {
-    return SmithyPsiImplUtilKt.toString(this);
   }
 
 }

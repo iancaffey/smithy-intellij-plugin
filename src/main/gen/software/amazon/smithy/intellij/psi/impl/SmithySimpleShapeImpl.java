@@ -9,7 +9,6 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static software.amazon.smithy.intellij.psi.SmithyTypes.*;
 import software.amazon.smithy.intellij.psi.*;
-import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 
 public class SmithySimpleShapeImpl extends SmithyShapeImpl implements SmithySimpleShape {
 
@@ -32,12 +31,6 @@ public class SmithySimpleShapeImpl extends SmithyShapeImpl implements SmithySimp
   @Nullable
   public SmithyDocumentation getDocumentation() {
     return findChildByClass(SmithyDocumentation.class);
-  }
-
-  @Override
-  @NotNull
-  public String getTypeName() {
-    return SmithyPsiImplUtilKt.getTypeName(this);
   }
 
 }

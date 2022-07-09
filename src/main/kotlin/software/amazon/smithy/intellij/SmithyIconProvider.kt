@@ -2,7 +2,6 @@ package software.amazon.smithy.intellij
 
 import com.intellij.ide.IconProvider
 import com.intellij.psi.PsiElement
-import software.amazon.smithy.intellij.psi.SmithyElement
 import software.amazon.smithy.intellij.psi.SmithyMember
 import software.amazon.smithy.intellij.psi.SmithyShape
 

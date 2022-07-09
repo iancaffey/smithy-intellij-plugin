@@ -4,16 +4,9 @@ package software.amazon.smithy.intellij.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import software.amazon.smithy.intellij.ext.SmithyModelExt;
+import software.amazon.smithy.intellij.ext.SmithyElement;
 
-public interface SmithyModel extends SmithyElement {
-
-  @NotNull
-  List<SmithyIncompleteAppliedTrait> getIncompleteAppliedTraitList();
-
-  @NotNull
-  String getNamespace();
-
-  @NotNull
-  List<SmithyShape> getShapes();
+public interface SmithyModel extends SmithyModelExt, SmithyElement {
 
 }

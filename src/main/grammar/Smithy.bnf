@@ -6,7 +6,6 @@
     psiImplClassSuffix="Impl"
     psiPackage="software.amazon.smithy.intellij.psi"
     psiImplPackage="software.amazon.smithy.intellij.psi.impl"
-    psiImplUtilClass="software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt"
     elementTypeHolderClass="software.amazon.smithy.intellij.psi.SmithyTypes"
     elementTypeClass="software.amazon.smithy.intellij.SmithyElementType"
     tokenTypeClass="software.amazon.smithy.intellij.SmithyTokenType"
@@ -56,8 +55,8 @@
         TOKEN_INCOMPLETE_STRING="regexp:\"((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF]))+"
         TOKEN_INCOMPLETE_TEXT_BLOCK="regexp:\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))+"
     ]
-    implements("^(?!.*element).*")=element
-    implements("array|object|shape_body|trait_body")=container
+    implements("^(?!.*element).*")="software.amazon.smithy.intellij.ext.SmithyElement"
+    implements("array|object|shape_body|trait_body")="software.amazon.smithy.intellij.ext.SmithyContainer"
     extends("array|object|primitive")=value
     extends("null|boolean|number|string|text_block|shape_id")=primitive
     extends("symbol|keyword|null|boolean|simple_type_name")=id
@@ -67,48 +66,109 @@
 }
 //https://awslabs.github.io/smithy/1.0/spec/core/idl.html
 root ::= model
-model ::= control* metadata* [namespace import* (applied_trait | incomplete_applied_trait | shape)*] {methods=[getNamespace getShapes control="" metadata="" namespace="" import="" applied_trait="" shape=""]}
+model ::= control* metadata* [namespace import* (applied_trait | incomplete_applied_trait | shape)*] {
+    methods=[control="" metadata="" namespace="" import="" applied_trait="" incomplete_applied_trait="" shape=""]
+    implements="software.amazon.smithy.intellij.ext.SmithyModelExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyModelMixin"
+}
 control ::= TOKEN_DOLLAR_SIGN key TOKEN_COLON value
 metadata ::= TOKEN_METADATA key TOKEN_EQUALS value
 namespace ::= TOKEN_NAMESPACE namespace_id
 import ::= TOKEN_USE shape_id
 
 //Shapes
-shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {implements=[named_element "software.amazon.smithy.intellij.SmithyShapeDefinition"] methods=[getNamespace getName getShapeId getDocumentation getDeclaredTraits getNameIdentifier getPresentation getTextOffset setName getType hasTrait getMember getMembers]}
-simple_shape ::= [documentation] trait* simple_type_name shape_name {methods=[getTypeName trait="" simple_type_name="" shape_name="" ]}
-list ::= [documentation] trait* TOKEN_LIST shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
-set ::= [documentation] trait* TOKEN_SET shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
-map ::= [documentation] trait* TOKEN_MAP shape_name shape_body {methods=[trait="" shape_name="" body="shape_body" getMember]}
-structure ::= [documentation] trait* TOKEN_STRUCTURE shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
-union ::= [documentation] trait* TOKEN_UNION shape_name shape_body {methods=[trait="" shape_name="" body="shape_body"]}
-service ::= [documentation] trait* TOKEN_SERVICE shape_name object {methods=[trait="" shape_name="" body="object"]}
-operation ::= [documentation] trait* TOKEN_OPERATION shape_name object {methods=[trait="" shape_name="" body="object"]}
-resource ::= [documentation] trait* TOKEN_RESOURCE shape_name object {methods=[trait="" shape_name="" body="object"]}
-shape_body ::= TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA] [incomplete_member]] TOKEN_CLOSE_BRACE {methods=[members="member" incomplete_member=""]}
-member ::= [documentation] trait* member_name TOKEN_COLON shape_id {implements=[named_element "software.amazon.smithy.intellij.SmithyMemberDefinition"] methods=[declared_traits="trait" name_identifier="member_name" getName getPresentation getTextOffset setName getEnclosingShape getTargetShapeId resolve]}
-
+shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {
+    implements="software.amazon.smithy.intellij.ext.SmithyShapeExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyShapeMixin"
+}
+simple_shape ::= [documentation] trait* simple_type_name shape_name {
+    methods=[trait="" simple_type_name="" shape_name="" ]
+}
+list ::= [documentation] trait* TOKEN_LIST shape_name shape_body {
+    methods=[trait="" shape_name="" body="shape_body"]
+}
+set ::= [documentation] trait* TOKEN_SET shape_name shape_body {
+    methods=[trait="" shape_name="" body="shape_body"]
+}
+map ::= [documentation] trait* TOKEN_MAP shape_name shape_body {
+    methods=[trait="" shape_name="" body="shape_body"]
+    mixin="software.amazon.smithy.intellij.ext.SmithyMapMixin"
+}
+structure ::= [documentation] trait* TOKEN_STRUCTURE shape_name shape_body {
+    methods=[trait="" shape_name="" body="shape_body"]
+}
+union ::= [documentation] trait* TOKEN_UNION shape_name shape_body {
+    methods=[trait="" shape_name="" body="shape_body"]
+}
+service ::= [documentation] trait* TOKEN_SERVICE shape_name object {
+    methods=[trait="" shape_name="" body="object"]
+}
+operation ::= [documentation] trait* TOKEN_OPERATION shape_name object {
+    methods=[trait="" shape_name="" body="object"]
+}
+resource ::= [documentation] trait* TOKEN_RESOURCE shape_name object {
+    methods=[trait="" shape_name="" body="object"]
+}
+shape_body ::= TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA] [incomplete_member]] TOKEN_CLOSE_BRACE {
+    methods=[members="member" incomplete_member=""]
+}
+member ::= [documentation] trait* member_name TOKEN_COLON shape_id {
+    methods=[declared_traits="trait" name_identifier="member_name"]
+    implements="software.amazon.smithy.intellij.ext.SmithyMemberExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyMemberMixin"
+}
 
 //Traits
 applied_trait ::= TOKEN_APPLY (member_id | shape_id) trait
-trait ::= TOKEN_AT shape_id [trait_body] {methods=[body="trait_body" resolve]}
-trait_body ::= TOKEN_OPEN_PAREN [trait_values | value] TOKEN_CLOSE_PAREN {methods=[values="entry" incomplete_entry=""]}
+trait ::= TOKEN_AT shape_id [trait_body] {
+    methods=[body="trait_body"]
+    implements=["software.amazon.smithy.intellij.ext.SmithyTraitExt"]
+    mixin="software.amazon.smithy.intellij.ext.SmithyTraitMixin"
+}
+trait_body ::= TOKEN_OPEN_PAREN [trait_values | value] TOKEN_CLOSE_PAREN {
+    methods=[values="entry" incomplete_entry=""]
+}
 private trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_entry]
 
 //Node values
-key ::= id | string {methods=[getReference]}
-value ::= array | object | primitive {methods=[getReference]}
-entry ::= key TOKEN_COLON value {methods=[resolve]}
-array ::= TOKEN_OPEN_BRACKET [value (TOKEN_COMMA value)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACKET {methods=[values="value"]}
-object ::= TOKEN_OPEN_BRACE [entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_entry]] TOKEN_CLOSE_BRACE {methods=[fields="entry" incomplete_entry=""]}
+key ::= id | string {
+    implements="software.amazon.smithy.intellij.ext.SmithyKeyExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyKeyMixin"
+}
+value ::= array | object | primitive {
+    implements="software.amazon.smithy.intellij.ext.SmithyValueExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyValueMixin"
+}
+entry ::= key TOKEN_COLON value {
+    implements="software.amazon.smithy.intellij.ext.SmithyEntryExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyEntryMixin"
+}
+array ::= TOKEN_OPEN_BRACKET [value (TOKEN_COMMA value)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACKET {
+    methods=[values="value"]
+}
+object ::= TOKEN_OPEN_BRACE [entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_entry]] TOKEN_CLOSE_BRACE {
+    methods=[fields="entry" incomplete_entry=""]
+}
 primitive ::= null | boolean | number | string | text_block | shape_id
 
 //Shape ID
-shape_id ::= [namespace_id TOKEN_HASH] id {methods=[id="" getId getShapeName getDeclaredNamespace getEnclosingNamespace getReference toString]}
-member_id ::= shape_id TOKEN_DOLLAR_SIGN member_name {methods=[getId getReference toString]}
-namespace_id ::= id (TOKEN_PERIOD id)* {methods=[parts="id" getId toString]}
-shape_name ::= id {methods=[id="" toString]}
-member_name ::= id {methods=[id="" toString]}
-id ::= symbol | keyword | null | boolean | simple_type_name {methods=[null="" boolean="" toString]}
+shape_id ::= [namespace_id TOKEN_HASH] id {
+    methods=[id=""]
+    implements="software.amazon.smithy.intellij.ext.SmithyShapeIdExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyShapeIdMixin"
+}
+member_id ::= shape_id TOKEN_DOLLAR_SIGN member_name {
+    implements="software.amazon.smithy.intellij.ext.SmithyMemberIdExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyMemberIdMixin"
+}
+namespace_id ::= id (TOKEN_PERIOD id)* {
+    methods=[parts="id"]
+    implements="software.amazon.smithy.intellij.ext.SmithyNamespaceIdExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyNamespaceIdMixin"
+}
+shape_name ::= id {methods=[id=""]}
+member_name ::= id {methods=[id=""]}
+id ::= symbol | keyword | null | boolean | simple_type_name {methods=[null="" boolean=""]}
 
 //Incomplete/intermediate elements which allow for a seamless parsing experience when typing out new entries in higher-level nodes
 //Without these "incomplete" members, the entire file would lose its parser state (and all syntax highlighting/annotations) until the member/entry was completed
@@ -118,18 +178,31 @@ incomplete_entry ::= key [TOKEN_COLON]
 
 //Re-declared tokens which will receive a dedicated AST node instead of raw PsiElement (since they are used in a meaningful way, like as a variant within another AST node)
 null ::= TOKEN_NULL {methods=[TOKEN_NULL=""]}
-boolean ::= TOKEN_BOOLEAN {methods=[booleanValue TOKEN_BOOLEAN=""]}
-number ::= TOKEN_NUMBER {methods=[byteValue shortValue intValue longValue floatValue doubleValue bigDecimalValue bigIntegerValue TOKEN_NUMBER=""]}
+boolean ::= TOKEN_BOOLEAN {
+    methods=[TOKEN_BOOLEAN=""]
+    implements="software.amazon.smithy.intellij.ext.SmithyBooleanExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyBooleanMixin"
+}
+number ::= TOKEN_NUMBER {
+    methods=[TOKEN_NUMBER=""]
+    implements="software.amazon.smithy.intellij.ext.SmithyNumberExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyNumberMixin"
+}
 string ::= TOKEN_STRING {methods=[TOKEN_STRING=""]}
 text_block ::= TOKEN_TEXT_BLOCK {methods=[TOKEN_TEXT_BLOCK=""]}
 symbol ::= TOKEN_SYMBOL {methods=[TOKEN_SYMBOL=""]}
 simple_type_name ::= TOKEN_SIMPLE_TYPE_NAME {methods=[TOKEN_SIMPLE_TYPE_NAME=""]}
 keyword ::= TOKEN_APPLY | TOKEN_USE | TOKEN_LIST | TOKEN_SET | TOKEN_MAP | TOKEN_METADATA | TOKEN_NAMESPACE | TOKEN_STRUCTURE | TOKEN_UNION | TOKEN_SERVICE | TOKEN_OPERATION | TOKEN_RESOURCE
-documentation ::= TOKEN_DOCUMENTATION_LINE+ {implements="com.intellij.psi.PsiDocCommentBase" methods=[getOwner getTokenType toDocString]}
-
+documentation ::= TOKEN_DOCUMENTATION_LINE+ {
+    implements="software.amazon.smithy.intellij.ext.SmithyDocumentationExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyDocumentationMixin"
+}
 //Fake rules (for introducing superinterfaces into the AST)
-fake element ::=
-fake container ::=
-fake aggregate_shape ::= shape_body {methods=[body="shape_body" getMembers]}
-fake named_element ::= {implements="com.intellij.psi.PsiNameIdentifierOwner"}
-fake keyed_element ::= key {implements=named_element methods=[getName setName getNameIdentifier getTextOffset]}
+fake aggregate_shape ::= shape_body {
+    methods=[body="shape_body"]
+    mixin="software.amazon.smithy.intellij.ext.SmithyAggregateShapeMixin"
+}
+fake keyed_element ::= key {
+    implements=["software.amazon.smithy.intellij.ext.SmithyKeyedElementExt"]
+    mixin="software.amazon.smithy.intellij.ext.SmithyKeyedElementMixin"
+}

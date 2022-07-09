@@ -4,27 +4,11 @@ package software.amazon.smithy.intellij.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import com.intellij.openapi.util.NlsSafe;
-import software.amazon.smithy.intellij.SmithyShapeReference;
+import software.amazon.smithy.intellij.ext.SmithyShapeIdExt;
 
-public interface SmithyShapeId extends SmithyPrimitive, SmithyElement {
+public interface SmithyShapeId extends SmithyPrimitive, SmithyShapeIdExt {
 
   @Nullable
   SmithyNamespaceId getNamespaceId();
-
-  @NotNull
-  String getId();
-
-  @NotNull
-  String getShapeName();
-
-  @Nullable
-  String getDeclaredNamespace();
-
-  @NotNull
-  String getEnclosingNamespace();
-
-  @NotNull
-  SmithyShapeReference getReference();
 
 }

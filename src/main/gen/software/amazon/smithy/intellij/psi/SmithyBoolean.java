@@ -4,9 +4,8 @@ package software.amazon.smithy.intellij.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import software.amazon.smithy.intellij.ext.SmithyBooleanExt;
 
-public interface SmithyBoolean extends SmithyPrimitive, SmithyElement {
-
-  boolean booleanValue();
+public interface SmithyBoolean extends SmithyPrimitive, SmithyBooleanExt {
 
 }

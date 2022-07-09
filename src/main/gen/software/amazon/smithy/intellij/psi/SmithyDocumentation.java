@@ -4,18 +4,9 @@ package software.amazon.smithy.intellij.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiDocCommentBase;
-import com.intellij.psi.tree.IElementType;
+import software.amazon.smithy.intellij.ext.SmithyDocumentationExt;
+import software.amazon.smithy.intellij.ext.SmithyElement;
 
-public interface SmithyDocumentation extends PsiDocCommentBase, SmithyElement {
-
-  @NotNull
-  PsiElement getOwner();
-
-  @NotNull
-  IElementType getTokenType();
-
-  @NotNull
-  String toDocString();
+public interface SmithyDocumentation extends SmithyDocumentationExt, SmithyElement {
 
 }
