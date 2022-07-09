@@ -188,11 +188,21 @@ class SmithyAnnotator : Annotator {
                 }
             }
         }
-        if (element is SmithyImport && element in SmithyImportOptimizer.unusedImports(element.containingFile)) {
-            holder.newAnnotation(HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING, "Unused import")
-                .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL)
-                .withFix(SmithyRemoveUnusedImportsQuickFix)
-                .create()
+        if (element is SmithyImport) {
+            val conflicts = getParentOfType(element, SmithyModel::class.java)?.shapes?.any {
+                it.name == element.shapeId.shapeName
+            } == true
+            if (conflicts) {
+                holder.newAnnotation(HighlightSeverity.ERROR, "'${element.shapeId.shapeName}' is already defined")
+                    .withFix(SmithyRemoveImportQuickFix(element))
+                    .create()
+            }
+            if (element in SmithyImportOptimizer.unusedImports(element.containingFile)) {
+                holder.newAnnotation(HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING, "Unused import")
+                    .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL)
+                    .withFix(SmithyRemoveUnusedImportsQuickFix)
+                    .create()
+            }
         }
         when (val reference = element.reference) {
             is SmithyKeyReference -> {
