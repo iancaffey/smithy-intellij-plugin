@@ -157,7 +157,10 @@ class SmithyAnnotator : Annotator {
         if (element is SmithyTrait) {
             val target = element.resolve()
             if (target != null && !target.hasTrait("smithy.api#trait")) {
-                holder.highlight(HighlightSeverity.ERROR, "${element.shapeId.shapeName} cannot be used as a trait")
+                holder.newAnnotation(
+                    HighlightSeverity.ERROR,
+                    "${element.shapeId.shapeName} cannot be used as a trait"
+                ).range(element.shapeId).highlightType(ProblemHighlightType.ERROR).create()
             }
         }
         if (element is SmithyShapeId && element.parent !is SmithyImport) {
@@ -165,7 +168,7 @@ class SmithyAnnotator : Annotator {
                 val fix = SmithyOptimizeShapeIdQuickFix(element.project, element)
                 holder.newAnnotation(
                     HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING,
-                    if (fix.hasImport) "Remove unnecessary qualifier" else "Add import for: ${element.text}"
+                    if (fix.hasImport) "Remove unnecessary qualifier" else "Add import for: ${element.shapeName}"
                 ).range(namespaceId.textRange)
                     .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL)
                     .withFix(fix)
@@ -178,32 +181,55 @@ class SmithyAnnotator : Annotator {
                 .withFix(SmithyRemoveUnusedImportsQuickFix)
                 .create()
         }
-        if (element is SmithyShapeId) {
-            val reference = element.reference
-            val target = reference.resolve()
-            if (target == null && !reference.isSoft) {
-                holder.newAnnotation(HighlightSeverity.ERROR, "Unresolved shape: ${element.text}")
-                    .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
-                    .withFix(SmithyImportShapeQuickFix(element.text, element.containingFile))
-                    .create()
+        when (val reference = element.reference) {
+            is SmithyKeyReference -> {
+                if (!reference.isSoft && reference.resolve() == null) {
+                    holder.newAnnotation(HighlightSeverity.ERROR, "Unresolved member: ${reference.key.text}")
+                        .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
+                        .create()
+                }
             }
-            val enclosingNamespace = (element.containingFile as? SmithyFile)?.model?.namespace
-            if (target is SmithyShapeDefinition && target.namespace != enclosingNamespace && target.hasTrait("smithy.api#private")) {
-                holder.newAnnotation(
-                    HighlightSeverity.ERROR, "${element.text} cannot be referenced outside ${target.namespace}"
-                ).highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL).create()
+            is SmithyMemberReference -> {
+                if (!reference.isSoft && reference.resolve() == null) {
+                    holder.newAnnotation(HighlightSeverity.ERROR, "Unresolved member: ${reference.id.text}")
+                        .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
+                        .create()
+                }
             }
-            if (target is SmithyShapeDefinition && target.hasTrait("smithy.api#deprecated")) {
-                holder.newAnnotation(
-                    HighlightSeverity.WARNING,
-                    "${element.text} is marked as @deprecated and could be removed in the future"
-                ).highlightType(ProblemHighlightType.LIKE_DEPRECATED).create()
-            }
-            if (target is SmithyShapeDefinition && target.hasTrait("smithy.api#unstable")) {
-                holder.newAnnotation(
-                    HighlightSeverity.WARNING,
-                    "${element.text} is marked as @unstable and could change in the future"
-                ).highlightType(ProblemHighlightType.WARNING).create()
+            is SmithyShapeReference -> {
+                val target = reference.resolve()
+                if (target == null) {
+                    if (!reference.isSoft) {
+                        holder.newAnnotation(HighlightSeverity.ERROR, "Unresolved shape: ${element.text}")
+                            .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
+                            .also {
+                                if (element is SmithyShapeId) {
+                                    it.withFix(SmithyImportShapeQuickFix(element.text, element.containingFile))
+                                }
+                            }
+                            .create()
+                    }
+                } else if (element is SmithyShapeId) {
+                    val enclosingNamespace = (element.containingFile as? SmithyFile)?.model?.namespace
+                    if (target.namespace != enclosingNamespace && target.hasTrait("smithy.api#private")) {
+                        holder.newAnnotation(
+                            HighlightSeverity.ERROR,
+                            "${element.shapeName} cannot be referenced outside ${target.namespace}"
+                        ).highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL).create()
+                    }
+                    if (target.hasTrait("smithy.api#deprecated")) {
+                        holder.newAnnotation(
+                            HighlightSeverity.WARNING,
+                            "${element.shapeName} is marked as @deprecated and could be removed in the future"
+                        ).highlightType(ProblemHighlightType.LIKE_DEPRECATED).create()
+                    }
+                    if (target.hasTrait("smithy.api#unstable")) {
+                        holder.newAnnotation(
+                            HighlightSeverity.WARNING,
+                            "${element.shapeName} is marked as @unstable and could change in the future"
+                        ).highlightType(ProblemHighlightType.WARNING).create()
+                    }
+                }
             }
         }
     }

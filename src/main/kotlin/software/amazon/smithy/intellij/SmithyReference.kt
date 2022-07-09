@@ -42,12 +42,13 @@ sealed class SmithyReference<T : PsiElement>(
  * @author Ian Caffey
  * @since 1.0
  */
-class SmithyKeyReference(key: SmithyKey) : SmithyReference<SmithyKey>(key, key.parent !is SmithyEntry) {
+class SmithyKeyReference(val key: SmithyKey) : SmithyReference<SmithyKey>(key, false) {
     private val entry = key.parent as? SmithyEntry
     private val delegate = PsiTreeUtil.findFirstParent(entry) { it is SmithyTrait }?.let {
         SmithyShapeReference((it as SmithyTrait).shapeId)
     }
     private val path = if (entry != null && delegate != null) MemberPath.build(entry) else null
+    override fun isSoft() = delegate == null || path == null
     override fun getAbsoluteRange(): TextRange = myElement.textRange
     override fun resolve() = if (path != null) delegate?.resolve()?.let { path.find(it) } else null
     override fun handleElementRename(newElementName: String): SmithyKey {
@@ -99,7 +100,7 @@ class SmithyKeyReference(key: SmithyKey) : SmithyReference<SmithyKey>(key, key.p
  * @author Ian Caffey
  * @since 1.0
  */
-class SmithyMemberReference(id: SmithyMemberId) : SmithyReference<SmithyMemberId>(id, false) {
+class SmithyMemberReference(val id: SmithyMemberId) : SmithyReference<SmithyMemberId>(id, false) {
     private val delegate = SmithyShapeReference(id.shapeId)
     override fun getAbsoluteRange(): TextRange = myElement.textRange
     override fun resolve() = delegate.resolve()?.getMember(myElement.memberName.text)
@@ -157,7 +158,11 @@ data class ValuePath(val path: List<String> = emptyList()) {
             val path = mutableListOf<String>()
             var current: PsiElement = value.parent
             while (current != root) {
-                path += if (current is SmithyEntry) current.name else "member"
+                when (current) {
+                    is SmithyEntry -> path += current.name
+                    is SmithyArray -> path += "member"
+                    //Note: SmithyObject do not impact the path
+                }
                 current = current.parent
             }
             path.reverse()
