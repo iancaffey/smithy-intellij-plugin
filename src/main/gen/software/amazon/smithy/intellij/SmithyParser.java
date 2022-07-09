@@ -217,6 +217,28 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // TOKEN_APPLY (member_id | shape_id)
+  public static boolean incomplete_applied_trait(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "incomplete_applied_trait")) return false;
+    if (!nextTokenIs(b, TOKEN_APPLY)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, TOKEN_APPLY);
+    r = r && incomplete_applied_trait_1(b, l + 1);
+    exit_section_(b, m, INCOMPLETE_APPLIED_TRAIT, r);
+    return r;
+  }
+
+  // member_id | shape_id
+  private static boolean incomplete_applied_trait_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "incomplete_applied_trait_1")) return false;
+    boolean r;
+    r = member_id(b, l + 1);
+    if (!r) r = shape_id(b, l + 1);
+    return r;
+  }
+
+  /* ********************************************************** */
   // key [TOKEN_COLON]
   public static boolean incomplete_entry(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "incomplete_entry")) return false;
@@ -427,7 +449,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // control* metadata* [namespace import* (applied_trait | shape)*]
+  // control* metadata* [namespace import* (applied_trait | incomplete_applied_trait | shape)*]
   public static boolean model(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "model")) return false;
     boolean r;
@@ -461,14 +483,14 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // [namespace import* (applied_trait | shape)*]
+  // [namespace import* (applied_trait | incomplete_applied_trait | shape)*]
   private static boolean model_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "model_2")) return false;
     model_2_0(b, l + 1);
     return true;
   }
 
-  // namespace import* (applied_trait | shape)*
+  // namespace import* (applied_trait | incomplete_applied_trait | shape)*
   private static boolean model_2_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "model_2_0")) return false;
     boolean r;
@@ -491,7 +513,7 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // (applied_trait | shape)*
+  // (applied_trait | incomplete_applied_trait | shape)*
   private static boolean model_2_0_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "model_2_0_2")) return false;
     while (true) {
@@ -502,11 +524,12 @@ public class SmithyParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // applied_trait | shape
+  // applied_trait | incomplete_applied_trait | shape
   private static boolean model_2_0_2_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "model_2_0_2_0")) return false;
     boolean r;
     r = applied_trait(b, l + 1);
+    if (!r) r = incomplete_applied_trait(b, l + 1);
     if (!r) r = shape(b, l + 1);
     return r;
   }

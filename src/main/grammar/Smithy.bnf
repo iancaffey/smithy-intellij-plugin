@@ -67,7 +67,7 @@
 }
 //https://awslabs.github.io/smithy/1.0/spec/core/idl.html
 root ::= model
-model ::= control* metadata* [namespace import* (applied_trait | shape)*] {methods=[getNamespace getShapes control="" metadata="" namespace="" import="" applied_trait="" shape=""]}
+model ::= control* metadata* [namespace import* (applied_trait | incomplete_applied_trait | shape)*] {methods=[getNamespace getShapes control="" metadata="" namespace="" import="" applied_trait="" shape=""]}
 control ::= TOKEN_DOLLAR_SIGN key TOKEN_COLON value
 metadata ::= TOKEN_METADATA key TOKEN_EQUALS value
 namespace ::= TOKEN_NAMESPACE namespace_id
@@ -112,6 +112,7 @@ id ::= symbol | keyword | null | boolean | simple_type_name {methods=[null="" bo
 
 //Incomplete/intermediate elements which allow for a seamless parsing experience when typing out new entries in higher-level nodes
 //Without these "incomplete" members, the entire file would lose its parser state (and all syntax highlighting/annotations) until the member/entry was completed
+incomplete_applied_trait ::= TOKEN_APPLY (member_id | shape_id)
 incomplete_member ::= member_name [TOKEN_COLON]
 incomplete_entry ::= key [TOKEN_COLON]
 

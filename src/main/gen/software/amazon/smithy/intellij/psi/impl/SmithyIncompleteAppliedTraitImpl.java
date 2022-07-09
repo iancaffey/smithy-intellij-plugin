@@ -12,14 +12,14 @@ import software.amazon.smithy.intellij.ext.SmithyPsiElement;
 import software.amazon.smithy.intellij.psi.*;
 import software.amazon.smithy.intellij.ext.SmithyPsiImplUtilKt;
 
-public class SmithyModelImpl extends SmithyPsiElement implements SmithyModel {
+public class SmithyIncompleteAppliedTraitImpl extends SmithyPsiElement implements SmithyIncompleteAppliedTrait {
 
-  public SmithyModelImpl(@NotNull ASTNode node) {
+  public SmithyIncompleteAppliedTraitImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SmithyVisitor visitor) {
-    visitor.visitModel(this);
+    visitor.visitIncompleteAppliedTrait(this);
   }
 
   @Override
@@ -29,21 +29,15 @@ public class SmithyModelImpl extends SmithyPsiElement implements SmithyModel {
   }
 
   @Override
-  @NotNull
-  public List<SmithyIncompleteAppliedTrait> getIncompleteAppliedTraitList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmithyIncompleteAppliedTrait.class);
+  @Nullable
+  public SmithyMemberId getMemberId() {
+    return findChildByClass(SmithyMemberId.class);
   }
 
   @Override
-  @NotNull
-  public String getNamespace() {
-    return SmithyPsiImplUtilKt.getNamespace(this);
-  }
-
-  @Override
-  @NotNull
-  public List<SmithyShape> getShapes() {
-    return SmithyPsiImplUtilKt.getShapes(this);
+  @Nullable
+  public SmithyShapeId getShapeId() {
+    return findChildByClass(SmithyShapeId.class);
   }
 
 }

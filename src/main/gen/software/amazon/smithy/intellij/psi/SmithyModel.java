@@ -8,6 +8,9 @@ import com.intellij.psi.PsiElement;
 public interface SmithyModel extends SmithyElement {
 
   @NotNull
+  List<SmithyIncompleteAppliedTrait> getIncompleteAppliedTraitList();
+
+  @NotNull
   String getNamespace();
 
   @NotNull

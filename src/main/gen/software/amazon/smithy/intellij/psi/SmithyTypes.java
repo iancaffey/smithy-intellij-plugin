@@ -18,6 +18,7 @@ public interface SmithyTypes {
   IElementType ENTRY = new SmithyElementType("ENTRY");
   IElementType ID = new SmithyElementType("ID");
   IElementType IMPORT = new SmithyElementType("IMPORT");
+  IElementType INCOMPLETE_APPLIED_TRAIT = new SmithyElementType("INCOMPLETE_APPLIED_TRAIT");
   IElementType INCOMPLETE_ENTRY = new SmithyElementType("INCOMPLETE_ENTRY");
   IElementType INCOMPLETE_MEMBER = new SmithyElementType("INCOMPLETE_MEMBER");
   IElementType KEY = new SmithyElementType("KEY");
@@ -117,6 +118,9 @@ public interface SmithyTypes {
       }
       else if (type == IMPORT) {
         return new SmithyImportImpl(node);
+      }
+      else if (type == INCOMPLETE_APPLIED_TRAIT) {
+        return new SmithyIncompleteAppliedTraitImpl(node);
       }
       else if (type == INCOMPLETE_ENTRY) {
         return new SmithyIncompleteEntryImpl(node);

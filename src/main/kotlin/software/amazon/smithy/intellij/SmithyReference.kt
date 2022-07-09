@@ -10,7 +10,6 @@ import com.intellij.psi.impl.FakePsiElement
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager.getCachedValue
 import com.intellij.psi.util.PsiModificationTracker
-import com.intellij.psi.util.PsiTreeUtil.findFirstParent
 import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import software.amazon.smithy.intellij.psi.SmithyArray
 import software.amazon.smithy.intellij.psi.SmithyEntry
@@ -58,7 +57,7 @@ class SmithyKeyReference(val key: SmithyKey) : SmithyReference<SmithyKey>(key, f
 
     private val ref: Ref? = (key.parent as? SmithyEntry)?.let { entry ->
         val name = entry.name
-        val trait = findFirstParent(entry) { it is SmithyTrait } as? SmithyTrait
+        val trait = getParentOfType(entry, SmithyTrait::class.java)
         val parent = entry.parent as? SmithyObject
         if (trait != null) Ref(trait, parent, name) else null
     }
@@ -150,7 +149,7 @@ data class ValuePath(val path: List<String> = emptyList()) {
     companion object {
         val EMPTY = ValuePath()
         fun buildTo(value: SmithyValue): ValuePath? {
-            val root = findFirstParent(value) { it is SmithyTraitBody } ?: return null
+            val root = getParentOfType(value, SmithyTraitBody::class.java) ?: return null
             val path = mutableListOf<String>()
             var current: PsiElement = value.parent
             while (current != root) {

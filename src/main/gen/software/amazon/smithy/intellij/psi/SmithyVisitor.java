@@ -62,6 +62,10 @@ public class SmithyVisitor extends PsiElementVisitor {
     visitElement(o);
   }
 
+  public void visitIncompleteAppliedTrait(@NotNull SmithyIncompleteAppliedTrait o) {
+    visitElement(o);
+  }
+
   public void visitIncompleteEntry(@NotNull SmithyIncompleteEntry o) {
     visitElement(o);
   }

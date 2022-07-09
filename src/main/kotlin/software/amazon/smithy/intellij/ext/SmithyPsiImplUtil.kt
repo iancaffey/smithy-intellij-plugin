@@ -9,6 +9,7 @@ import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import com.intellij.psi.util.siblings
 import software.amazon.smithy.intellij.SmithyFile
 import software.amazon.smithy.intellij.SmithyKeyReference
@@ -149,9 +150,8 @@ fun getMember(shape: SmithyMap, name: String): SmithyMember? = shape.members.fin
 fun getMembers(shape: SmithyShape): List<SmithyMember> = emptyList()
 fun getMembers(shape: SmithyAggregateShape): List<SmithyMember> = shape.body.members
 fun getShapeId(shape: SmithyShape) = "${shape.namespace}#${shape.name}"
-fun getEnclosingShape(member: SmithyMember): SmithyAggregateShape = PsiTreeUtil.findFirstParent(member) {
-    it is SmithyAggregateShape
-} as SmithyAggregateShape
+fun getEnclosingShape(member: SmithyMember): SmithyAggregateShape =
+    getParentOfType(member, SmithyAggregateShape::class.java)!!
 
 fun getTargetShapeId(member: SmithyMember): String = member.shapeId.id
 fun resolve(entry: SmithyEntry): SmithyMemberDefinition? = entry.key.reference.resolve()
