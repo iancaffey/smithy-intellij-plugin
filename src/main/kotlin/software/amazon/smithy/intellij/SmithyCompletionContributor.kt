@@ -27,7 +27,7 @@ class SmithyCompletionContributor : CompletionContributor() {
                         val model = it.model ?: return@let
                         if (model.namespace == namespace) return@let
                         if (namespace == "smithy.api"
-                            && SmithyShapeResolver.resolve("${model.namespace}#$name", it).isNotEmpty()
+                            && SmithyShapeResolver.resolve("${model.namespace}#$name", it).isEmpty()
                         ) return@let
                         SmithyElementFactory.addImport(it, "$namespace#$name")
                     }
