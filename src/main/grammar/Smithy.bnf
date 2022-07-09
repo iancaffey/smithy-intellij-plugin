@@ -71,10 +71,22 @@ model ::= control* metadata* [namespace import* (applied_trait | incomplete_appl
     implements="software.amazon.smithy.intellij.ext.SmithyModelExt"
     mixin="software.amazon.smithy.intellij.ext.SmithyModelMixin"
 }
-control ::= TOKEN_DOLLAR_SIGN key TOKEN_COLON value
-metadata ::= TOKEN_METADATA key TOKEN_EQUALS value
-namespace ::= TOKEN_NAMESPACE namespace_id
-import ::= TOKEN_USE shape_id
+control ::= TOKEN_DOLLAR_SIGN key TOKEN_COLON value {
+    implements="software.amazon.smithy.intellij.ext.SmithyControlExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyControlMixin"
+}
+metadata ::= TOKEN_METADATA key TOKEN_EQUALS value {
+    implements="software.amazon.smithy.intellij.ext.SmithyMetadataExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyMetadataMixin"
+}
+namespace ::= TOKEN_NAMESPACE namespace_id {
+    implements="software.amazon.smithy.intellij.ext.SmithyNamespaceExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyNamespaceMixin"
+}
+import ::= TOKEN_USE shape_id {
+    implements="software.amazon.smithy.intellij.ext.SmithyImportExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyImportMixin"
+}
 
 //Shapes
 shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {
@@ -119,7 +131,10 @@ member ::= [documentation] trait* member_name TOKEN_COLON shape_id {
 }
 
 //Traits
-applied_trait ::= TOKEN_APPLY (member_id | shape_id) trait
+applied_trait ::= TOKEN_APPLY (member_id | shape_id) trait {
+    implements="software.amazon.smithy.intellij.ext.SmithyAppliedTraitExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyAppliedTraitMixin"
+}
 trait ::= TOKEN_AT shape_id [trait_body] {
     methods=[body="trait_body"]
     implements=["software.amazon.smithy.intellij.ext.SmithyTraitExt"]
@@ -172,7 +187,10 @@ id ::= symbol | keyword | null | boolean | simple_type_name {methods=[null="" bo
 
 //Incomplete/intermediate elements which allow for a seamless parsing experience when typing out new entries in higher-level nodes
 //Without these "incomplete" members, the entire file would lose its parser state (and all syntax highlighting/annotations) until the member/entry was completed
-incomplete_applied_trait ::= TOKEN_APPLY (member_id | shape_id)
+incomplete_applied_trait ::= TOKEN_APPLY (member_id | shape_id){
+    implements="software.amazon.smithy.intellij.ext.SmithyIncompleteAppliedTraitExt"
+    mixin="software.amazon.smithy.intellij.ext.SmithyIncompleteAppliedTraitMixin"
+}
 incomplete_member ::= member_name [TOKEN_COLON]
 incomplete_entry ::= key [TOKEN_COLON]
 

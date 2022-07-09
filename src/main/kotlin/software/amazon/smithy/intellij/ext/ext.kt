@@ -23,16 +23,20 @@ import software.amazon.smithy.intellij.SmithyMemberReference
 import software.amazon.smithy.intellij.SmithyShapeDefinition
 import software.amazon.smithy.intellij.SmithyShapeReference
 import software.amazon.smithy.intellij.psi.SmithyAggregateShape
+import software.amazon.smithy.intellij.psi.SmithyAppliedTrait
 import software.amazon.smithy.intellij.psi.SmithyBoolean
+import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyDocumentation
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyId
 import software.amazon.smithy.intellij.psi.SmithyImport
+import software.amazon.smithy.intellij.psi.SmithyIncompleteAppliedTrait
 import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyKeyedElement
 import software.amazon.smithy.intellij.psi.SmithyMap
 import software.amazon.smithy.intellij.psi.SmithyMember
 import software.amazon.smithy.intellij.psi.SmithyMemberId
+import software.amazon.smithy.intellij.psi.SmithyMetadata
 import software.amazon.smithy.intellij.psi.SmithyModel
 import software.amazon.smithy.intellij.psi.SmithyNamespace
 import software.amazon.smithy.intellij.psi.SmithyNamespaceId
@@ -63,10 +67,17 @@ open class SmithyPsiElement(node: ASTNode) : ASTWrapperPsiElement(node) {
 interface SmithyElement : PsiElement
 interface SmithyContainer : SmithyElement
 interface SmithyNamedElement : SmithyElement, PsiNameIdentifierOwner
+interface SmithyStatement : SmithyElement {
+    val type: String get() = typeIdentifier.text
+    val typeIdentifier: PsiElement get() = firstChild
+}
 
 abstract class SmithyAggregateShapeMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyAggregateShape {
     override val members: List<SmithyMember> get() = body.members
 }
+
+interface SmithyAppliedTraitExt : SmithyStatement
+abstract class SmithyAppliedTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyAppliedTrait
 
 interface SmithyBooleanExt : SmithyElement {
     fun booleanValue(): Boolean
@@ -75,6 +86,9 @@ interface SmithyBooleanExt : SmithyElement {
 abstract class SmithyBooleanMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyBoolean {
     override fun booleanValue() = text.toBoolean()
 }
+
+interface SmithyControlExt : SmithyStatement
+abstract class SmithyControlMixin(node: ASTNode) : SmithyKeyedElementImpl(node), SmithyControl
 
 interface SmithyDocumentationExt : PsiDocCommentBase {
     fun toDocString(): String
@@ -101,6 +115,12 @@ interface SmithyEntryExt : SmithyElement {
 abstract class SmithyEntryMixin(node: ASTNode) : SmithyKeyedElementImpl(node), SmithyEntry {
     override fun resolve() = key.reference.resolve()
 }
+
+interface SmithyImportExt : SmithyStatement
+abstract class SmithyImportMixin(node: ASTNode) : SmithyPsiElement(node), SmithyImport
+
+interface SmithyIncompleteAppliedTraitExt : SmithyStatement
+abstract class SmithyIncompleteAppliedTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyIncompleteAppliedTrait
 
 interface SmithyKeyExt : SmithyElement {
     val reference: SmithyKeyReference
@@ -151,6 +171,9 @@ abstract class SmithyMemberIdMixin(node: ASTNode) : SmithyPsiElement(node), Smit
     override val reference by lazy { SmithyMemberReference(this) }
 }
 
+interface SmithyMetadataExt : SmithyStatement
+abstract class SmithyMetadataMixin(node: ASTNode) : SmithyKeyedElementImpl(node), SmithyMetadata
+
 interface SmithyModelExt : SmithyElement {
     val namespace: String
     val shapes: List<SmithyShape>
@@ -160,6 +183,9 @@ abstract class SmithyModelMixin(node: ASTNode) : SmithyPsiElement(node), SmithyM
     override val namespace get() = getChildOfType(this, SmithyNamespace::class.java)!!.namespaceId.id
     override val shapes: List<SmithyShape> get() = getChildrenOfTypeAsList(this, SmithyShape::class.java)
 }
+
+interface SmithyNamespaceExt : SmithyStatement
+abstract class SmithyNamespaceMixin(node: ASTNode) : SmithyPsiElement(node), SmithyNamespace
 
 interface SmithyNamespaceIdExt : SmithyElement {
     val id: String
@@ -185,16 +211,18 @@ abstract class SmithyNumberMixin(node: ASTNode) : SmithyPrimitiveImpl(node), Smi
     override fun bigDecimalValue() = BigDecimal(text)
 }
 
-interface SmithyShapeExt : SmithyNamedElement, SmithyShapeDefinition {
+interface SmithyShapeExt : SmithyNamedElement, SmithyShapeDefinition, SmithyStatement {
+    override val type get() = super.type
     val model: SmithyModel
     val documentation: SmithyDocumentation?
     val declaredTraits: List<SmithyTrait>
 }
 
 abstract class SmithyShapeMixin(node: ASTNode) : SmithyPsiElement(node), SmithyShape {
-    final override val type: String = nameIdentifier.siblings(forward = false, withSelf = false).first {
-        it !is PsiWhiteSpace && it !is PsiComment
-    }.text
+    override val typeIdentifier
+        get() = nameIdentifier.siblings(forward = false, withSelf = false).first {
+            it !is PsiWhiteSpace && it !is PsiComment
+        }
     override val model get() = parent as SmithyModel
     override val namespace get() = model.namespace
     override val shapeId get() = "${namespace}#${name}"
