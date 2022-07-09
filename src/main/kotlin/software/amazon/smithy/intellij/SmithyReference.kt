@@ -6,6 +6,7 @@ import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceBase
+import com.intellij.psi.impl.FakePsiElement
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager.getCachedValue
 import com.intellij.psi.util.PsiModificationTracker
@@ -132,13 +133,19 @@ data class SmithyShapeReference(val value: SmithyValue) : SmithyReference<Smithy
     private val path = if (value is SmithyShapeId) null else ValuePath.buildTo(value)
     override fun isSoft() = shapeId == null && path == null
     override fun getAbsoluteRange(): TextRange = myElement.textRange
-    override fun resolve() = shapeId?.let { getCachedValue(value, resolver(shapeId, path)) }
+    override fun resolve() = shapeId?.let { getCachedValue(Ref(shapeId, path), resolver(shapeId, path)) }
     override fun handleElementRename(newElementName: String): SmithyValue {
         val textRange = myElement.textRange
         val document = FileDocumentManager.getInstance().getDocument(myElement.containingFile.virtualFile)
         document!!.replaceString(textRange.startOffset, textRange.endOffset, newElementName)
         PsiDocumentManager.getInstance(myElement.project).commitDocument(document)
         return myElement
+    }
+
+    //Note: the path from the enclosing trait to the value can change (e.g. if the enclosing field is renamed), so
+    //this PsiElement serves as the representative context for the CachedValue computation (with a well-formed equals/hashCode)
+    private data class Ref(val shapeId: SmithyShapeId, val path: ValuePath?) : FakePsiElement() {
+        override fun getParent() = shapeId
     }
 }
 
