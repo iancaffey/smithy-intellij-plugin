@@ -10,11 +10,13 @@ import com.intellij.psi.impl.FakePsiElement
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager.getCachedValue
 import com.intellij.psi.util.PsiModificationTracker
-import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.PsiTreeUtil.findFirstParent
+import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import software.amazon.smithy.intellij.psi.SmithyArray
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyMemberId
+import software.amazon.smithy.intellij.psi.SmithyObject
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 import software.amazon.smithy.intellij.psi.SmithyTrait
 import software.amazon.smithy.intellij.psi.SmithyTraitBody
@@ -44,14 +46,26 @@ sealed class SmithyReference<T : PsiElement>(
  * @since 1.0
  */
 class SmithyKeyReference(val key: SmithyKey) : SmithyReference<SmithyKey>(key, false) {
-    private val entry = key.parent as? SmithyEntry
-    private val delegate = PsiTreeUtil.findFirstParent(entry) { it is SmithyTrait }?.let {
-        SmithyShapeReference((it as SmithyTrait).shapeId)
+    companion object {
+        private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
+        private fun resolver(ref: Ref) = CachedValueProvider {
+            val parent = if (ref.enclosing != null) ref.enclosing.reference.resolve() else ref.trait.resolve()
+            CachedValueProvider.Result.create(
+                parent?.getMember(ref.memberName), dependencies
+            )
+        }
     }
-    private val path = if (entry != null && delegate != null) MemberPath.build(entry) else null
-    override fun isSoft() = delegate == null || path == null
+
+    private val ref: Ref? = (key.parent as? SmithyEntry)?.let { entry ->
+        val name = entry.name
+        val trait = findFirstParent(entry) { it is SmithyTrait } as? SmithyTrait
+        val parent = entry.parent as? SmithyObject
+        if (trait != null) Ref(trait, parent, name) else null
+    }
+
+    override fun isSoft() = ref == null
     override fun getAbsoluteRange(): TextRange = myElement.textRange
-    override fun resolve() = if (path != null) delegate?.resolve()?.let { path.find(it) } else null
+    override fun resolve() = ref?.let { getCachedValue(it, resolver(it)) }
     override fun handleElementRename(newElementName: String): SmithyKey {
         val textRange = myElement.textRange
         val document = FileDocumentManager.getInstance().getDocument(myElement.containingFile.virtualFile)
@@ -60,36 +74,12 @@ class SmithyKeyReference(val key: SmithyKey) : SmithyReference<SmithyKey>(key, f
         return myElement
     }
 
-    interface MemberPath {
-        companion object {
-            fun build(entry: SmithyEntry): MemberPath {
-                var path = MemberPath(entry.name)
-                var current = entry.parent
-                while (current != null && current !is SmithyTraitBody) {
-                    when (current) {
-                        is SmithyArray -> path = MemberPath("member").andThen(path)
-                        is SmithyEntry -> path = MemberPath(current.name).andThen(path)
-                    }
-                    current = current.parent
-                }
-                return path
-            }
-
-            operator fun invoke(name: String) = object : MemberPath {
-                override fun find(shape: SmithyShapeDefinition) = shape.getMember(name)
-                override fun toString() = name
-            }
-        }
-
-        fun find(shape: SmithyShapeDefinition): SmithyMemberDefinition?
-        fun andThen(next: MemberPath) = object : MemberPath {
-            override fun find(shape: SmithyShapeDefinition) = this@MemberPath.find(shape)?.let {
-                val results = SmithyShapeResolver.resolve(it)
-                if (results.size == 1) next.find(results.first()) else null
-            }
-
-            override fun toString() = "${this@MemberPath}.$next"
-        }
+    //Note: the path from the enclosing trait to the value can change (e.g. if the enclosing field is renamed), so
+    //this PsiElement serves as the representative context for the CachedValue computation (with a well-formed equals/hashCode)
+    private data class Ref(
+        val trait: SmithyTrait, val enclosing: SmithyObject?, val memberName: String
+    ) : FakePsiElement() {
+        override fun getParent() = trait
     }
 }
 
@@ -123,17 +113,16 @@ class SmithyMemberReference(val id: SmithyMemberId) : SmithyReference<SmithyMemb
 data class SmithyShapeReference(val value: SmithyValue) : SmithyReference<SmithyValue>(value, false) {
     companion object {
         private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
-        private fun resolver(shapeId: SmithyShapeId, path: ValuePath?) = CachedValueProvider {
-            CachedValueProvider.Result.create((path ?: ValuePath.EMPTY).resolve(shapeId), dependencies)
+        private fun resolver(ref: Ref) = CachedValueProvider {
+            CachedValueProvider.Result.create((ref.path ?: ValuePath.EMPTY).resolve(ref.shapeId), dependencies)
         }
     }
 
-    private val shapeId =
-        (value as? SmithyShapeId) ?: PsiTreeUtil.getParentOfType(value, SmithyTrait::class.java)?.shapeId
-    private val path = if (value is SmithyShapeId) null else ValuePath.buildTo(value)
-    override fun isSoft() = shapeId == null && path == null
+    private val shapeId = value as? SmithyShapeId ?: getParentOfType(value, SmithyTrait::class.java)?.shapeId
+    private val ref = shapeId?.let { Ref(it, if (value is SmithyShapeId) null else ValuePath.buildTo(value)) }
+    override fun isSoft() = ref == null
     override fun getAbsoluteRange(): TextRange = myElement.textRange
-    override fun resolve() = shapeId?.let { getCachedValue(Ref(shapeId, path), resolver(shapeId, path)) }
+    override fun resolve() = ref?.let { getCachedValue(it, resolver(it)) }
     override fun handleElementRename(newElementName: String): SmithyValue {
         val textRange = myElement.textRange
         val document = FileDocumentManager.getInstance().getDocument(myElement.containingFile.virtualFile)
@@ -161,7 +150,7 @@ data class ValuePath(val path: List<String> = emptyList()) {
     companion object {
         val EMPTY = ValuePath()
         fun buildTo(value: SmithyValue): ValuePath? {
-            val root = PsiTreeUtil.findFirstParent(value) { it is SmithyTraitBody } ?: return null
+            val root = findFirstParent(value) { it is SmithyTraitBody } ?: return null
             val path = mutableListOf<String>()
             var current: PsiElement = value.parent
             while (current != root) {
