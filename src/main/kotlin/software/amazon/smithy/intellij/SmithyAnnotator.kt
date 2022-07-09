@@ -4,7 +4,6 @@ import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
-import com.intellij.openapi.editor.HighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiComment
@@ -15,25 +14,21 @@ import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.nextLeaf
 import com.intellij.psi.util.nextLeafs
-import software.amazon.smithy.intellij.psi.SmithyBoolean
+import software.amazon.smithy.intellij.ext.SmithyStatement
 import software.amazon.smithy.intellij.psi.SmithyControl
-import software.amazon.smithy.intellij.psi.SmithyId
 import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyIncompleteAppliedTrait
 import software.amazon.smithy.intellij.psi.SmithyIncompleteEntry
 import software.amazon.smithy.intellij.psi.SmithyIncompleteMember
 import software.amazon.smithy.intellij.psi.SmithyKey
-import software.amazon.smithy.intellij.psi.SmithyKeyword
 import software.amazon.smithy.intellij.psi.SmithyList
 import software.amazon.smithy.intellij.psi.SmithyMap
 import software.amazon.smithy.intellij.psi.SmithyMember
 import software.amazon.smithy.intellij.psi.SmithyMemberName
 import software.amazon.smithy.intellij.psi.SmithyModel
-import software.amazon.smithy.intellij.psi.SmithyNull
 import software.amazon.smithy.intellij.psi.SmithySet
 import software.amazon.smithy.intellij.psi.SmithyShape
 import software.amazon.smithy.intellij.psi.SmithyShapeId
-import software.amazon.smithy.intellij.psi.SmithySimpleTypeName
 import software.amazon.smithy.intellij.psi.SmithyString
 import software.amazon.smithy.intellij.psi.SmithyTextBlock
 import software.amazon.smithy.intellij.psi.SmithyTrait
@@ -70,6 +65,9 @@ class SmithyAnnotator : Annotator {
     }
 
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+        getParentOfType(element, SmithyStatement::class.java)?.takeIf { element == it.typeIdentifier }?.let {
+            holder.highlight(SmithyColorSettings.KEYWORD)
+        }
         if ((element is SmithyKey || element.elementType == SmithyTypes.TOKEN_DOLLAR_SIGN) && element.parent is SmithyControl) {
             holder.highlight(SmithyColorSettings.CONTROL)
         }
@@ -81,10 +79,6 @@ class SmithyAnnotator : Annotator {
         }
         if ((element is SmithyShapeId || element.elementType == SmithyTypes.TOKEN_AT) && element.parent is SmithyTrait) {
             holder.highlight(SmithyColorSettings.TRAIT_NAME)
-        }
-        //Reset all keywords/literals/types used as standalone identifiers back to the normal text color
-        if ((element is SmithyBoolean || element is SmithyKeyword || element is SmithyNull || element is SmithySimpleTypeName) && element.parent is SmithyId && element.parent.parent !is SmithyKey) {
-            holder.highlight(HighlighterColors.TEXT)
         }
         //Highlight all escape sequences within strings and text blocks
         if ((element is SmithyString || element is SmithyTextBlock) && element.text.contains("\\")) {

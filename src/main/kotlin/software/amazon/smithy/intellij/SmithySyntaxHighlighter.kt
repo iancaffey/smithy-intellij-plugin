@@ -43,22 +43,7 @@ class SmithySyntaxHighlighter : SyntaxHighlighterBase() {
             SmithyTypes.TOKEN_OPEN_PAREN to arrayOf(SmithyColorSettings.PARENS),
             SmithyTypes.TOKEN_CLOSE_PAREN to arrayOf(SmithyColorSettings.PARENS),
             SmithyTypes.TOKEN_COMMA to arrayOf(SmithyColorSettings.COMMA),
-            SmithyTypes.TOKEN_PERIOD to arrayOf(SmithyColorSettings.DOT),
-            SmithyTypes.TOKEN_SIMPLE_TYPE_NAME to arrayOf(SmithyColorSettings.KEYWORD),
-            SmithyTypes.TOKEN_BOOLEAN to arrayOf(SmithyColorSettings.KEYWORD),
-            SmithyTypes.TOKEN_NULL to arrayOf(SmithyColorSettings.KEYWORD),
-            SmithyTypes.TOKEN_APPLY to arrayOf(SmithyColorSettings.KEYWORD),
-            SmithyTypes.TOKEN_LIST to arrayOf(SmithyColorSettings.KEYWORD),
-            SmithyTypes.TOKEN_MAP to arrayOf(SmithyColorSettings.KEYWORD),
-            SmithyTypes.TOKEN_OPERATION to arrayOf(SmithyColorSettings.KEYWORD),
-            SmithyTypes.TOKEN_METADATA to arrayOf(SmithyColorSettings.KEYWORD),
-            SmithyTypes.TOKEN_NAMESPACE to arrayOf(SmithyColorSettings.KEYWORD),
-            SmithyTypes.TOKEN_RESOURCE to arrayOf(SmithyColorSettings.KEYWORD),
-            SmithyTypes.TOKEN_SERVICE to arrayOf(SmithyColorSettings.KEYWORD),
-            SmithyTypes.TOKEN_SET to arrayOf(SmithyColorSettings.KEYWORD),
-            SmithyTypes.TOKEN_STRUCTURE to arrayOf(SmithyColorSettings.KEYWORD),
-            SmithyTypes.TOKEN_UNION to arrayOf(SmithyColorSettings.KEYWORD),
-            SmithyTypes.TOKEN_USE to arrayOf(SmithyColorSettings.KEYWORD)
+            SmithyTypes.TOKEN_PERIOD to arrayOf(SmithyColorSettings.DOT)
         )
     }
 
