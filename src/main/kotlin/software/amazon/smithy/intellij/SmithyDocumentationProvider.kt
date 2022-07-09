@@ -86,23 +86,28 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
         is SmithyMember -> buildString {
             element.documentation?.let { append(generateRenderedDoc(it)) }
             append(getQuickNavigateInfo(element, originalElement))
-            val additionalInfo = mutableMapOf<String, String>()
+            val additionalInfo = mutableMapOf(
+                "Namespace" to element.enclosingShape.namespace,
+                "Parent" to element.enclosingShape.name
+            )
             element.resolve()?.let { target ->
                 additionalInfo["Type"] = HtmlSyntaxInfoUtil.getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
             }
-            if (additionalInfo.isNotEmpty()) {
-                append(renderAdditionalInfo(additionalInfo))
-            }
+            append(renderAdditionalInfo(additionalInfo))
         }
         is SmithyShape -> buildString {
             element.documentation?.let { append(generateRenderedDoc(it)) }
             append(getQuickNavigateInfo(element, originalElement))
+            append(renderAdditionalInfo(mapOf("Namespace" to element.namespace)))
         }
         is SmithyExternalMember -> buildString {
             element.reference.traits?.get(DOCUMENTATION)
                 ?.let { append(renderDocumentation(it.toString())).append("<br/>") }
             append(getQuickNavigateInfo(element, originalElement))
-            val additionalInfo = mutableMapOf<String, String>()
+            val additionalInfo = mutableMapOf(
+                "Namespace" to element.enclosingShape.namespace,
+                "Parent" to element.enclosingShape.name
+            )
             element.resolve()?.let { target ->
                 additionalInfo["Type"] = HtmlSyntaxInfoUtil.getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
             }
@@ -111,14 +116,12 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                     "<span>, </span>", "<div>", "</div>"
                 ) { (title, href) -> "<a href='$href'>$title</a>" }
             }
-            if (additionalInfo.isNotEmpty()) {
-                append(renderAdditionalInfo(additionalInfo))
-            }
+            append(renderAdditionalInfo(additionalInfo))
         }
         is SmithyExternalShape -> buildString {
             element.shape.traits?.get(DOCUMENTATION)?.let { append(renderDocumentation(it.toString())).append("<br/>") }
             append(getQuickNavigateInfo(element, originalElement))
-            val additionalInfo = mutableMapOf<String, String>()
+            val additionalInfo = mutableMapOf("Namespace" to element.namespace)
             element.shape.traits?.get(EXTERNAL_DOCUMENTATION)?.let {
                 additionalInfo["See also"] = (it as Map<*, *>).entries.joinToString(
                     "<span>, </span>", "<div>", "</div>"
