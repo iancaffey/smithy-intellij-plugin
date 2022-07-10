@@ -67,7 +67,7 @@ object SmithyShapeResolver {
         if (ctx.exact && ctx.declaredNamespace == null && results.isEmpty()) {
             SmithyFileIndex.forEach(scope) { file ->
                 file.model?.shapes?.forEach { shape ->
-                    if (shape.namespace == "smithy.api" && shape.name == ctx.shapeName && results.none { shape.shapeId == it.shapeId }) {
+                    if (shape.namespace == SmithyPreludeShapes.NAMESPACE && shape.name == ctx.shapeName && results.none { shape.shapeId == it.shapeId }) {
                         results.add(shape)
                     }
                 }

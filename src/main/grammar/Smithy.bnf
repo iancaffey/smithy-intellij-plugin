@@ -136,7 +136,7 @@ applied_trait ::= TOKEN_APPLY (member_id | shape_id) trait {
     mixin="software.amazon.smithy.intellij.psi.SmithyAppliedTraitMixin"
 }
 trait ::= TOKEN_AT shape_id [trait_body] {
-    methods=[body="trait_body"]
+    methods=[body="trait_body" shape="shape_id"]
     implements=["software.amazon.smithy.intellij.psi.SmithyTraitExt"]
     mixin="software.amazon.smithy.intellij.psi.SmithyTraitMixin"
 }

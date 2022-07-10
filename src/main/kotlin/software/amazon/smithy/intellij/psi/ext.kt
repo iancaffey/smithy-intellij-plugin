@@ -3,9 +3,9 @@ package software.amazon.smithy.intellij.psi
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.navigation.ItemPresentation
+import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.psi.PsiComment
-import com.intellij.psi.PsiDocCommentBase
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
@@ -16,8 +16,10 @@ import com.intellij.psi.util.PsiTreeUtil.getChildOfType
 import com.intellij.psi.util.PsiTreeUtil.getChildrenOfTypeAsList
 import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import com.intellij.psi.util.siblings
+import software.amazon.smithy.intellij.SmithyColorSettings
 import software.amazon.smithy.intellij.SmithyFile
 import software.amazon.smithy.intellij.SmithyKeyReference
+import software.amazon.smithy.intellij.SmithyLanguage
 import software.amazon.smithy.intellij.SmithyMemberReference
 import software.amazon.smithy.intellij.SmithyShapeReference
 import software.amazon.smithy.intellij.psi.impl.SmithyAggregateShapeImpl
@@ -63,9 +65,7 @@ abstract class SmithyBooleanMixin(node: ASTNode) : SmithyPrimitiveImpl(node), Sm
 interface SmithyControlExt : SmithyStatement
 abstract class SmithyControlMixin(node: ASTNode) : SmithyKeyedElementImpl(node), SmithyControl
 
-interface SmithyDocumentationExt : PsiDocCommentBase {
-    fun toDocString(): String
-}
+interface SmithyDocumentationExt : SmithyDocumentationDefinition
 
 abstract class SmithyDocumentationMixin(node: ASTNode) : SmithyPsiElement(node), SmithyDocumentation {
     companion object {
@@ -119,9 +119,14 @@ abstract class SmithyMapMixin(node: ASTNode) : SmithyAggregateShapeImpl(node), S
     override fun getMember(name: String) = members.find { it.name == "value" }
 }
 
-interface SmithyMemberExt : SmithyNamedElement, SmithyMemberDefinition
+interface SmithyMemberExt : SmithyNamedElement, SmithyMemberDefinition {
+    override val documentation: SmithyDocumentation?
+    override val declaredTraits: List<SmithyTrait>
+}
+
 abstract class SmithyMemberMixin(node: ASTNode) : SmithyPsiElement(node), SmithyMember {
     override val targetShapeId get() = shapeId.id
+    override val targetShapeName get() = shapeId.shapeName
     override val enclosingShape: SmithyAggregateShape get() = getParentOfType(this, SmithyAggregateShape::class.java)!!
     override fun getName(): String = nameIdentifier.text
     override fun setName(newName: String) = setName<SmithyMember>(this, newName)
@@ -186,9 +191,9 @@ abstract class SmithyNumberMixin(node: ASTNode) : SmithyPrimitiveImpl(node), Smi
 
 interface SmithyShapeExt : SmithyNamedElement, SmithyShapeDefinition, SmithyStatement {
     override val type get() = super.type
+    override val documentation: SmithyDocumentation?
+    override val declaredTraits: List<SmithyTrait>
     val model: SmithyModel
-    val documentation: SmithyDocumentation?
-    val declaredTraits: List<SmithyTrait>
 }
 
 abstract class SmithyShapeMixin(node: ASTNode) : SmithyPsiElement(node), SmithyShape {
@@ -214,8 +219,8 @@ abstract class SmithyShapeMixin(node: ASTNode) : SmithyPsiElement(node), SmithyS
     }
 
     override fun hasTrait(id: String): Boolean = declaredTraits.any {
-        if (it.shapeId.id == id) return@any true
-        if (it.shapeId.declaredNamespace != null) return@any false
+        if (it.shape.id == id) return@any true
+        if (it.shape.declaredNamespace != null) return@any false
         val target = it.resolve()
         target is SmithyShapeDefinition && id == target.shapeId
     }
@@ -253,12 +258,40 @@ abstract class SmithyShapeIdMixin(node: ASTNode) : SmithyPrimitiveImpl(node), Sm
 
 }
 
-interface SmithyTraitExt : SmithyElement {
+interface SmithyTraitExt : SmithyElement, SmithyTraitDefinition {
     fun resolve(): SmithyShapeDefinition?
 }
 
 abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyTrait {
-    override fun resolve() = shapeId.reference.resolve()
+    override val shapeId: String = shape.id
+    override val shapeName: String = shape.shapeName
+    override fun resolve() = shape.reference.resolve()
+    override fun toDocString() = buildString {
+        //Note: since this can only do lexer-based highlighting, this will be approximately the same style as
+        //the editor display (but could have some keyword highlighting issues in the body)
+        HtmlSyntaxInfoUtil.appendStyledSpan(
+            this, SmithyColorSettings.TRAIT_NAME, "@$shapeName", 1f
+        )
+        body?.let { body ->
+            //Note: since keys are dynamically highlighted using an annotator, this will manually apply the same
+            //behavior to improve readability of trait values
+            if (body.values.isNotEmpty()) {
+                append(body.values.joinToString(", ", "(", ")") {
+                    val key = HtmlSyntaxInfoUtil.getStyledSpan(
+                        SmithyColorSettings.KEY, it.key.text, 1f
+                    )
+                    val value = HtmlSyntaxInfoUtil.getHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
+                        project, SmithyLanguage, it.value.text, 1f
+                    )
+                    "$key: $value"
+                })
+            } else {
+                HtmlSyntaxInfoUtil.appendHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
+                    this, project, SmithyLanguage, body.text, 1f
+                )
+            }
+        }
+    }
 }
 
 interface SmithyValueExt : SmithyElement {

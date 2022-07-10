@@ -11,5 +11,6 @@ package software.amazon.smithy.intellij.psi
 interface SmithyMemberDefinition : SmithyDefinition {
     val enclosingShape: SmithyShapeDefinition
     val targetShapeId: String
+    val targetShapeName: String
     fun resolve(): SmithyShapeDefinition?
 }
