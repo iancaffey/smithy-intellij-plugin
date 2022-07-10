@@ -120,7 +120,11 @@ data class SmithyShapeReference(val value: SmithyValue) : SmithyReference<Smithy
         }
     }
 
-    private val shapeId = value as? SmithyShapeId ?: getParentOfType(value, SmithyTrait::class.java)?.shape
+    private val shapeId = when {
+        value is SmithyShapeId -> value
+        value.parent is SmithyKey -> null //the parent SmithyKey references the member while this value would resolve to the type of the member which conflicts when hovering the key
+        else -> getParentOfType(value, SmithyTrait::class.java)?.shape
+    }
     private val ref = shapeId?.let { Ref(it, if (value is SmithyShapeId) null else ValuePath.buildTo(value)) }
     override fun isSoft() = ref == null
     override fun getAbsoluteRange(): TextRange = myElement.textRange
