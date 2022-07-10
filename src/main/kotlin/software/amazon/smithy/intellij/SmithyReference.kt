@@ -58,12 +58,25 @@ class SmithyKeyReference(val key: SmithyKey) : SmithyReference<SmithyKey>(key, f
         }
     }
 
-    private val ref: Ref? = (key.parent as? SmithyEntry)?.let { entry ->
-        val name = entry.name
-        val trait = getParentOfType(entry, SmithyTrait::class.java)
-        val parent = entry.parent as? SmithyObject
-        if (trait != null) Ref(trait, parent, name) else null
-    }
+    //Note: since the reference depends on the parent PSI context, we need to manually keep track of any project PSI
+    //modifications, to refresh the internal reference context (but also cache it since this is called very frequently
+    //when displaying annotations and documentation in the editor as code is being browsed)
+    private val modificationTracker = PsiModificationTracker.SERVICE.getInstance(key.project)
+    private var _ref: Ref? = null
+    private var lastModCount: Long? = null
+    private val ref: Ref?
+        get() {
+            modificationTracker.modificationCount.takeIf { it != lastModCount }?.let { modCount ->
+                _ref = (key.parent as? SmithyEntry)?.let { entry ->
+                    val name = entry.name
+                    val trait = getParentOfType(entry, SmithyTrait::class.java)
+                    val parent = entry.parent as? SmithyObject
+                    if (trait != null) Ref(trait, parent, name) else null
+                }
+                lastModCount = modCount
+            }
+            return _ref
+        }
 
     override fun isSoft() = ref == null
     override fun getAbsoluteRange(): TextRange = myElement.textRange
@@ -120,12 +133,25 @@ data class SmithyShapeReference(val value: SmithyValue) : SmithyReference<Smithy
         }
     }
 
-    private val shapeId = when {
-        value is SmithyShapeId -> value
-        value.parent is SmithyKey -> null //the parent SmithyKey references the member while this value would resolve to the type of the member which conflicts when hovering the key
-        else -> getParentOfType(value, SmithyTrait::class.java)?.shape
-    }
-    private val ref = shapeId?.let { Ref(it, if (value is SmithyShapeId) null else ValuePath.buildTo(value)) }
+    //Note: since the reference depends on the parent PSI context, we need to manually keep track of any project PSI
+    //modifications, to refresh the internal reference context (but also cache it since this is called very frequently
+    //when displaying annotations and documentation in the editor as code is being browsed)
+    private val modificationTracker = PsiModificationTracker.SERVICE.getInstance(value.project)
+    private var _ref: Ref? = null
+    private var lastModCount: Long? = null
+    private val ref: Ref?
+        get() {
+            modificationTracker.modificationCount.takeIf { it != lastModCount }?.let { modCount ->
+                _ref = when {
+                    value is SmithyShapeId -> value
+                    value.parent is SmithyKey -> null //the parent SmithyKey references the member while this value would resolve to the type of the member which conflicts when hovering the key
+                    else -> getParentOfType(value, SmithyTrait::class.java)?.shape
+                }?.let { Ref(it, if (value is SmithyShapeId) null else ValuePath.buildTo(value)) }
+                lastModCount = modCount
+            }
+            return _ref
+        }
+
     override fun isSoft() = ref == null
     override fun getAbsoluteRange(): TextRange = myElement.textRange
     override fun resolve() = ref?.let { getCachedValue(if (value is SmithyShapeId) value else it, resolver(it)) }
