@@ -112,9 +112,11 @@ simple_shape ::= [documentation] trait* simple_type_name shape_name {
 }
 list ::= [documentation] trait* TOKEN_LIST shape_name shape_body {
     methods=[trait="" shape_name="" body="shape_body"]
+    mixin="software.amazon.smithy.intellij.psi.SmithyListMixin"
 }
 set ::= [documentation] trait* TOKEN_SET shape_name shape_body {
     methods=[trait="" shape_name="" body="shape_body"]
+    mixin="software.amazon.smithy.intellij.psi.SmithySetMixin"
 }
 map ::= [documentation] trait* TOKEN_MAP shape_name shape_body {
     methods=[trait="" shape_name="" body="shape_body"]
@@ -128,12 +130,15 @@ union ::= [documentation] trait* TOKEN_UNION shape_name shape_body {
 }
 service ::= [documentation] trait* TOKEN_SERVICE shape_name object {
     methods=[trait="" shape_name="" body="object"]
+    mixin="software.amazon.smithy.intellij.psi.SmithyServiceMixin"
 }
 operation ::= [documentation] trait* TOKEN_OPERATION shape_name object {
     methods=[trait="" shape_name="" body="object"]
+    mixin="software.amazon.smithy.intellij.psi.SmithyOperationMixin"
 }
 resource ::= [documentation] trait* TOKEN_RESOURCE shape_name object {
     methods=[trait="" shape_name="" body="object"]
+    mixin="software.amazon.smithy.intellij.psi.SmithyResourceMixin"
 }
 shape_body ::= TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA] [incomplete_member]] TOKEN_CLOSE_BRACE {
     methods=[members="member" incomplete_member=""]

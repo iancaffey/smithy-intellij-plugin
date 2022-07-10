@@ -16,6 +16,26 @@ import software.amazon.smithy.intellij.psi.SmithyTypes
  * @see SmithyBlock
  */
 class SmithyFormattingModelBuilder : FormattingModelBuilder {
+    companion object {
+        val TOKENS_REQUIRING_TRAILING_NEW_LINE = TokenSet.create(
+            SmithyTypes.APPLIED_TRAIT,
+            SmithyTypes.CONTROL,
+            SmithyTypes.DOCUMENTATION,
+            SmithyTypes.IMPORT,
+            SmithyTypes.LIST,
+            SmithyTypes.MAP,
+            SmithyTypes.METADATA,
+            SmithyTypes.NAMESPACE,
+            SmithyTypes.OPERATION,
+            SmithyTypes.RESOURCE,
+            SmithyTypes.SERVICE,
+            SmithyTypes.SET,
+            SmithyTypes.SIMPLE_SHAPE,
+            SmithyTypes.STRUCTURE,
+            SmithyTypes.TOKEN_LINE_COMMENT,
+            SmithyTypes.UNION
+        )
+    }
     @Suppress("UnstableApiUsage")
     override fun createModel(formattingContext: FormattingContext): FormattingModel {
         val codeStyleSettings = formattingContext.codeStyleSettings
@@ -40,7 +60,7 @@ class SmithyFormattingModelBuilder : FormattingModelBuilder {
                 )
             ).blankLines(1)
             //Line break after all traits
-            .after(SmithyAnnotator.TOKENS_REQUIRING_TRAILING_NEW_LINE).lineBreakInCode()
+            .after(TOKENS_REQUIRING_TRAILING_NEW_LINE).lineBreakInCode()
         return FormattingModelProvider.createFormattingModelForPsiFile(
             formattingContext.containingFile, SmithyBlock(formattingContext.node, spacingBuilder), codeStyleSettings
         )

@@ -115,11 +115,17 @@ abstract class SmithyKeyedElementMixin(node: ASTNode) : SmithyPsiElement(node), 
     override fun getTextOffset() = key.textOffset
 }
 
+abstract class SmithyListMixin(node: ASTNode) : SmithyAggregateShapeImpl(node), SmithyList {
+    override val requiredMembers = setOf("member")
+}
+
 abstract class SmithyMapMixin(node: ASTNode) : SmithyAggregateShapeImpl(node), SmithyMap {
+    override val requiredMembers = setOf("key", "value")
     override fun getMember(name: String) = members.find { it.name == "value" }
 }
 
 interface SmithyMemberExt : SmithyNamedElement, SmithyMemberDefinition {
+    override val enclosingShape: SmithyShape
     override val documentation: SmithyDocumentation?
     override val declaredTraits: List<SmithyTrait>
     override fun findTrait(shapeId: String): SmithyTrait?
@@ -197,11 +203,40 @@ abstract class SmithyNumberMixin(node: ASTNode) : SmithyPrimitiveImpl(node), Smi
     override fun bigDecimalValue() = BigDecimal(text)
 }
 
+abstract class SmithyOperationMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyOperation {
+    override val supportedMembers = setOf("input", "output", "errors")
+}
+
+abstract class SmithyResourceMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyResource {
+    override val supportedMembers = setOf(
+        "identifiers",
+        "create",
+        "put",
+        "read",
+        "update",
+        "delete",
+        "list",
+        "operations",
+        "collectionOperations",
+        "resources"
+    )
+}
+
+abstract class SmithyServiceMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyService {
+    override val supportedMembers = setOf("version", "operations", "resources", "errors", "rename")
+}
+
+abstract class SmithySetMixin(node: ASTNode) : SmithyAggregateShapeImpl(node), SmithySet {
+    override val requiredMembers = setOf("member")
+}
+
 interface SmithyShapeExt : SmithyNamedElement, SmithyShapeDefinition, SmithyStatement {
     override val type get() = super.type
     override val documentation: SmithyDocumentation?
     override val declaredTraits: List<SmithyTrait>
     val model: SmithyModel
+    val requiredMembers: Set<String> get() = emptySet()
+    val supportedMembers: Set<String>? get() = requiredMembers.takeIf { it.isNotEmpty() }
     override fun findTrait(shapeId: String): SmithyTrait?
 }
 
