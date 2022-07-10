@@ -272,11 +272,6 @@ interface SmithyTraitExt : SmithyElement, SmithyTraitDefinition {
 }
 
 abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyTrait {
-    //TODO: shape.id will only be qualified for IDL shapes and fully-qualified AST trait references
-    //      need to find a better way of representing the declared id, approximate id, and resolved id
-    //      declared -> what's actually listed
-    //      approximate -> uses the enclosing namespace + imports to resolve the id
-    //      resolved -> performs a full resolution if the shape id is missing and it can't be inferred
     override val shapeId: String = shape.id
     override val shapeName: String = shape.shapeName
     override fun resolve() = shape.reference.resolve()

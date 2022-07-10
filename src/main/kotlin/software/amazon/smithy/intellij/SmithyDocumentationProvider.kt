@@ -30,18 +30,22 @@ import java.util.function.Consumer
  * @since 1.0
  */
 class SmithyDocumentationProvider : AbstractDocumentationProvider() {
-    companion object {
-        private val DOCUMENTATION_TRAITS = setOf(DOCUMENTATION, EXTERNAL_DOCUMENTATION)
-    }
-
     override fun getQuickNavigateInfo(element: PsiElement, originalElement: PsiElement?): String? = when (element) {
         is SmithyMemberDefinition -> buildString {
-            element.declaredTraits.forEach { append(getQuickNavigateInfo(it, it)).append("<br/>") }
+            val docs = element.findTrait(DOCUMENTATION)
+            val externalDocs = element.findTrait(EXTERNAL_DOCUMENTATION)
+            element.declaredTraits.forEach {
+                if (it != docs && it != externalDocs) append(getQuickNavigateInfo(it, it)).append("<br/>")
+            }
             HtmlSyntaxInfoUtil.appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
             append(": ${element.targetShapeName}")
         }
         is SmithyShapeDefinition -> buildString {
-            element.declaredTraits.forEach { append(getQuickNavigateInfo(it, it)).append("<br/>") }
+            val docs = element.findTrait(DOCUMENTATION)
+            val externalDocs = element.findTrait(EXTERNAL_DOCUMENTATION)
+            element.declaredTraits.forEach {
+                if (it != docs && it != externalDocs) append(getQuickNavigateInfo(it, it)).append("<br/>")
+            }
             HtmlSyntaxInfoUtil.appendStyledSpan(this, SmithyColorSettings.KEYWORD, element.type, 1f)
             append(" ").append(element.name)
         }
