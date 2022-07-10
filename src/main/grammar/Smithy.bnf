@@ -36,8 +36,22 @@
         TOKEN_STRUCTURE="structure"
         TOKEN_UNION="union"
         TOKEN_SERVICE="service"
+        TOKEN_VERSION="version"
+        TOKEN_OPERATIONS="operations"
+        TOKEN_RESOURCES="resources"
+        TOKEN_RENAME="rename"
         TOKEN_OPERATION="operation"
+        TOKEN_INPUT="input"
+        TOKEN_OUTPUT="output"
+        TOKEN_ERRORS="errors"
         TOKEN_RESOURCE="resource"
+        TOKEN_IDENTIFIERS="identifiers"
+        TOKEN_CREATE="create"
+        TOKEN_PUT="put"
+        TOKEN_READ="read"
+        TOKEN_UPDATE="update"
+        TOKEN_DELETE="delete"
+        TOKEN_COLLECTION_OPERATIONS="collectionOperations"
         TOKEN_NULL="null"
         TOKEN_BOOLEAN="regexp:true|false"
         TOKEN_SIMPLE_TYPE_NAME="regexp:blob|boolean|document|string|byte|short|integer|long|float|double|bigInteger|bigDecimal|timestamp"
@@ -59,7 +73,7 @@
     implements("array|object|shape_body|trait_body")="software.amazon.smithy.intellij.psi.SmithyContainer"
     extends("array|object|primitive")=value
     extends("null|boolean|number|string|text_block|shape_id")=primitive
-    extends("symbol|keyword|null|boolean|simple_type_name")=id
+    extends("symbol|null|boolean|simple_type_name")=id
     extends("aggregate_shape|simple_shape||service|operation|resource")=shape
     extends("list|set|map|structure|union")=aggregate_shape
     extends("control|entry|metadata")=keyed_element
@@ -183,7 +197,13 @@ namespace_id ::= id (TOKEN_PERIOD id)* {
 }
 shape_name ::= id {methods=[id=""]}
 member_name ::= id {methods=[id=""]}
-id ::= symbol | keyword | null | boolean | simple_type_name {methods=[null="" boolean=""]}
+id ::= symbol | null | boolean | simple_type_name
+       | TOKEN_APPLY | TOKEN_USE | TOKEN_LIST | TOKEN_SET | TOKEN_MAP | TOKEN_METADATA | TOKEN_NAMESPACE | TOKEN_STRUCTURE
+       | TOKEN_UNION | TOKEN_SERVICE | TOKEN_OPERATION | TOKEN_RESOURCE | TOKEN_VERSION | TOKEN_OPERATIONS | TOKEN_RESOURCES
+       | TOKEN_RENAME | TOKEN_INPUT | TOKEN_OUTPUT | TOKEN_ERRORS | TOKEN_IDENTIFIERS | TOKEN_CREATE | TOKEN_PUT | TOKEN_READ
+       | TOKEN_UPDATE | TOKEN_DELETE | TOKEN_COLLECTION_OPERATIONS {
+    methods=[null="" boolean=""]
+}
 
 //Incomplete/intermediate elements which allow for a seamless parsing experience when typing out new entries in higher-level nodes
 //Without these "incomplete" members, the entire file would lose its parser state (and all syntax highlighting/annotations) until the member/entry was completed
@@ -210,7 +230,6 @@ string ::= TOKEN_STRING {methods=[TOKEN_STRING=""]}
 text_block ::= TOKEN_TEXT_BLOCK {methods=[TOKEN_TEXT_BLOCK=""]}
 symbol ::= TOKEN_SYMBOL {methods=[TOKEN_SYMBOL=""]}
 simple_type_name ::= TOKEN_SIMPLE_TYPE_NAME {methods=[TOKEN_SIMPLE_TYPE_NAME=""]}
-keyword ::= TOKEN_APPLY | TOKEN_USE | TOKEN_LIST | TOKEN_SET | TOKEN_MAP | TOKEN_METADATA | TOKEN_NAMESPACE | TOKEN_STRUCTURE | TOKEN_UNION | TOKEN_SERVICE | TOKEN_OPERATION | TOKEN_RESOURCE
 documentation ::= TOKEN_DOCUMENTATION_LINE+ {
     implements="software.amazon.smithy.intellij.psi.SmithyDocumentationExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyDocumentationMixin"
