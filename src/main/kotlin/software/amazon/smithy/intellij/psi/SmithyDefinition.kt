@@ -13,6 +13,8 @@ import com.intellij.psi.PsiNamedElement
  */
 sealed interface SmithyDefinition : SmithyElement, NavigatablePsiElement, PsiNamedElement {
     override fun getName(): String
+    fun hasTrait(shapeId: String) = findTrait(shapeId) != null
+    fun findTrait(shapeId: String): SmithyTraitDefinition?
     val declaredTraits: List<@JvmWildcard SmithyTraitDefinition>
     val documentation: SmithyDocumentationDefinition?
     //TODO: add consolidated node value(s) API that unpacks any literals into the corresponding value

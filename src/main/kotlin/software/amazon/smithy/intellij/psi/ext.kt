@@ -122,6 +122,7 @@ abstract class SmithyMapMixin(node: ASTNode) : SmithyAggregateShapeImpl(node), S
 interface SmithyMemberExt : SmithyNamedElement, SmithyMemberDefinition {
     override val documentation: SmithyDocumentation?
     override val declaredTraits: List<SmithyTrait>
+    override fun findTrait(shapeId: String): SmithyTrait?
 }
 
 abstract class SmithyMemberMixin(node: ASTNode) : SmithyPsiElement(node), SmithyMember {
@@ -136,6 +137,13 @@ abstract class SmithyMemberMixin(node: ASTNode) : SmithyPsiElement(node), Smithy
         override fun getPresentableText(): String = "$name: ${shapeId.id}"
         override fun getLocationString() = (parent.parent as SmithyShape).shapeId
         override fun getIcon(unused: Boolean) = getIcon(0)
+    }
+
+    override fun findTrait(shapeId: String) = declaredTraits.find {
+        if (it.shape.id == shapeId) return@find true
+        if (it.shape.declaredNamespace != null || !shapeId.endsWith(it.shapeName)) return@find false
+        val target = it.resolve()
+        target is SmithyShapeDefinition && shapeId == target.shapeId
     }
 }
 
@@ -194,6 +202,7 @@ interface SmithyShapeExt : SmithyNamedElement, SmithyShapeDefinition, SmithyStat
     override val documentation: SmithyDocumentation?
     override val declaredTraits: List<SmithyTrait>
     val model: SmithyModel
+    override fun findTrait(shapeId: String): SmithyTrait?
 }
 
 abstract class SmithyShapeMixin(node: ASTNode) : SmithyPsiElement(node), SmithyShape {
@@ -218,11 +227,11 @@ abstract class SmithyShapeMixin(node: ASTNode) : SmithyPsiElement(node), SmithyS
         override fun getIcon(unused: Boolean) = getIcon(0)
     }
 
-    override fun hasTrait(id: String): Boolean = declaredTraits.any {
-        if (it.shape.id == id) return@any true
-        if (it.shape.declaredNamespace != null) return@any false
+    override fun findTrait(shapeId: String) = declaredTraits.find {
+        if (it.shape.id == shapeId) return@find true
+        if (it.shape.declaredNamespace != null || !shapeId.endsWith(it.shapeName)) return@find false
         val target = it.resolve()
-        target is SmithyShapeDefinition && id == target.shapeId
+        target is SmithyShapeDefinition && shapeId == target.shapeId
     }
 }
 
@@ -263,6 +272,11 @@ interface SmithyTraitExt : SmithyElement, SmithyTraitDefinition {
 }
 
 abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyTrait {
+    //TODO: shape.id will only be qualified for IDL shapes and fully-qualified AST trait references
+    //      need to find a better way of representing the declared id, approximate id, and resolved id
+    //      declared -> what's actually listed
+    //      approximate -> uses the enclosing namespace + imports to resolve the id
+    //      resolved -> performs a full resolution if the shape id is missing and it can't be inferred
     override val shapeId: String = shape.id
     override val shapeName: String = shape.shapeName
     override fun resolve() = shape.reference.resolve()

@@ -29,7 +29,7 @@ data class SmithyAstShape(
     }
     override val namespace = shapeId.split('#', limit = 2)[0]
     override fun getName() = shapeId.split('#', limit = 2)[1]
-    override fun hasTrait(id: String) = shape.traits?.keys?.any { it == id } == true
+    override fun findTrait(shapeId: String) = declaredTraits.find { it.shapeId == shapeId }
     override fun getMember(name: String): SmithyAstMember? {
         val key = if (shape is SmithyAst.Map) "value" else name
         return members.find { it.name == key }

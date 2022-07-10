@@ -41,6 +41,7 @@ data class SmithyAstMember(
     override fun getParent(): SmithyAstShape = enclosingShape
     override fun getLocationString(): String = enclosingShape.locationString
     override fun getIcon(unused: Boolean) = SmithyIcons.MEMBER
+    override fun findTrait(shapeId: String) = declaredTraits.find { it.shapeId == shapeId }
     override fun resolve(): SmithyShapeDefinition? = CachedValuesManager.getCachedValue(this, resolver(this))
     override fun toString() = "$parent$$memberName"
 }
