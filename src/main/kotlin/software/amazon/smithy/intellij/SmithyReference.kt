@@ -35,7 +35,13 @@ import software.amazon.smithy.intellij.psi.SmithyValue
  */
 sealed class SmithyReference<T : PsiElement>(
     element: T, soft: Boolean
-) : PsiReferenceBase<T>(element, TextRange.from(0, element.textLength), soft) {
+) : PsiReferenceBase<T>(element, soft) {
+    private var range = TextRange.from(0, element.textLength)
+    override fun getRangeInElement(): TextRange {
+        element.textLength.takeIf { it != range.length }?.let { range = TextRange.from(0, it) }
+        return range
+    }
+
     abstract override fun resolve(): SmithyDefinition?
 }
 
