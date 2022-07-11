@@ -61,7 +61,7 @@ class SmithyKeyReference(val key: SmithyKey) : SmithyReference<SmithyKey>(key, f
     //Note: since the reference depends on the parent PSI context, we need to manually keep track of any project PSI
     //modifications, to refresh the internal reference context (but also cache it since this is called very frequently
     //when displaying annotations and documentation in the editor as code is being browsed)
-    private val modificationTracker = PsiModificationTracker.SERVICE.getInstance(key.project)
+    private val modificationTracker = key.project.getService(PsiModificationTracker::class.java)
     private var _ref: Ref? = null
     private var lastModCount: Long? = null
     private val ref: Ref?
@@ -136,7 +136,7 @@ data class SmithyShapeReference(val value: SmithyValue) : SmithyReference<Smithy
     //Note: since the reference depends on the parent PSI context, we need to manually keep track of any project PSI
     //modifications, to refresh the internal reference context (but also cache it since this is called very frequently
     //when displaying annotations and documentation in the editor as code is being browsed)
-    private val modificationTracker = PsiModificationTracker.SERVICE.getInstance(value.project)
+    private val modificationTracker = value.project.getService(PsiModificationTracker::class.java)
     private var _ref: Ref? = null
     private var lastModCount: Long? = null
     private val ref: Ref?
