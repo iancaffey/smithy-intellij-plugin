@@ -2,6 +2,27 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [1.5.3]
+### Added
+- Added namespace and enclosing shape (for shape members) information to documentation popups.
+- Added support for resolving shape member ids.
+- Added support for inferring the shape of node values (providing the same documentation and reference benefits as explicit members).
+- Added support for annotating unresolved member shapes as errors.
+- Added support for annotating duplicate members as errors (with a quick fix to delete the duplicate).
+- Added support for annotating imports which conflict with a shape defined in the current file as an error (with a quick fix to remove the import).
+- Added support for annotating unknown members as errors.
+- Added support for annotating shapes which are missing required members as errors.
+
+### Changed
+- Improved the performance of shape resolution by caching resolved shapes and invalidating upon PSI modifications.
+- Improved the import optimizer to omit imports for prelude shapes which do not conflict with an existing shape in the enclosing namespace.
+- Improved the incremental parsing of applied trait statements.
+- Removed documentation and externalDocumentation traits from the documentation popup.
+
+### Fixed
+- Fixed relative shape id resolution for prelude shapes.
+- Adjusted keyword highlighting to only highlight the “type” of top-level statements (shape ids will no longer highlight namespace or shape name elements as keywords).
+
 ## [1.5.2]
 ### Added
 - Added support for annotating @deprecated shape usage as a warning.
