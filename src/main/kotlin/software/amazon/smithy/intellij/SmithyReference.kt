@@ -59,7 +59,7 @@ class SmithyKeyReference(val key: SmithyKey) : SmithyReference<SmithyKey>(key, f
         private fun resolver(ref: Ref) = CachedValueProvider {
             val parent = if (ref.enclosing != null) ref.enclosing.reference.resolve() else ref.trait.resolve()
             CachedValueProvider.Result.create(
-                parent?.getMember(ref.memberName), dependencies
+                parent?.getMember(if (parent.type == "map") "key" else ref.memberName), dependencies
             )
         }
     }
@@ -210,7 +210,9 @@ data class ValuePath(val path: List<String> = emptyList()) {
         if (path.isEmpty()) return root
         var current: SmithyMemberDefinition? = null
         path.forEach { name ->
-            current = current?.let { it.resolve()?.getMember(name) } ?: root.getMember(name) ?: return null
+            current = current.let { if (it != null) it.resolve() else root }?.let { next ->
+                next.getMember(if (next.type == "map") "value" else name)
+            } ?: return null
         }
         return current?.resolve()
     }

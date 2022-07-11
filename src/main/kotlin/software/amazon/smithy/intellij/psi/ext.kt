@@ -121,7 +121,6 @@ abstract class SmithyListMixin(node: ASTNode) : SmithyAggregateShapeImpl(node), 
 
 abstract class SmithyMapMixin(node: ASTNode) : SmithyAggregateShapeImpl(node), SmithyMap {
     override val requiredMembers = setOf("key", "value")
-    override fun getMember(name: String) = members.find { it.name == "value" }
 }
 
 interface SmithyMemberExt : SmithyNamedElement, SmithyMemberDefinition {
