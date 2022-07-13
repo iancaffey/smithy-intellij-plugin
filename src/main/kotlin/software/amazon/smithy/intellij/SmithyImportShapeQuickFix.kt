@@ -6,6 +6,7 @@ import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
+import software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex
 
 /**
  * An [IntentionAction] to add imports for unresolved [SmithyReference].
@@ -13,9 +14,9 @@ import com.intellij.psi.PsiFile
  * @author Ian Caffey
  * @since 1.0
  */
-class SmithyImportShapeQuickFix(val shapeId: String, val file: PsiFile) : BaseIntentionAction() {
-    private val options = SmithyShapeResolver.resolve(shapeId, file, exact = false)
-    override fun getText() = "Import \"$shapeId\""
+class SmithyImportShapeQuickFix(val shapeName: String, val file: PsiFile) : BaseIntentionAction() {
+    private val options = SmithyDefinedShapeIdIndex.getShapeIdsByName(shapeName, file.project)
+    override fun getText() = "Import \"$shapeName\""
     override fun getFamilyName() = "Import"
     override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?) =
         file is SmithyFile && options.isNotEmpty()
@@ -24,8 +25,9 @@ class SmithyImportShapeQuickFix(val shapeId: String, val file: PsiFile) : BaseIn
         if (options.isEmpty()) return
         val file = f as? SmithyFile ?: return
         if (options.size == 1) {
+            val (namespace, shapeName) = options.first().split('#', limit = 2)
             WriteCommandAction.runWriteCommandAction(project) {
-                SmithyElementFactory.addImport(file, options.first().shapeId)
+                SmithyElementFactory.addImport(file, namespace, shapeName)
             }
         } else {
             SmithyAddImportAction(project, editor, file, options).execute()

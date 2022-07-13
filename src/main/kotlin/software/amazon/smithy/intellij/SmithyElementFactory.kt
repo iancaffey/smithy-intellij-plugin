@@ -13,13 +13,15 @@ import software.amazon.smithy.intellij.psi.SmithyNamespace
  * @since 1.0
  */
 object SmithyElementFactory {
-    fun addImport(file: SmithyFile, shapeId: String) {
+    fun addImport(file: SmithyFile, namespace: String, shapeName: String) {
         val model = file.model!!
         val imports = PsiTreeUtil.getChildrenOfTypeAsList(model, SmithyImport::class.java)
         if (imports.isNotEmpty()) {
-            if (imports.any { shapeId == it.shapeId.id }) return
-            val newImport = createImport(file.project, shapeId)
-            val sortedImports = imports.toMutableList().plus(newImport).sortedBy { it.shapeId.id }
+            if (imports.any { shapeName == it.shapeId.shapeName && namespace == it.shapeId.declaredNamespace }) return
+            val newImport = createImport(file.project, namespace, shapeName)
+            val sortedImports = imports.toMutableList().plus(newImport).sortedWith(
+                compareBy<SmithyImport> { it.shapeId.declaredNamespace }.thenBy { it.shapeId.shapeName }
+            )
             val insertIndex = sortedImports.indexOf(newImport)
             if (insertIndex == 0) {
                 model.addBefore(newImport, sortedImports[1])
@@ -27,23 +29,26 @@ object SmithyElementFactory {
                 model.addAfter(newImport, sortedImports[insertIndex - 1])
             }
         } else {
-            val namespace = PsiTreeUtil.getChildOfType(model, SmithyNamespace::class.java)
-            model.addAfter(createImport(file.project, shapeId), namespace)
+            model.addAfter(
+                createImport(file.project, namespace, shapeName),
+                PsiTreeUtil.getChildOfType(model, SmithyNamespace::class.java)
+            )
         }
     }
 
-    fun createImport(project: Project, shapeId: String): SmithyImport {
+    fun createImport(project: Project, namespace: String?, shapeName: String): SmithyImport {
         val file = createFile(
             project, """
             namespace smithy.tmp
             
-            use $shapeId
+            use ${if (namespace != null) "$namespace#$shapeName" else shapeName}
         """.trimIndent()
         )
         return PsiTreeUtil.getChildOfType(file.model!!, SmithyImport::class.java)!!
     }
 
-    fun createShapeId(project: Project, shapeId: String) = createImport(project, shapeId).shapeId
+    fun createShapeId(project: Project, namespace: String?, shapeName: String) =
+        createImport(project, namespace, shapeName).shapeId
 
     fun createFile(project: Project, content: String) =
         PsiFileFactory.getInstance(project).createFileFromText("tmp.smithy", SmithyFileType, content) as SmithyFile

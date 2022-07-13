@@ -11,6 +11,7 @@ package software.amazon.smithy.intellij.psi
 interface SmithyShapeDefinition : SmithyDefinition {
     val type: String
     val shapeId: String
+    val shapeName: String
     val namespace: String
     val members: List<@JvmWildcard SmithyMemberDefinition>
     fun getMember(name: String): SmithyMemberDefinition? = members.find { it.name == name }

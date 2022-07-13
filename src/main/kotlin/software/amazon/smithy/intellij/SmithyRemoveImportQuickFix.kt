@@ -14,7 +14,7 @@ import software.amazon.smithy.intellij.psi.SmithyImport
  * @since 1.0
  */
 data class SmithyRemoveImportQuickFix(val import: SmithyImport) : BaseIntentionAction() {
-    override fun getText() = "Remove import '${import.shapeId.id}'"
+    override fun getText() = "Remove import '${import.shapeId.declaredNamespace}#${import.shapeId.shapeName}'"
     override fun getFamilyName() = "Remove import"
     override fun isAvailable(project: Project, editor: Editor, file: PsiFile) = true
     override fun invoke(project: Project, editor: Editor, file: PsiFile) = import.delete()

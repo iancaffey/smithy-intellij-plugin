@@ -4,7 +4,6 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.impl.FakePsiElement
 import software.amazon.smithy.intellij.SmithyAst
 import software.amazon.smithy.intellij.SmithyIcons
-import software.amazon.smithy.intellij.SmithyPreludeShapes
 
 /**
  * A [shape](https://awslabs.github.io/smithy/1.0/spec/core/model.html#shapes) definition in the [Smithy](https://awslabs.github.io/smithy) [AST](https://awslabs.github.io/smithy/1.0/spec/core/json-ast.html).
@@ -13,26 +12,36 @@ import software.amazon.smithy.intellij.SmithyPreludeShapes
  * @since 1.0
  */
 data class SmithyAstShape(
-    override val ast: SmithyAst, override val file: PsiFile, override val shapeId: String, val shape: SmithyAst.Shape
+    override val shapeId: String, val shape: SmithyAst.Shape
 ) : FakePsiElement(), SmithyAstDefinition, SmithyShapeDefinition {
+    //Note: SmithyAstShape loaded from SmithyAstShapeIndex will have a lazily-initialized parent file, so that way
+    //dependencies can be cached in a FileBasedIndex and a shallow copy performed to get a valid PSI element on reads
+    private var file: PsiFile? = null
+    private val parts = shapeId.split('#', limit = 2)
+    override val shapeName = parts[1]
+    override val namespace = parts[0]
     override val type = shape.type
     override val members = shape.let { it as? SmithyAst.AggregateShape }?.let {
         (it.members ?: emptyMap()).entries.map { (memberName, reference) ->
             SmithyAstMember(this, memberName, reference)
         }
     } ?: emptyList()
-    override val documentation = (shape.traits?.get(SmithyPreludeShapes.DOCUMENTATION) as? String)?.let {
+    override val documentation = (shape.traits?.get("smithy.api#documentation") as? String)?.let {
         SmithyAstDocumentation(this, it)
     }
     override val declaredTraits = (shape.traits ?: emptyMap()).entries.map { (key, value) ->
         SmithyAstTrait(this, key, value)
     }
-    override val namespace = shapeId.split('#', limit = 2)[0]
-    override fun getName() = shapeId.split('#', limit = 2)[1]
-    override fun findTrait(shapeId: String) = declaredTraits.find { it.shapeId == shapeId }
+
+    override fun getName() = shapeName
+    override fun findTrait(namespace: String, shapeName: String) = declaredTraits.find {
+        it.shapeName == shapeName && it.resolvedNamespace == namespace
+    }
+
     override fun getMember(name: String) = members.find { it.name == name }
     override fun getParent() = file
     override fun getLocationString() = namespace
     override fun getIcon(unused: Boolean) = SmithyIcons.SHAPE
     override fun toString() = shapeId
+    fun within(file: PsiFile) = SmithyAstShape(shapeId, shape).also { it.file = file }
 }

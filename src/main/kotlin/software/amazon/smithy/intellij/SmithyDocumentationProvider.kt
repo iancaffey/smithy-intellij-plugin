@@ -10,8 +10,6 @@ import com.intellij.psi.util.PsiTreeUtil.findChildrenOfType
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
-import software.amazon.smithy.intellij.SmithyPreludeShapes.DOCUMENTATION
-import software.amazon.smithy.intellij.SmithyPreludeShapes.EXTERNAL_DOCUMENTATION
 import software.amazon.smithy.intellij.psi.SmithyAstMember
 import software.amazon.smithy.intellij.psi.SmithyAstShape
 import software.amazon.smithy.intellij.psi.SmithyDocumentation
@@ -32,8 +30,8 @@ import java.util.function.Consumer
 class SmithyDocumentationProvider : AbstractDocumentationProvider() {
     override fun getQuickNavigateInfo(element: PsiElement, originalElement: PsiElement?): String? = when (element) {
         is SmithyMemberDefinition -> buildString {
-            val docs = element.findTrait(DOCUMENTATION)
-            val externalDocs = element.findTrait(EXTERNAL_DOCUMENTATION)
+            val docs = element.findTrait("smithy.api", "documentation")
+            val externalDocs = element.findTrait("smithy.api", "externalDocumentation")
             element.declaredTraits.forEach {
                 if (it != docs && it != externalDocs) append(getQuickNavigateInfo(it, it)).append("<br/>")
             }
@@ -41,8 +39,8 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             append(": ${element.targetShapeName}")
         }
         is SmithyShapeDefinition -> buildString {
-            val docs = element.findTrait(DOCUMENTATION)
-            val externalDocs = element.findTrait(EXTERNAL_DOCUMENTATION)
+            val docs = element.findTrait("smithy.api", "documentation")
+            val externalDocs = element.findTrait("smithy.api", "externalDocumentation")
             element.declaredTraits.forEach {
                 if (it != docs && it != externalDocs) append(getQuickNavigateInfo(it, it)).append("<br/>")
             }
@@ -65,7 +63,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 additionalInfo["Type"] = HtmlSyntaxInfoUtil.getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
             }
             //TODO: generalize this once SmithyMemberDefinition has a consolidated node value(s) API
-            element.let { it as? SmithyAstMember }?.reference?.traits?.get(EXTERNAL_DOCUMENTATION)?.let {
+            element.let { it as? SmithyAstMember }?.reference?.traits?.get("smithy.api#externalDocumentation")?.let {
                 additionalInfo["See also"] = (it as Map<*, *>).entries.joinToString(
                     "<span>, </span>", "<div>", "</div>"
                 ) { (title, href) -> "<a href='$href'>$title</a>" }
@@ -77,7 +75,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             append(getQuickNavigateInfo(element, originalElement))
             val additionalInfo = mutableMapOf("Namespace" to element.namespace)
             //TODO: generalize this once SmithyShapeDefinition has a consolidated node value(s) API
-            element.let { it as? SmithyAstShape }?.shape?.traits?.get(EXTERNAL_DOCUMENTATION)?.let {
+            element.let { it as? SmithyAstShape }?.shape?.traits?.get("smithy.api#externalDocumentation")?.let {
                 additionalInfo["See also"] = (it as Map<*, *>).entries.joinToString(
                     "<span>, </span>", "<div>", "</div>"
                 ) { (title, href) -> "<a href='$href'>$title</a>" }

@@ -1,12 +1,8 @@
 package software.amazon.smithy.intellij.psi
 
 import com.intellij.psi.impl.FakePsiElement
-import com.intellij.psi.util.CachedValueProvider
-import com.intellij.psi.util.CachedValuesManager
-import com.intellij.psi.util.PsiModificationTracker
 import software.amazon.smithy.intellij.SmithyAst
 import software.amazon.smithy.intellij.SmithyIcons
-import software.amazon.smithy.intellij.SmithyPreludeShapes
 import software.amazon.smithy.intellij.SmithyShapeResolver
 
 /**
@@ -18,19 +14,11 @@ import software.amazon.smithy.intellij.SmithyShapeResolver
 data class SmithyAstMember(
     override val enclosingShape: SmithyAstShape, val memberName: String, val reference: SmithyAst.Reference
 ) : FakePsiElement(), SmithyAstDefinition, SmithyMemberDefinition {
-    companion object {
-        private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
-        private fun resolver(member: SmithyAstMember) = CachedValueProvider {
-            val results = SmithyShapeResolver.resolve(member)
-            CachedValueProvider.Result.create(if (results.size == 1) results.first() else null, dependencies)
-        }
-    }
-
-    override val ast = enclosingShape.ast
-    override val file = enclosingShape.file
-    override val targetShapeId = reference.target
-    override val targetShapeName = targetShapeId.split('#', limit = 2)[1]
-    override val documentation = (reference.traits?.get(SmithyPreludeShapes.DOCUMENTATION) as? String)?.let {
+    private val targetParts = reference.target.split('#', limit = 2)
+    override val targetShapeName = targetParts[1]
+    override val declaredTargetNamespace = targetParts[0]
+    override val resolvedTargetNamespace = targetParts[0]
+    override val documentation = (reference.traits?.get("smithy.api#documentation") as? String)?.let {
         SmithyAstDocumentation(this, it)
     }
     override val declaredTraits = (reference.traits ?: emptyMap()).entries.map { (key, value) ->
@@ -41,7 +29,13 @@ data class SmithyAstMember(
     override fun getParent(): SmithyAstShape = enclosingShape
     override fun getLocationString(): String = enclosingShape.locationString
     override fun getIcon(unused: Boolean) = SmithyIcons.MEMBER
-    override fun findTrait(shapeId: String) = declaredTraits.find { it.shapeId == shapeId }
-    override fun resolve(): SmithyShapeDefinition? = CachedValuesManager.getCachedValue(this, resolver(this))
+    override fun findTrait(namespace: String, shapeName: String) = declaredTraits.find {
+        it.shapeName == shapeName && it.resolvedNamespace == namespace
+    }
+
+    override fun resolve() = SmithyShapeResolver.getDefinitions(this, declaredTargetNamespace, targetShapeName).takeIf {
+        it.size == 1
+    }?.first()
+
     override fun toString() = "$parent$$memberName"
 }

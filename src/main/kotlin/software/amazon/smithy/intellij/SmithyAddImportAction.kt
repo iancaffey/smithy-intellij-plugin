@@ -18,15 +18,19 @@ import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
  * @since 1.0
  */
 class SmithyAddImportAction(
-    val project: Project, val editor: Editor, val file: SmithyFile, val options: List<SmithyShapeDefinition>
+    val project: Project, val editor: Editor, val file: SmithyFile, val shapeIds: List<String>
 ) : QuestionAction {
     override fun execute(): Boolean {
-        val step = object : BaseListPopupStep<SmithyShapeDefinition>("Imports", options) {
+        val shapes = shapeIds.flatMap {
+            val (namespace, shapeName) = it.split('#', limit = 2)
+            SmithyShapeResolver.getDefinitions(namespace, shapeName, file.project)
+        }
+        val step = object : BaseListPopupStep<SmithyShapeDefinition>("Imports", shapes) {
             override fun onChosen(selectedValue: SmithyShapeDefinition?, finalChoice: Boolean): PopupStep<*>? {
                 if (finalChoice && selectedValue != null) {
                     doFinalStep {
                         WriteCommandAction.runWriteCommandAction(project) {
-                            SmithyElementFactory.addImport(file, selectedValue.shapeId)
+                            SmithyElementFactory.addImport(file, selectedValue.namespace, selectedValue.shapeName)
                         }
                     }
                 }

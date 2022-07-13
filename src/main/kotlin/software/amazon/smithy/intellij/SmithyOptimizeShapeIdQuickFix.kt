@@ -21,8 +21,8 @@ import software.amazon.smithy.intellij.psi.SmithyShapeId
 class SmithyOptimizeShapeIdQuickFix(val project: Project, val shapeId: SmithyShapeId) : BaseIntentionAction() {
     val hasImport = PsiTreeUtil.getChildrenOfTypeAsList(
         (shapeId.containingFile as? SmithyFile)?.model, SmithyImport::class.java
-    ).any { shapeId.id == it.shapeId.id }
-    val requiresImport = shapeId.declaredNamespace != shapeId.enclosingNamespace && !hasImport
+    ).any { shapeId.shapeName == it.shapeId.shapeName }
+    val requiresImport = !hasImport && shapeId.declaredNamespace != shapeId.enclosingNamespace
 
     override fun getText() =
         if (requiresImport) "Add import for \"${shapeId}\"" else "Remove unnecessary qualifier for \"${shapeId.shapeName}\""
@@ -32,16 +32,16 @@ class SmithyOptimizeShapeIdQuickFix(val project: Project, val shapeId: SmithySha
         file is SmithyFile && shapeId.declaredNamespace != null
 
     override fun invoke(project: Project, editor: Editor, f: PsiFile?) {
-        if (shapeId.declaredNamespace == null) return
+        val namespace = shapeId.declaredNamespace ?: return
         val file = shapeId.containingFile as? SmithyFile ?: return
         val shapeIds = PsiTreeUtil.collectElementsOfType(file, SmithyShapeId::class.java).filter {
-            it.id == shapeId.id && it.parent !is SmithyImport
+            it.declaredNamespace == namespace && it.shapeName == shapeId.shapeName && it.parent !is SmithyImport
         }
         WriteCommandAction.runWriteCommandAction(project) {
             if (requiresImport) {
-                SmithyElementFactory.addImport(file, shapeId.id)
+                SmithyElementFactory.addImport(file, namespace, shapeId.shapeName)
             }
-            shapeIds.forEach { it.replace(SmithyElementFactory.createShapeId(project, it.shapeName)) }
+            shapeIds.forEach { it.replace(SmithyElementFactory.createShapeId(project, null, it.shapeName)) }
         }
     }
 }

@@ -1,97 +1,59 @@
 package software.amazon.smithy.intellij
 
+import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
-import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.util.PsiTreeUtil
-import software.amazon.smithy.intellij.psi.SmithyAstShape
-import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
-import software.amazon.smithy.intellij.psi.SmithyNamespace
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager.getCachedValue
+import com.intellij.psi.util.PsiModificationTracker
+import software.amazon.smithy.intellij.index.SmithyAstShapeIndex
+import software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex
+import software.amazon.smithy.intellij.index.SmithyShapeNameResolutionHintIndex
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
-import software.amazon.smithy.intellij.psi.SmithyShapeId
 
 /**
- * A utility class providing methods to resolve the target of a [SmithyShapeId].
+ * A utility class providing methods to resolve the namespace of a shape name (relative shape id).
  *
  * @author Ian Caffey
  * @since 1.0
  */
 object SmithyShapeResolver {
-    fun resolve(member: SmithyMemberDefinition) = resolve(
-        member.targetShapeId,
-        member.containingFile
-    )
+    private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
 
-    fun resolve(id: String, file: PsiFile, exact: Boolean = true): List<SmithyShapeDefinition> =
-        if ('#' in id) {
-            val declaredNamespace = id.split('#', limit = 2)[0]
-            resolve(ResolveContext(id, file, declaredNamespace, declaredNamespace, exact))
-        } else {
-            val enclosingNamespace = (file as? SmithyFile)?.let {
-                PsiTreeUtil.getChildOfType(it.model, SmithyNamespace::class.java)?.namespaceId?.id
-            }
-            resolve(ResolveContext(id, file, enclosingNamespace, null, exact))
+    fun getDefinitions(scope: PsiElement, namespace: String, shapeName: String): List<SmithyShapeDefinition> =
+        getCachedValue(scope) {
+            CachedValueProvider.Result.create(getDefinitions(namespace, shapeName, scope.project), dependencies)
         }
 
-    fun resolve(shapeId: SmithyShapeId) = resolve(
-        ResolveContext(
-            shapeId.id,
-            shapeId.containingFile,
-            shapeId.enclosingNamespace,
-            shapeId.declaredNamespace
-        )
-    )
-
-    private fun resolve(ctx: ResolveContext): List<SmithyShapeDefinition> {
-        val results = mutableListOf<SmithyShapeDefinition>()
-        val manager = PsiManager.getInstance(ctx.enclosingFile.project)
-        val scope = GlobalSearchScope.allScope(ctx.enclosingFile.project)
-        //Attempt to find the shape within the project IDL
-        SmithyFileIndex.forEach(scope) { file ->
-            file.model?.shapes?.forEach { shape ->
-                if (results.none { shape.shapeId == it.shapeId } && matches(ctx, shape.namespace, shape.name)) {
-                    results.add(shape)
-                }
-            }
-        }
-        //Attempt to find the shape within any project AST
-        SmithyAstIndex.forEach(scope) { ast, file ->
-            ast.shapes?.forEach { (id, shape) ->
-                val (namespace, name) = id.split('#', limit = 2)
-                if (results.none { id == it.shapeId } && matches(ctx, namespace, name)) {
-                    results.add(SmithyAstShape(ast, manager.findFile(file)!!, id, shape))
-                }
-            }
-        }
-        //Attempt to find the shape within the prelude by name, if not explicitly scoped to a namespace and no previous matches were found
-        if (ctx.exact && ctx.declaredNamespace == null && results.isEmpty()) {
-            SmithyFileIndex.forEach(scope) { file ->
-                file.model?.shapes?.forEach { shape ->
-                    if (shape.namespace == SmithyPreludeShapes.NAMESPACE && shape.name == ctx.shapeName && results.none { shape.shapeId == it.shapeId }) {
-                        results.add(shape)
-                    }
-                }
-            }
-        }
-        return results
+    fun getNamespace(scope: PsiElement, shapeName: String): String? = getCachedValue(scope) {
+        CachedValueProvider.Result.create(getNamespace(scope.containingFile, shapeName), dependencies)
     }
 
-    private fun matches(ctx: ResolveContext, namespace: String, name: String): Boolean {
-        if (!ctx.exact) return name == ctx.shapeName
-        val declaredNamespace = ctx.declaredNamespace
-        val enclosingNamespace = ctx.enclosingNamespace
-        //Note: for ambiguous shape ids (which lack a declared namespace), matching can fallback to the enclosing
-        //namespace to match the model file merging logic of normal Smithy builds
-        return name == ctx.shapeName && (namespace == declaredNamespace || (declaredNamespace == null && namespace == enclosingNamespace))
+    fun getDefinitions(namespace: String, shapeName: String, project: Project): List<SmithyShapeDefinition> {
+        val psi = PsiManager.getInstance(project)
+        val definitions = mutableListOf<SmithyShapeDefinition>()
+        definitions += SmithyAstShapeIndex.getShapes(namespace, shapeName, project)
+        SmithyDefinedShapeIdIndex.getFiles(namespace, shapeName, project).forEach { file ->
+            if (file.extension != "smithy") return@forEach
+            (psi.findFile(file) as? SmithyFile)?.model?.shapes?.forEach { shape ->
+                if (shape.shapeName == shapeName && shape.namespace == namespace) {
+                    definitions += shape
+                }
+            }
+        }
+        return definitions
     }
 
-    private data class ResolveContext(
-        val shapeId: String,
-        val enclosingFile: PsiFile,
-        val enclosingNamespace: String?,
-        val declaredNamespace: String?,
-        val exact: Boolean = true
-    ) {
-        val shapeName = if (shapeId.contains('#')) shapeId.split('#', limit = 2)[1] else shapeId
+    private fun getNamespace(enclosingFile: PsiFile, shapeName: String): String? {
+        val project = enclosingFile.project
+        val hint = SmithyShapeNameResolutionHintIndex.getHint(shapeName, enclosingFile)
+        return when {
+            hint == null -> null //Note: only happens when the project hasn't completed indexing
+            hint.resolvedNamespace != null -> hint.resolvedNamespace
+            SmithyDefinedShapeIdIndex.exists(hint.enclosingNamespace, shapeName, project) -> hint.enclosingNamespace
+            SmithyDefinedShapeIdIndex.exists("smithy.api", shapeName, project) -> "smithy.api"
+            else -> null
+        }
     }
 }

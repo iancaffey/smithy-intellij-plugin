@@ -63,7 +63,9 @@
                                 implementationClass="software.amazon.smithy.intellij.SmithyCompletionContributor"/>
         <defaultLiveTemplates file="/liveTemplates/Smithy.xml"/>
         <enterHandlerDelegate implementation="software.amazon.smithy.intellij.SmithyDocumentationEnterHandler"/>
-        <fileBasedIndex implementation="software.amazon.smithy.intellij.SmithyAstIndex"/>
+        <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyAstShapeIndex"/>
+        <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex"/>
+        <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyShapeNameResolutionHintIndex"/>
         <gotoClassContributor implementation="software.amazon.smithy.intellij.SmithyGotoShapeContributor"/>
         <gotoSymbolContributor implementation="software.amazon.smithy.intellij.SmithyGotoMemberContributor"/>
         <iconProvider implementation="software.amazon.smithy.intellij.SmithyIconProvider"/>

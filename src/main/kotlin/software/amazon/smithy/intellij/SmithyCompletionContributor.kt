@@ -9,16 +9,17 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiErrorElement
-import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import com.intellij.util.ProcessingContext
 import com.intellij.util.applyIf
+import software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyIncompleteEntry
 import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyMemberId
 import software.amazon.smithy.intellij.psi.SmithyObject
+import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 import software.amazon.smithy.intellij.psi.SmithyTrait
 import software.amazon.smithy.intellij.psi.SmithyTraitBody
@@ -44,8 +45,9 @@ class SmithyCompletionContributor : CompletionContributor() {
                     getParentOfType(element, SmithyEntry::class.java)?.let { addMembers(it, it.key, results) }
                     getParentOfType(element, SmithyIncompleteEntry::class.java)?.let { addMembers(it, it.key, results) }
                     getParentOfType(element, SmithyMemberId::class.java)?.let {
-                        it.shapeId.reference.resolve()?.members?.forEach { member ->
-                            results.addElement(memberElement(member.name, member.targetShapeId, it.shapeId.id))
+                        val parent = it.shapeId.reference.resolve()
+                        parent?.members?.forEach { member ->
+                            results.addElement(memberElement(member.name, member.targetShapeName, parent))
                         }
                     }
                 }
@@ -56,17 +58,9 @@ class SmithyCompletionContributor : CompletionContributor() {
 private fun addShapes(element: PsiElement, parameters: CompletionParameters, results: CompletionResultSet) {
     val addImports = getParentOfType(element, SmithyImport::class.java) == null
     val project = parameters.editor.project!!
-    val scope = GlobalSearchScope.allScope(project)
-    SmithyFileIndex.forEach(scope) {
-        it.model?.shapes?.forEach { shape ->
-            results.addElement(shapeElement(shape.namespace, shape.name, addImports))
-        }
-    }
-    SmithyAstIndex.forEach(scope) { ast, _ ->
-        ast.shapes?.forEach { (id, _) ->
-            val (namespace, name) = id.split('#', limit = 2)
-            results.addElement(shapeElement(namespace, name, addImports))
-        }
+    SmithyDefinedShapeIdIndex.forEach(project) {
+        val (namespace, shapeName) = it.split('#', limit = 2)
+        results.addElement(shapeElement(namespace, shapeName, addImports))
     }
 }
 
@@ -78,16 +72,16 @@ private fun addMembers(element: PsiElement, key: SmithyKey, results: CompletionR
         else -> null
     }
     enclosingShape?.members?.forEach { member ->
-        memberResults.addElement(memberElement(member.name, member.targetShapeId))
+        memberResults.addElement(memberElement(member.name, member.targetShapeName))
     }
 }
 
-private fun shapeElement(namespace: String, name: String, addImports: Boolean): LookupElementBuilder {
-    val qualifiedName = "$namespace#$name"
-    return LookupElementBuilder.create(if (addImports) name else qualifiedName)
+private fun shapeElement(namespace: String, shapeName: String, addImports: Boolean): LookupElementBuilder {
+    val qualifiedName = "$namespace#$shapeName"
+    return LookupElementBuilder.create(if (addImports) shapeName else qualifiedName)
         .withIcon(SmithyIcons.SHAPE)
-        .withPresentableText(name)
-        .withLookupString(name)
+        .withPresentableText(shapeName)
+        .withLookupString(shapeName)
         .withLookupString(qualifiedName)
         .withTailText("($namespace)")
         .applyIf(addImports) {
@@ -95,10 +89,10 @@ private fun shapeElement(namespace: String, name: String, addImports: Boolean): 
                 context.file.let { it as? SmithyFile }?.let {
                     val model = it.model ?: return@let
                     if (model.namespace == namespace) return@let
-                    if (namespace == SmithyPreludeShapes.NAMESPACE
-                        && SmithyShapeResolver.resolve("${model.namespace}#$name", it).isEmpty()
+                    if (namespace == "smithy.api"
+                        && !SmithyDefinedShapeIdIndex.exists(model.namespace, shapeName, it.project)
                     ) return@let
-                    SmithyElementFactory.addImport(it, "$namespace#$name")
+                    SmithyElementFactory.addImport(it, namespace, shapeName)
                 }
             }
         }
@@ -106,11 +100,10 @@ private fun shapeElement(namespace: String, name: String, addImports: Boolean): 
 
 private fun memberElement(
     memberName: String,
-    shapeId: String,
-    enclosingShapeId: String? = null
+    shapeName: String,
+    enclosingShape: SmithyShapeDefinition? = null
 ): LookupElementBuilder {
-    val shapeName = if ('#' in shapeId) shapeId.split('#', limit = 2)[1] else shapeId
-    return LookupElementBuilder.create(if (enclosingShapeId != null) "$enclosingShapeId$$memberName" else memberName)
+    return LookupElementBuilder.create(if (enclosingShape != null) "${enclosingShape.shapeId}$$memberName" else memberName)
         .withPresentableText(memberName)
         .withTypeText(shapeName)
         .withIcon(SmithyIcons.MEMBER)

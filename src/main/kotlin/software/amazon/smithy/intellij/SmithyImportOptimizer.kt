@@ -40,9 +40,14 @@ class SmithyImportOptimizer : ImportOptimizer {
         removeUnusedImports(file)
         val remainingImports = PsiTreeUtil.getChildrenOfTypeAsList(file.model, SmithyImport::class.java)
         if (remainingImports.isEmpty()) return@Runnable
-        val sortedImports = remainingImports.toMutableList().sortedBy { it.shapeId.id }
+        val sortedImports = remainingImports.toMutableList().sortedWith(
+            compareBy<SmithyImport> { it.shapeId.declaredNamespace }.thenBy { it.shapeId.shapeName }
+        )
         if (remainingImports == sortedImports) return@Runnable
         remainingImports.forEach { it.delete() }
-        sortedImports.forEach { SmithyElementFactory.addImport(file, it.shapeId.id) }
+        sortedImports.forEach {
+            val namespace = it.shapeId.declaredNamespace ?: return@forEach
+            SmithyElementFactory.addImport(file, namespace, it.shapeId.shapeName)
+        }
     }
 }

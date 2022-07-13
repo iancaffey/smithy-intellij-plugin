@@ -22,6 +22,7 @@ import software.amazon.smithy.intellij.SmithyKeyReference
 import software.amazon.smithy.intellij.SmithyLanguage
 import software.amazon.smithy.intellij.SmithyMemberReference
 import software.amazon.smithy.intellij.SmithyShapeReference
+import software.amazon.smithy.intellij.SmithyShapeResolver.getNamespace
 import software.amazon.smithy.intellij.psi.impl.SmithyAggregateShapeImpl
 import software.amazon.smithy.intellij.psi.impl.SmithyKeyedElementImpl
 import software.amazon.smithy.intellij.psi.impl.SmithyPrimitiveImpl
@@ -127,38 +128,34 @@ interface SmithyMemberExt : SmithyNamedElement, SmithyMemberDefinition {
     override val enclosingShape: SmithyShape
     override val documentation: SmithyDocumentation?
     override val declaredTraits: List<SmithyTrait>
-    override fun findTrait(shapeId: String): SmithyTrait?
+    override fun findTrait(namespace: String, shapeName: String): SmithyTrait?
 }
 
 abstract class SmithyMemberMixin(node: ASTNode) : SmithyPsiElement(node), SmithyMember {
-    override val targetShapeId get() = shapeId.id
     override val targetShapeName get() = shapeId.shapeName
+    override val declaredTargetNamespace get() = shapeId.declaredNamespace
+    override val resolvedTargetNamespace get() = shapeId.resolvedNamespace
     override val enclosingShape: SmithyAggregateShape get() = getParentOfType(this, SmithyAggregateShape::class.java)!!
     override fun getName(): String = nameIdentifier.text
     override fun setName(newName: String) = setName<SmithyMember>(this, newName)
     override fun getTextOffset() = nameIdentifier.textOffset
     override fun resolve(): SmithyShapeDefinition? = shapeId.reference.resolve()
     override fun getPresentation() = object : ItemPresentation {
-        override fun getPresentableText(): String = "$name: ${shapeId.id}"
-        override fun getLocationString() = (parent.parent as SmithyShape).shapeId
+        override fun getPresentableText(): String = "$name: ${shapeId.shapeName}"
+        override fun getLocationString() = (parent.parent as SmithyShape).shapeName
         override fun getIcon(unused: Boolean) = getIcon(0)
     }
 
-    override fun findTrait(shapeId: String) = declaredTraits.find {
-        if (it.shape.id == shapeId) return@find true
-        if (it.shape.declaredNamespace != null || !shapeId.endsWith(it.shapeName)) return@find false
-        val target = it.resolve()
-        target is SmithyShapeDefinition && shapeId == target.shapeId
+    override fun findTrait(namespace: String, shapeName: String) = declaredTraits.find {
+        it.shapeName == shapeName && it.resolvedNamespace == namespace
     }
 }
 
 interface SmithyMemberIdExt : SmithyElement {
-    val id: String
     val reference: SmithyMemberReference
 }
 
 abstract class SmithyMemberIdMixin(node: ASTNode) : SmithyPsiElement(node), SmithyMemberId {
-    override val id get() = "${shapeId.id}$${memberName.text}"
     override val reference by lazy { SmithyMemberReference(this) }
 }
 
@@ -167,12 +164,10 @@ abstract class SmithyMetadataMixin(node: ASTNode) : SmithyKeyedElementImpl(node)
 
 interface SmithyModelExt : SmithyElement {
     val namespace: String
-    val shapes: List<SmithyShape>
 }
 
 abstract class SmithyModelMixin(node: ASTNode) : SmithyPsiElement(node), SmithyModel {
     override val namespace get() = getChildOfType(this, SmithyNamespace::class.java)!!.namespaceId.id
-    override val shapes: List<SmithyShape> get() = getChildrenOfTypeAsList(this, SmithyShape::class.java)
 }
 
 interface SmithyNamespaceExt : SmithyStatement
@@ -236,7 +231,7 @@ interface SmithyShapeExt : SmithyNamedElement, SmithyShapeDefinition, SmithyStat
     val model: SmithyModel
     val requiredMembers: Set<String> get() = emptySet()
     val supportedMembers: Set<String>? get() = requiredMembers.takeIf { it.isNotEmpty() }
-    override fun findTrait(shapeId: String): SmithyTrait?
+    override fun findTrait(namespace: String, shapeName: String): SmithyTraitDefinition?
 }
 
 abstract class SmithyShapeMixin(node: ASTNode) : SmithyPsiElement(node), SmithyShape {
@@ -244,71 +239,49 @@ abstract class SmithyShapeMixin(node: ASTNode) : SmithyPsiElement(node), SmithyS
         get() = nameIdentifier.siblings(forward = false, withSelf = false).first {
             it !is PsiWhiteSpace && it !is PsiComment
         }
-    override val model get() = parent as SmithyModel
     override val namespace get() = model.namespace
-    override val shapeId get() = "${namespace}#${name}"
+    override val shapeName: String get() = nameIdentifier.text
+    override val shapeId get() = "$namespace#$shapeName"
+    override val model get() = parent as SmithyModel
     override val members get() = emptyList<SmithyMember>()
     override val documentation get() = getChildOfType(this, SmithyDocumentation::class.java)
     override val declaredTraits: List<SmithyTrait> get() = getChildrenOfTypeAsList(this, SmithyTrait::class.java)
     override fun getMember(name: String): SmithyMember? = members.find { it.name == name }
-    override fun getName(): String = nameIdentifier.text
+    override fun getName() = shapeName
     override fun setName(newName: String) = setName<SmithyShape>(this, newName)
     override fun getNameIdentifier() = getChildOfType(this, SmithyShapeName::class.java)!!
     override fun getTextOffset() = nameIdentifier.textOffset
     override fun getPresentation() = object : ItemPresentation {
-        override fun getPresentableText(): String = name
+        override fun getPresentableText(): String = shapeName
         override fun getLocationString(): String = namespace
         override fun getIcon(unused: Boolean) = getIcon(0)
     }
 
-    override fun findTrait(shapeId: String) = declaredTraits.find {
-        if (it.shape.id == shapeId) return@find true
-        if (it.shape.declaredNamespace != null || !shapeId.endsWith(it.shapeName)) return@find false
-        val target = it.resolve()
-        target is SmithyShapeDefinition && shapeId == target.shapeId
+    override fun findTrait(namespace: String, shapeName: String) = declaredTraits.find {
+        it.shapeName == shapeName && it.resolvedNamespace == namespace
     }
 }
 
 interface SmithyShapeIdExt : SmithyElement {
-    val id: String
     val shapeName: String
     val declaredNamespace: String?
-    val enclosingNamespace: String
+    val enclosingNamespace: String?
+    val resolvedNamespace: String?
 }
 
 abstract class SmithyShapeIdMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyShapeId {
-    override val id
-        get() = buildString {
-            declaredNamespace?.let { append(it).append("#") }
-            append(shapeName)
-        }
     override val shapeName: String get() = getChildOfType(this, SmithyId::class.java)!!.text
-    override val declaredNamespace: String?
-        get() {
-            namespaceId?.let { return it.id }
-            val model = (containingFile as SmithyFile).model
-            val imports = getChildrenOfTypeAsList(model, SmithyImport::class.java)
-            for (i in imports) {
-                val importedShapeId = i.shapeId
-                val importedNamespaceId = importedShapeId.namespaceId
-                if (importedNamespaceId != null && shapeName == importedShapeId.shapeName) {
-                    return importedNamespaceId.id
-                }
-            }
-            return null
-        }
-    override val enclosingNamespace get() = (containingFile as SmithyFile).model!!.namespace
-
+    override val declaredNamespace get() = namespaceId?.id
+    override val enclosingNamespace get() = (containingFile as SmithyFile).model?.namespace
+    override val resolvedNamespace: String? get() = declaredNamespace ?: getNamespace(this, shapeName)
 }
 
-interface SmithyTraitExt : SmithyElement, SmithyTraitDefinition {
-    fun resolve(): SmithyShapeDefinition?
-}
+interface SmithyTraitExt : SmithyElement, SmithyTraitDefinition
 
 abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyTrait {
-    override val shapeId: String = shape.id
-    override val shapeName: String = shape.shapeName
-    override fun resolve() = shape.reference.resolve()
+    override val shapeName get() = shape.shapeName
+    override val declaredNamespace get() = shape.declaredNamespace
+    override val resolvedNamespace get() = shape.resolvedNamespace
     override fun toDocString() = buildString {
         //Note: since this can only do lexer-based highlighting, this will be approximately the same style as
         //the editor display (but could have some keyword highlighting issues in the body)

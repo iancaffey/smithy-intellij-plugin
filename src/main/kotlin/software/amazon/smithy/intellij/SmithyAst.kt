@@ -10,8 +10,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import java.io.File
-import java.io.InputStream
 
 /**
  * An [abstract syntax tree](https://awslabs.github.io/smithy/1.0/spec/core/json-ast.html) for [Smithy](https://awslabs.github.io/smithy).
@@ -24,27 +22,11 @@ data class SmithyAst(
     val metadata: kotlin.collections.Map<kotlin.String, Any>? = null,
     val shapes: kotlin.collections.Map<kotlin.String, Shape>? = null
 ) {
-    fun toJson() = toJson(this)
-
     companion object {
-        private val serializer = jacksonObjectMapper().apply {
+        val SERIALIZER = jacksonObjectMapper().apply {
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             setSerializationInclusion(Include.NON_NULL)
         }
-
-        fun parse(input: InputStream): SmithyAst {
-            return serializer.readValue(input, SmithyAst::class.java)
-        }
-
-        fun parse(file: File): SmithyAst {
-            return serializer.readValue(file, SmithyAst::class.java)
-        }
-
-        fun parse(ast: kotlin.String): SmithyAst {
-            return serializer.readValue(ast, SmithyAst::class.java)
-        }
-
-        fun toJson(value: Any?): kotlin.String = serializer.writeValueAsString(value)
     }
 
     data class Reference(val target: kotlin.String, val traits: kotlin.collections.Map<kotlin.String, Any>? = null)

@@ -220,7 +220,7 @@ private enum class Annotation : Annotator {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element is SmithyTrait) {
                 val target = element.resolve()
-                if (target != null && !target.hasTrait(SmithyPreludeShapes.TRAIT)) {
+                if (target != null && !target.hasTrait("smithy.api", "trait")) {
                     holder.newAnnotation(
                         HighlightSeverity.ERROR,
                         "${element.shape.shapeName} cannot be used as a trait"
@@ -296,26 +296,26 @@ private enum class Annotation : Annotator {
                                 .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
                                 .also {
                                     if (element is SmithyShapeId) {
-                                        it.withFix(SmithyImportShapeQuickFix(element.text, element.containingFile))
+                                        it.withFix(SmithyImportShapeQuickFix(element.shapeName, element.containingFile))
                                     }
                                 }
                                 .create()
                         }
                     } else if (element is SmithyShapeId) {
                         val enclosingNamespace = (element.containingFile as? SmithyFile)?.model?.namespace
-                        if (target.namespace != enclosingNamespace && target.hasTrait(SmithyPreludeShapes.PRIVATE)) {
+                        if (target.namespace != enclosingNamespace && target.hasTrait("smithy.api", "private")) {
                             holder.newAnnotation(
                                 HighlightSeverity.ERROR,
                                 "${element.shapeName} cannot be referenced outside ${target.namespace}"
                             ).highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL).create()
                         }
-                        if (target.hasTrait(SmithyPreludeShapes.DEPRECATED)) {
+                        if (target.hasTrait("smithy.api", "deprecated")) {
                             holder.newAnnotation(
                                 HighlightSeverity.WARNING,
                                 "${element.shapeName} is marked as @deprecated and could be removed in the future"
                             ).highlightType(ProblemHighlightType.LIKE_DEPRECATED).create()
                         }
-                        if (target.hasTrait(SmithyPreludeShapes.UNSTABLE)) {
+                        if (target.hasTrait("smithy.api", "unstable")) {
                             holder.newAnnotation(
                                 HighlightSeverity.WARNING,
                                 "${element.shapeName} is marked as @unstable and could change in the future"

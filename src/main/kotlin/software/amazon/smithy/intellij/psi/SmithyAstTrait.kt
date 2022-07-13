@@ -13,14 +13,15 @@ import software.amazon.smithy.intellij.SmithyLanguage
  * @since 1.0
  */
 data class SmithyAstTrait(
-    val target: SmithyDefinition, override val shapeId: String, val body: Any
+    val target: SmithyDefinition, val shapeId: String, val body: Any
 ) : FakePsiElement(), SmithyTraitDefinition {
-    override val shapeName = shapeId.split('#', limit = 2)[1]
+    private val parts = shapeId.split('#', limit = 2)
+    override val shapeName = parts[1]
+    override val declaredNamespace = parts[0]
+    override val resolvedNamespace = parts[0]
     override fun getParent() = target
     override fun toDocString() = buildString {
-        HtmlSyntaxInfoUtil.appendStyledSpan(
-            this, SmithyColorSettings.TRAIT_NAME, "@${shapeId.split('#', limit = 2)[1]}", 1f
-        )
+        HtmlSyntaxInfoUtil.appendStyledSpan(this, SmithyColorSettings.TRAIT_NAME, "@$shapeName", 1f)
         if (body is Map<*, *>) {
             if (body.isNotEmpty()) {
                 append(body.entries.joinToString(", ", "(", ")") {
@@ -28,7 +29,7 @@ data class SmithyAstTrait(
                         SmithyColorSettings.KEY, it.key as String, 1f
                     )
                     val value = HtmlSyntaxInfoUtil.getHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
-                        project, SmithyLanguage, SmithyAst.toJson(it.value), 1f
+                        project, SmithyLanguage, SmithyAst.SERIALIZER.writeValueAsString(it.value), 1f
                     )
                     "$key: $value"
                 })
@@ -37,7 +38,7 @@ data class SmithyAstTrait(
             append("(")
             append(
                 HtmlSyntaxInfoUtil.getHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
-                    project, SmithyLanguage, SmithyAst.toJson(body), 1f
+                    project, SmithyLanguage, SmithyAst.SERIALIZER.writeValueAsString(body), 1f
                 )
             )
             append(")")
