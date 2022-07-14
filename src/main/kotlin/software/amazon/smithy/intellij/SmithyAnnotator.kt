@@ -98,7 +98,7 @@ private enum class Annotation : Annotator {
                     val length = if (i < element.textLength - 5 && element.text[i + 1] == 'u' && (2..5).all {
                             val digit = element.text[i + it]
                             (digit in '0'..'9') || (digit in 'a'..'f') || (digit in 'A'..'F')
-                        }) 5 else 2
+                        }) 6 else 2
                     if (length == 2 && element.text[i + 1] !in "\"'bfnrt/\\\n") {
                         invalid.add(TextRange.from(i, length))
                     } else {
