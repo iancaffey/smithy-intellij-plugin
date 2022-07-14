@@ -59,7 +59,7 @@
         //Literals
         TOKEN_NUMBER="regexp:-?(0|([1-9][0-9]*))(\.[0-9]+)?(e[+-]?[0-9]+)?"
         //Note: both string and text_block regex here permit invalid escape sequences to later on annotate them as errors
-        TOKEN_STRING="regexp:\"((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF]))*\""
+        TOKEN_STRING="regexp:\"((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\?\r?\n))*\""
         TOKEN_TEXT_BLOCK="regexp:\"\"\"\n((\"[^\"])|(\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))*\"\"\""
         //Note: due to limitations with FormattingModelBuilder and DocRenderPassFactory, comments cannot include the trailing line-break as it breaks formatting/rendering, but validation is done within SmithyAnnotator
         TOKEN_LINE_COMMENT="regexp:(//)|(//[^/\n][\t -\U10FFFF]*)"
@@ -231,8 +231,16 @@ number ::= TOKEN_NUMBER {
     implements="software.amazon.smithy.intellij.psi.SmithyNumberExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyNumberMixin"
 }
-string ::= TOKEN_STRING {methods=[TOKEN_STRING=""]}
-text_block ::= TOKEN_TEXT_BLOCK {methods=[TOKEN_TEXT_BLOCK=""]}
+string ::= TOKEN_STRING {
+    methods=[TOKEN_STRING=""]
+    implements="software.amazon.smithy.intellij.psi.SmithyStringExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyStringMixin"
+}
+text_block ::= TOKEN_TEXT_BLOCK {
+    methods=[TOKEN_TEXT_BLOCK=""]
+    implements="software.amazon.smithy.intellij.psi.SmithyTextBlockExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyTextBlockMixin"
+}
 symbol ::= TOKEN_SYMBOL {methods=[TOKEN_SYMBOL=""]}
 simple_type_name ::= TOKEN_SIMPLE_TYPE_NAME {methods=[TOKEN_SIMPLE_TYPE_NAME=""]}
 documentation ::= TOKEN_DOCUMENTATION_LINE+ {
