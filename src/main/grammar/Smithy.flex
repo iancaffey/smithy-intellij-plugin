@@ -30,7 +30,7 @@ TOKEN_SIMPLE_TYPE_NAME=blob|boolean|document|string|byte|short|integer|long|floa
 TOKEN_SYMBOL=_*[A-Za-z][A-Za-z0-9_]*
 TOKEN_NUMBER=-?(0|([1-9][0-9]*))(\.[0-9]+)?(e[+-]?[0-9]+)?
 TOKEN_STRING=\"((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF]))*\"
-TOKEN_TEXT_BLOCK=\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))*\"\"\"
+TOKEN_TEXT_BLOCK=\"\"\"\n((\"[^\"])|(\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))*\"\"\"
 TOKEN_LINE_COMMENT=("//")|("//"[^/\n][\t -\U10FFFF]*)
 TOKEN_DOCUMENTATION_LINE="///"[\t -\U10FFFF]*
 TOKEN_INCOMPLETE_STRING=\"((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF]))+
@@ -63,8 +63,22 @@ TOKEN_INCOMPLETE_TEXT_BLOCK=\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[
   "structure"                        { return TOKEN_STRUCTURE; }
   "union"                            { return TOKEN_UNION; }
   "service"                          { return TOKEN_SERVICE; }
+  "version"                          { return TOKEN_VERSION; }
+  "operations"                       { return TOKEN_OPERATIONS; }
+  "resources"                        { return TOKEN_RESOURCES; }
+  "rename"                           { return TOKEN_RENAME; }
   "operation"                        { return TOKEN_OPERATION; }
+  "input"                            { return TOKEN_INPUT; }
+  "output"                           { return TOKEN_OUTPUT; }
+  "errors"                           { return TOKEN_ERRORS; }
   "resource"                         { return TOKEN_RESOURCE; }
+  "identifiers"                      { return TOKEN_IDENTIFIERS; }
+  "create"                           { return TOKEN_CREATE; }
+  "put"                              { return TOKEN_PUT; }
+  "read"                             { return TOKEN_READ; }
+  "update"                           { return TOKEN_UPDATE; }
+  "delete"                           { return TOKEN_DELETE; }
+  "collectionOperations"             { return TOKEN_COLLECTION_OPERATIONS; }
   "null"                             { return TOKEN_NULL; }
 
   {TOKEN_BOOLEAN}                    { return TOKEN_BOOLEAN; }
