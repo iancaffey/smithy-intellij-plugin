@@ -276,6 +276,95 @@ abstract class SmithyShapeIdMixin(node: ASTNode) : SmithyPrimitiveImpl(node), Sm
     override val resolvedNamespace: String? get() = declaredNamespace ?: getNamespace(this, shapeName)
 }
 
+private fun parseInnerText(text: String, start: Int = 0, end: Int = text.length - start): String? = buildString {
+    var i = start
+    val lastIndex = end.takeIf { it >= i } ?: return null
+    while (i < lastIndex) {
+        val n = i + 1
+        val c = text[i]
+        if (c == '\r') {
+            append('\n').also { i += if (n < lastIndex && text[n] == '\n') 2 else 1 }
+        } else if (c != '\\') {
+            append(c).also { i++ }
+        } else if (i == lastIndex - 1) {
+            return null //invalid string (closing quote is escaped)
+        } else when (text[n]) {
+            '\n' -> i += 2 //escaped new-line expands to nothing
+            '\r' -> i += if (n < lastIndex - 1 && text[n + 1] == '\n') 3 else 2 //escaped new-line expands to nothing
+            '"' -> append('"').also { i += 2 }
+            '\\' -> append('\\').also { i += 2 }
+            '/' -> append('/').also { i += 2 }
+            'b' -> append('\b').also { i += 2 }
+            'f' -> append('\u000c').also { i += 2 }
+            'n' -> append('\n').also { i += 2 }
+            'r' -> append('\r').also { i += 2 }
+            't' -> append('\t').also { i += 2 }
+            'u' -> {
+                if (n >= lastIndex - 4) return null //invalid string (less than 4 digits in the unicode escape sequence)
+                var unicode = 0
+                (1..4).forEach {
+                    unicode = when (val u = text[n + it]) {
+                        in '0'..'9' -> (unicode shl 4) or (u - '0')
+                        in 'a'..'f' -> (unicode shl 4) or (10 + (u - 'a'))
+                        in 'A'..'F' -> (unicode shl 4) or (10 + (u - 'A'))
+                        else -> return null //invalid string (non-digit in unicode escape sequence)
+                    }
+                }
+                append(unicode.toChar()).also { i += 6 }
+            }
+            else -> return null //invalid string (unknown escape sequence)
+        }
+    }
+}
+
+interface SmithyCharSequence : SmithyElement {
+    val valid: Boolean get() = stringValue() != null
+    fun stringValue(): String?
+}
+
+interface SmithyStringExt : SmithyCharSequence
+
+abstract class SmithyStringMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyString {
+    private var parsed = false
+    private var value: String? = null
+    override fun stringValue(): String? =
+        if (parsed) value else parseInnerText(text, 1).also {
+            value = it
+            parsed = true
+        }
+
+    override fun subtreeChanged() {
+        parsed = false
+    }
+}
+
+interface SmithyTextBlockExt : SmithyCharSequence
+
+abstract class SmithyTextBlockMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyTextBlock {
+    private var parsed = false
+    private var value: String? = null
+    override fun stringValue(): String? =
+        if (parsed) value else text.let { text ->
+            val normalized = if ('\r' in text) text.replace("\r\n", "\n") else text
+            if (normalized.length < 7) return@let null
+            val lines = normalized.substring(4, normalized.length - 3).split('\n')
+            val leadingSpaces = lines.filterIndexed { i, line ->
+                i == lines.lastIndex || line.any { it != ' ' }
+            }.minOfOrNull { line -> line.indexOfFirst { it != ' ' }.takeIf { it != -1 } ?: line.length } ?: 0
+            val trimmed = lines.joinToString("\n") { line ->
+                line.let { if (line.length < leadingSpaces) line else line.substring(leadingSpaces) }.trimEnd(' ')
+            }
+            parseInnerText(trimmed)
+        }.also {
+            value = it
+            parsed = true
+        }
+
+    override fun subtreeChanged() {
+        parsed = false
+    }
+}
+
 interface SmithyTraitExt : SmithyElement, SmithyTraitDefinition
 
 abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyTrait {
