@@ -24,6 +24,7 @@ import software.amazon.smithy.intellij.psi.SmithyMap
 import software.amazon.smithy.intellij.psi.SmithyMember
 import software.amazon.smithy.intellij.psi.SmithyMemberName
 import software.amazon.smithy.intellij.psi.SmithyModel
+import software.amazon.smithy.intellij.psi.SmithyNull
 import software.amazon.smithy.intellij.psi.SmithyShape
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 import software.amazon.smithy.intellij.psi.SmithyStatement
@@ -51,6 +52,9 @@ class SmithyAnnotator : Annotator {
 private enum class Annotation : Annotator {
     KEYWORD {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+            if (element is SmithyNull) {
+                holder.highlight(SmithyColorSettings.KEYWORD)
+            }
             getParentOfType(element, SmithyStatement::class.java)?.takeIf { element == it.typeIdentifier }?.let {
                 holder.highlight(SmithyColorSettings.KEYWORD)
             }
