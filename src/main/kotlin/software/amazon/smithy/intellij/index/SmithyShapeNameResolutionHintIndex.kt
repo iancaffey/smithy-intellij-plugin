@@ -36,7 +36,7 @@ import java.io.DataOutput
 class SmithyShapeNameResolutionHintIndex : FileBasedIndexExtension<String, ShapeNameResolutionHint>() {
     companion object {
         val NAME = ID.create<String, ShapeNameResolutionHint>("smithy.shape-hints")
-        fun getHint(shapeName: String, file: PsiFile) = getHint(shapeName, file.project, file.virtualFile)
+        fun getHint(shapeName: String, file: PsiFile) = file.virtualFile?.let { getHint(shapeName, file.project, it) }
         fun getHint(shapeName: String, project: Project, file: VirtualFile): ShapeNameResolutionHint? {
             if (DumbService.isDumb(project)) return null
             var hint: ShapeNameResolutionHint? = null
