@@ -59,7 +59,7 @@ class SmithyKeyReference(val key: SmithyKey) : SmithyReference<SmithyKey>(key, f
         private fun resolver(ref: Ref) = CachedValueProvider {
             val parent = if (ref.enclosing != null) ref.enclosing.reference.resolve() else ref.trait.resolve()
             CachedValueProvider.Result.create(
-                parent?.getMember(if (parent.type == "map") "key" else ref.memberName), dependencies
+                parent?.getMember(if (parent.type == "map") "value" else ref.memberName), dependencies
             )
         }
     }
