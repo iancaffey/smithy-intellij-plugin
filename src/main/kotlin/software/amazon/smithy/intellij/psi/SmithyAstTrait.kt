@@ -28,7 +28,7 @@ data class SmithyAstTrait(
             value.fields.takeIf { it.isNotEmpty() }?.let { fields ->
                 append(fields.map {
                     val key = HtmlSyntaxInfoUtil.getStyledSpan(
-                        SmithyColorSettings.KEY, it.key as String, 1f
+                        SmithyColorSettings.KEY, it.key, 1f
                     )
                     val value = HtmlSyntaxInfoUtil.getHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
                         project, SmithyLanguage, SmithyAst.SERIALIZER.writeValueAsString(it.value), 1f

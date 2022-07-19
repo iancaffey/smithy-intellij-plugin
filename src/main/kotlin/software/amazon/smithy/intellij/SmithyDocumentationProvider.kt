@@ -10,8 +10,6 @@ import com.intellij.psi.util.PsiTreeUtil.findChildrenOfType
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
-import software.amazon.smithy.intellij.psi.SmithyAstMember
-import software.amazon.smithy.intellij.psi.SmithyAstShape
 import software.amazon.smithy.intellij.psi.SmithyDocumentation
 import software.amazon.smithy.intellij.psi.SmithyDocumentationDefinition
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
@@ -56,9 +54,10 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             append("<div class='definition'><pre>")
             append(getQuickNavigateInfo(element, originalElement))
             append("</pre></div>")
-            element.documentation?.let {
-                append("<div class='content'>").append(generateRenderedDoc(it)).append("</div>")
-            }
+            val docs = element.findTrait("smithy.api", "documentation")?.value?.asString()?.let {
+                renderDocumentation(it)
+            } ?: element.documentation?.let { generateRenderedDoc(it) }
+            docs?.let { append("<div class='content'>").append(docs).append("</div>") }
             val additionalInfo = mutableMapOf(
                 "Namespace" to element.enclosingShape.namespace,
                 "Parent" to element.enclosingShape.name
@@ -66,9 +65,8 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             element.resolve()?.let { target ->
                 additionalInfo["Type"] = HtmlSyntaxInfoUtil.getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
             }
-            //TODO: generalize this once SmithyMemberDefinition has a consolidated node value(s) API
-            element.let { it as? SmithyAstMember }?.reference?.traits?.get("smithy.api#externalDocumentation")?.let {
-                additionalInfo["See also"] = it.fields.mapNotNull { (title, value) ->
+            element.findTrait("smithy.api", "externalDocumentation")?.let {
+                additionalInfo["See also"] = it.value.fields.mapNotNull { (title, value) ->
                     value.asString()?.let { href -> "<a href='$href'>$title</a>" }
                 }.joinToString("<span>, </span>", "<div>", "</div>")
             }
@@ -78,13 +76,13 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             append("<div class='definition'><pre>")
             append(getQuickNavigateInfo(element, originalElement))
             append("</pre></div>")
-            element.documentation?.let {
-                append("<div class='content'>").append(generateRenderedDoc(it)).append("</div>")
-            }
+            val docs = element.findTrait("smithy.api", "documentation")?.value?.asString()?.let {
+                renderDocumentation(it)
+            } ?: element.documentation?.let { generateRenderedDoc(it) }
+            docs?.let { append("<div class='content'>").append(docs).append("</div>") }
             val additionalInfo = mutableMapOf("Namespace" to element.namespace)
-            //TODO: generalize this once SmithyShapeDefinition has a consolidated node value(s) API
-            element.let { it as? SmithyAstShape }?.shape?.traits?.get("smithy.api#externalDocumentation")?.let {
-                additionalInfo["See also"] = it.fields.mapNotNull { (title, value) ->
+            element.findTrait("smithy.api", "externalDocumentation")?.let {
+                additionalInfo["See also"] = it.value.fields.mapNotNull { (title, value) ->
                     value.asString()?.let { href -> "<a href='$href'>$title</a>" }
                 }.joinToString("<span>, </span>", "<div>", "</div>")
             }
