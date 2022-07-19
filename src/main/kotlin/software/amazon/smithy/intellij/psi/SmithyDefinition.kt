@@ -17,5 +17,4 @@ sealed interface SmithyDefinition : SmithyElement, NavigatablePsiElement, PsiNam
     val documentation: SmithyDocumentationDefinition?
     fun hasTrait(namespace: String, shapeName: String) = findTrait(namespace, shapeName) != null
     fun findTrait(namespace: String, shapeName: String): SmithyTraitDefinition?
-    //TODO: add consolidated node value(s) API that unpacks any literals into the corresponding value
 }

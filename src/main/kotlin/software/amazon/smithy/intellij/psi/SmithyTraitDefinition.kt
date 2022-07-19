@@ -1,6 +1,7 @@
 package software.amazon.smithy.intellij.psi
 
 import software.amazon.smithy.intellij.SmithyShapeResolver
+import software.amazon.smithy.intellij.SmithyValueDefinition
 
 /**
  * A [trait](https://awslabs.github.io/smithy/1.0/spec/core/model.html#traits) definition (either in an AST or IDL) in [Smithy](https://awslabs.github.io/smithy).
@@ -14,8 +15,7 @@ interface SmithyTraitDefinition : SmithyElement {
     val shapeName: String
     val declaredNamespace: String?
     val resolvedNamespace: String?
+    val value: SmithyValueDefinition
     fun resolve() = SmithyShapeResolver.getDefinitions(this).takeIf { it.size == 1 }?.first()
-
-    //TODO: once a unified model is created for the node value(s) between AST + IDL, move the doc string logic into the value
     fun toDocString(): String
 }

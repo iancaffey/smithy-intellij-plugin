@@ -398,12 +398,35 @@ abstract class SmithyTextBlockMixin(node: ASTNode) : SmithyPrimitiveImpl(node), 
     }
 }
 
+private val emptyObject = object : SmithyValueDefinition {
+    override val type = SmithyValueType.OBJECT
+}
+
 interface SmithyTraitExt : SmithyElement, SmithyTraitDefinition
 
 abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyTrait {
+    private var parsed = false
+    private var _value: SmithyValueDefinition = emptyObject
+    override val value: SmithyValueDefinition
+        get() =
+            if (parsed) _value else when (val body = body) {
+                null -> emptyObject
+                else -> body.value ?: object : SmithyValueDefinition {
+                    override val type = SmithyValueType.OBJECT
+                    override val fields = body.entries.associate { it.name to it.value }
+                }
+            }.also {
+                _value = it
+                parsed = true
+            }
     override val shapeName get() = shape.shapeName
     override val declaredNamespace get() = shape.declaredNamespace
     override val resolvedNamespace get() = shape.resolvedNamespace
+
+    override fun subtreeChanged() {
+        parsed = false
+    }
+
     override fun toDocString() = buildString {
         //Note: since this can only do lexer-based highlighting, this will be approximately the same style as
         //the editor display (but could have some keyword highlighting issues in the body)
@@ -413,8 +436,8 @@ abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyT
         body?.let { body ->
             //Note: since keys are dynamically highlighted using an annotator, this will manually apply the same
             //behavior to improve readability of trait values
-            if (body.values.isNotEmpty()) {
-                append(body.values.joinToString(", ", "(", ")") {
+            if (body.entries.isNotEmpty()) {
+                append(body.entries.joinToString(", ", "(", ")") {
                     val key = HtmlSyntaxInfoUtil.getStyledSpan(
                         SmithyColorSettings.KEY, it.key.text, 1f
                     )

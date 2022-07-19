@@ -156,11 +156,11 @@ applied_trait ::= TOKEN_APPLY (member_id | shape_id) trait {
 }
 trait ::= TOKEN_AT shape_id [trait_body] {
     methods=[body="trait_body" shape="shape_id"]
-    implements=["software.amazon.smithy.intellij.psi.SmithyTraitExt"]
+    implements="software.amazon.smithy.intellij.psi.SmithyTraitExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyTraitMixin"
 }
 trait_body ::= TOKEN_OPEN_PAREN [trait_values | value] TOKEN_CLOSE_PAREN {
-    methods=[values="entry" incomplete_entry=""]
+    methods=[entries="entry" incomplete_entry=""]
 }
 private trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_entry]
 

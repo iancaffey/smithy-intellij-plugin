@@ -15,7 +15,7 @@ import software.amazon.smithy.intellij.SmithyValueType
  * @since 1.0
  */
 data class SmithyAstTrait(
-    val target: SmithyDefinition, val shapeId: String, val body: SmithyAstValue
+    val target: SmithyDefinition, val shapeId: String, override val value: SmithyAstValue
 ) : FakePsiElement(), SmithyTraitDefinition {
     private val parts = shapeId.split('#', limit = 2)
     override val shapeName = parts[1]
@@ -24,8 +24,8 @@ data class SmithyAstTrait(
     override fun getParent() = target
     override fun toDocString() = buildString {
         HtmlSyntaxInfoUtil.appendStyledSpan(this, SmithyColorSettings.TRAIT_NAME, "@$shapeName", 1f)
-        if (body.type == SmithyValueType.OBJECT) {
-            body.fields.takeIf { it.isNotEmpty() }?.let { fields ->
+        if (value.type == SmithyValueType.OBJECT) {
+            value.fields.takeIf { it.isNotEmpty() }?.let { fields ->
                 append(fields.map {
                     val key = HtmlSyntaxInfoUtil.getStyledSpan(
                         SmithyColorSettings.KEY, it.key as String, 1f
@@ -40,7 +40,7 @@ data class SmithyAstTrait(
             append("(")
             append(
                 HtmlSyntaxInfoUtil.getHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
-                    project, SmithyLanguage, SmithyAst.SERIALIZER.writeValueAsString(body), 1f
+                    project, SmithyLanguage, SmithyAst.SERIALIZER.writeValueAsString(value), 1f
                 )
             )
             append(")")
