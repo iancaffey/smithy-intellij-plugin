@@ -7,15 +7,14 @@ import software.amazon.smithy.intellij.SmithyShapeResolver
  *
  * @author Ian Caffey
  * @since 1.0
+ * @see SmithyTrait
+ * @see SmithyAstTrait
  */
 interface SmithyTraitDefinition : SmithyElement {
     val shapeName: String
     val declaredNamespace: String?
     val resolvedNamespace: String?
-    fun resolve(): SmithyShapeDefinition? {
-        val namespace = resolvedNamespace ?: return null
-        return SmithyShapeResolver.getDefinitions(this, namespace, shapeName).takeIf { it.size == 1 }?.first()
-    }
+    fun resolve() = SmithyShapeResolver.getDefinitions(this).takeIf { it.size == 1 }?.first()
 
     //TODO: once a unified model is created for the node value(s) between AST + IDL, move the doc string logic into the value
     fun toDocString(): String

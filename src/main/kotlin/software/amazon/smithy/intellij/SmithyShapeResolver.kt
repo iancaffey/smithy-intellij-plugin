@@ -10,7 +10,10 @@ import com.intellij.psi.util.PsiModificationTracker
 import software.amazon.smithy.intellij.index.SmithyAstShapeIndex
 import software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex
 import software.amazon.smithy.intellij.index.SmithyShapeNameResolutionHintIndex
+import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
+import software.amazon.smithy.intellij.psi.SmithyShapeId
+import software.amazon.smithy.intellij.psi.SmithyTraitDefinition
 
 /**
  * A utility class providing methods to resolve the namespace of a shape name (relative shape id).
@@ -20,10 +23,26 @@ import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
  */
 object SmithyShapeResolver {
     private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
+    fun getDefinitions(member: SmithyMemberDefinition): List<SmithyShapeDefinition> =
+        getCachedValue(member) {
+            val namespace = member.resolvedTargetNamespace
+            val definitions =
+                namespace?.let { getDefinitions(it, member.targetShapeName, member.project) } ?: emptyList()
+            CachedValueProvider.Result.create(definitions, dependencies)
+        }
 
-    fun getDefinitions(scope: PsiElement, namespace: String, shapeName: String): List<SmithyShapeDefinition> =
-        getCachedValue(scope) {
-            CachedValueProvider.Result.create(getDefinitions(namespace, shapeName, scope.project), dependencies)
+    fun getDefinitions(shapeId: SmithyShapeId): List<SmithyShapeDefinition> =
+        getCachedValue(shapeId) {
+            val namespace = shapeId.resolvedNamespace
+            val definitions = namespace?.let { getDefinitions(it, shapeId.shapeName, shapeId.project) } ?: emptyList()
+            CachedValueProvider.Result.create(definitions, dependencies)
+        }
+
+    fun getDefinitions(trait: SmithyTraitDefinition): List<SmithyShapeDefinition> =
+        getCachedValue(trait) {
+            val namespace = trait.resolvedNamespace
+            val definitions = namespace?.let { getDefinitions(it, trait.shapeName, trait.project) } ?: emptyList()
+            CachedValueProvider.Result.create(definitions, dependencies)
         }
 
     fun getNamespace(scope: PsiElement, shapeName: String): String? = getCachedValue(scope) {

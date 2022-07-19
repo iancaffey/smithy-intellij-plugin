@@ -205,9 +205,7 @@ data class ValuePath(val path: List<String> = emptyList()) {
     }
 
     fun resolve(shapeId: SmithyShapeId): SmithyShapeDefinition? {
-        val namespace = shapeId.resolvedNamespace ?: return null
-        val results = SmithyShapeResolver.getDefinitions(shapeId, namespace, shapeId.shapeName)
-        val root = results.takeIf { it.size == 1 }?.first() ?: return null
+        val root = SmithyShapeResolver.getDefinitions(shapeId).takeIf { it.size == 1 }?.first() ?: return null
         if (path.isEmpty()) return root
         var current: SmithyMemberDefinition? = null
         path.forEach { name ->
