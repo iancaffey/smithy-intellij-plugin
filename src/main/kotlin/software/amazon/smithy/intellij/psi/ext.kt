@@ -23,10 +23,13 @@ import software.amazon.smithy.intellij.SmithyLanguage
 import software.amazon.smithy.intellij.SmithyMemberReference
 import software.amazon.smithy.intellij.SmithyShapeReference
 import software.amazon.smithy.intellij.SmithyShapeResolver.getNamespace
+import software.amazon.smithy.intellij.SmithyValueDefinition
+import software.amazon.smithy.intellij.SmithyValueType
 import software.amazon.smithy.intellij.psi.impl.SmithyAggregateShapeImpl
 import software.amazon.smithy.intellij.psi.impl.SmithyKeyedElementImpl
 import software.amazon.smithy.intellij.psi.impl.SmithyPrimitiveImpl
 import software.amazon.smithy.intellij.psi.impl.SmithyShapeImpl
+import software.amazon.smithy.intellij.psi.impl.SmithyValueImpl
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -55,12 +58,17 @@ abstract class SmithyAggregateShapeMixin(node: ASTNode) : SmithyShapeImpl(node),
 interface SmithyAppliedTraitExt : SmithyStatement
 abstract class SmithyAppliedTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyAppliedTrait
 
-interface SmithyBooleanExt : SmithyElement {
-    fun booleanValue(): Boolean
+abstract class SmithyArrayMixin(node: ASTNode) : SmithyValueImpl(node), SmithyArray {
+    override val type = SmithyValueType.ARRAY
+}
+
+interface SmithyBooleanExt : SmithyPrimitive {
+    override fun asBoolean(): Boolean
 }
 
 abstract class SmithyBooleanMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyBoolean {
-    override fun booleanValue() = text.toBoolean()
+    override val type = SmithyValueType.BOOLEAN
+    override fun asBoolean() = text.toBoolean()
 }
 
 interface SmithyControlExt : SmithyStatement
@@ -98,10 +106,12 @@ abstract class SmithyIncompleteAppliedTraitMixin(node: ASTNode) : SmithyPsiEleme
 
 interface SmithyKeyExt : SmithyElement {
     val reference: SmithyKeyReference
+    fun stringValue(): String
 }
 
 abstract class SmithyKeyMixin(node: ASTNode) : SmithyPsiElement(node), SmithyKey {
     override val reference by lazy { SmithyKeyReference(this) }
+    override fun stringValue(): String = id?.text ?: string?.asString() ?: text
 }
 
 interface SmithyKeyedElementExt : SmithyNamedElement {
@@ -111,7 +121,7 @@ interface SmithyKeyedElementExt : SmithyNamedElement {
 
 abstract class SmithyKeyedElementMixin(node: ASTNode) : SmithyPsiElement(node), SmithyKeyedElement {
     override val nameIdentifier get() = key
-    override fun getName(): String = key.text
+    override fun getName(): String = key.stringValue()
     override fun setName(newName: String) = setName<SmithyKeyedElement>(this, newName)
     override fun getTextOffset() = key.textOffset
 }
@@ -182,7 +192,11 @@ abstract class SmithyNamespaceIdMixin(node: ASTNode) : SmithyPsiElement(node), S
     override fun toString() = id
 }
 
-interface SmithyNumberExt : SmithyElement {
+abstract class SmithyNullMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyNull {
+    override val type = SmithyValueType.NULL
+}
+
+interface SmithyNumberExt : SmithyPrimitive {
     fun byteValue(): Byte = bigDecimalValue().byteValueExact()
     fun shortValue(): Short = bigDecimalValue().shortValueExact()
     fun intValue(): Int = bigDecimalValue().intValueExact()
@@ -190,11 +204,29 @@ interface SmithyNumberExt : SmithyElement {
     fun doubleValue(): Double = bigDecimalValue().toDouble()
     fun longValue(): Long = bigDecimalValue().longValueExact()
     fun bigDecimalValue(): BigDecimal
+
     fun bigIntegerValue(): BigInteger = bigDecimalValue().toBigIntegerExact()
 }
 
 abstract class SmithyNumberMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyNumber {
+    override val type = SmithyValueType.NUMBER
+    override fun asNumber() = bigDecimalValue()
     override fun bigDecimalValue() = BigDecimal(text)
+}
+
+abstract class SmithyObjectMixin(node: ASTNode) : SmithyValueImpl(node), SmithyObject {
+    private var parsed = false
+    private var value: Map<String, SmithyValue> = emptyMap()
+    override val type = SmithyValueType.OBJECT
+    override val fields
+        get() = if (parsed) value else entries.associate { it.name to it.value }.also {
+            value = it
+            parsed = true
+        }
+
+    override fun subtreeChanged() {
+        parsed = false
+    }
 }
 
 abstract class SmithyOperationMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyOperation {
@@ -262,7 +294,7 @@ abstract class SmithyShapeMixin(node: ASTNode) : SmithyPsiElement(node), SmithyS
     }
 }
 
-interface SmithyShapeIdExt : SmithyElement {
+interface SmithyShapeIdExt : SmithyCharSequence {
     val shapeName: String
     val declaredNamespace: String?
     val enclosingNamespace: String?
@@ -274,6 +306,7 @@ abstract class SmithyShapeIdMixin(node: ASTNode) : SmithyPrimitiveImpl(node), Sm
     override val declaredNamespace get() = namespaceId?.id
     override val enclosingNamespace get() = (containingFile as SmithyFile).model?.namespace
     override val resolvedNamespace: String? get() = declaredNamespace ?: getNamespace(this, shapeName)
+    override fun asString() = resolvedNamespace?.let { "$it#$shapeName" } ?: shapeName
 }
 
 private fun parseInnerText(text: String, start: Int = 0, end: Int = text.length - start): String? = buildString {
@@ -317,9 +350,9 @@ private fun parseInnerText(text: String, start: Int = 0, end: Int = text.length 
     }
 }
 
-interface SmithyCharSequence : SmithyElement {
-    val valid: Boolean get() = stringValue() != null
-    fun stringValue(): String?
+interface SmithyCharSequence : SmithyPrimitive {
+    override val type get() = SmithyValueType.STRING
+    val valid: Boolean get() = asString() != null
 }
 
 interface SmithyStringExt : SmithyCharSequence
@@ -327,7 +360,7 @@ interface SmithyStringExt : SmithyCharSequence
 abstract class SmithyStringMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyString {
     private var parsed = false
     private var value: String? = null
-    override fun stringValue(): String? =
+    override fun asString(): String? =
         if (parsed) value else parseInnerText(text, 1).also {
             value = it
             parsed = true
@@ -343,7 +376,7 @@ interface SmithyTextBlockExt : SmithyCharSequence
 abstract class SmithyTextBlockMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyTextBlock {
     private var parsed = false
     private var value: String? = null
-    override fun stringValue(): String? =
+    override fun asString(): String? =
         if (parsed) value else text.let { text ->
             val normalized = if ('\r' in text) text.replace("\r\n", "\n") else text
             if (normalized.length < 7) return@let null
@@ -399,7 +432,7 @@ abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyT
     }
 }
 
-interface SmithyValueExt : SmithyElement {
+interface SmithyValueExt : SmithyElement, SmithyValueDefinition {
     val reference: SmithyShapeReference
 }
 

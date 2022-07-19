@@ -179,9 +179,11 @@ entry ::= key TOKEN_COLON value {
 }
 array ::= TOKEN_OPEN_BRACKET [value (TOKEN_COMMA value)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACKET {
     methods=[values="value"]
+    mixin="software.amazon.smithy.intellij.psi.SmithyArrayMixin"
 }
 object ::= TOKEN_OPEN_BRACE [entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_entry]] TOKEN_CLOSE_BRACE {
-    methods=[fields="entry" incomplete_entry=""]
+    methods=[entries="entry" incomplete_entry=""]
+    mixin="software.amazon.smithy.intellij.psi.SmithyObjectMixin"
 }
 primitive ::= null | boolean | number | string | text_block | shape_id
 
@@ -220,7 +222,10 @@ incomplete_member ::= member_name [TOKEN_COLON]
 incomplete_entry ::= key [TOKEN_COLON]
 
 //Re-declared tokens which will receive a dedicated AST node instead of raw PsiElement (since they are used in a meaningful way, like as a variant within another AST node)
-null ::= TOKEN_NULL {methods=[TOKEN_NULL=""]}
+null ::= TOKEN_NULL {
+    methods=[TOKEN_NULL=""]
+    mixin="software.amazon.smithy.intellij.psi.SmithyNullMixin"
+}
 boolean ::= TOKEN_BOOLEAN {
     methods=[TOKEN_BOOLEAN=""]
     implements="software.amazon.smithy.intellij.psi.SmithyBooleanExt"

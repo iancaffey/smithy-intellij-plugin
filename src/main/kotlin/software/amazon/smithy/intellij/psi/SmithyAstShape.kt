@@ -26,7 +26,7 @@ data class SmithyAstShape(
             SmithyAstMember(this, memberName, reference)
         }
     } ?: emptyList()
-    override val documentation = (shape.traits?.get("smithy.api#documentation") as? String)?.let {
+    override val documentation = shape.traits?.get("smithy.api#documentation")?.asString()?.let {
         SmithyAstDocumentation(this, it)
     }
     override val declaredTraits = (shape.traits ?: emptyMap()).entries.map { (key, value) ->

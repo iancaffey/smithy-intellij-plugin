@@ -18,7 +18,7 @@ data class SmithyAstMember(
     override val targetShapeName = targetParts[1]
     override val declaredTargetNamespace = targetParts[0]
     override val resolvedTargetNamespace = targetParts[0]
-    override val documentation = (reference.traits?.get("smithy.api#documentation") as? String)?.let {
+    override val documentation = reference.traits?.get("smithy.api#documentation")?.asString()?.let {
         SmithyAstDocumentation(this, it)
     }
     override val declaredTraits = (reference.traits ?: emptyMap()).entries.map { (key, value) ->
