@@ -2,6 +2,19 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [1.5.4]
+### Added
+- Added support for incremental shape resolution (with file-based indexes to improve overall resolution performance).
+- Added support for displaying documentation traits and external documentation links of shapes in documentation popups.
+- Added support for line breaks in quoted strings.
+- Added support for singular unescaped double quotes within text blocks.
+- Added support for highlighting null literals like keywords.
+
+### Changed
+- Updated map entry shape resolution to resolve to the 'value' member to align with how structure fields are resolved.
+- Updated unicode escape sequence highlighting to cover the entire sequence.
+- Improved the overall styling of documentation popups to better align with standard IntelliJ styling.
+
 ## [1.5.3]
 ### Added
 - Added namespace and enclosing shape (for shape members) information to documentation popups.
