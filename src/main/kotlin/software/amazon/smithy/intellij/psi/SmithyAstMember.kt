@@ -33,6 +33,6 @@ data class SmithyAstMember(
         it.shapeName == shapeName && it.resolvedNamespace == namespace
     }
 
-    override fun resolve() = SmithyShapeResolver.getDefinitions(this).takeIf { it.size == 1 }?.first()
+    override fun resolve() = SmithyShapeResolver.getDefinitions(this).firstOrNull()
     override fun toString() = "$parent$$memberName"
 }

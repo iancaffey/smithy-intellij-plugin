@@ -16,6 +16,6 @@ interface SmithyTraitDefinition : SmithyElement {
     val declaredNamespace: String?
     val resolvedNamespace: String?
     val value: SmithyValueDefinition
-    fun resolve() = SmithyShapeResolver.getDefinitions(this).takeIf { it.size == 1 }?.first()
+    fun resolve() = SmithyShapeResolver.getDefinitions(this).firstOrNull()
     fun toDocString(): String
 }
