@@ -79,8 +79,8 @@
     extends("control|entry|metadata")=keyed_element
 }
 //https://awslabs.github.io/smithy/1.0/spec/core/idl.html
-root ::= model
-model ::= control* metadata* [namespace import* (applied_trait | incomplete_applied_trait | shape)*] {
+root ::= [model]
+model ::= control* metadata* namespace [import* (applied_trait | incomplete_applied_trait | shape)*] {
     methods=[control="" metadata="" namespace="" imports="import" applied_traits="applied_trait" incomplete_applied_trait="" shapes="shape"]
     implements="software.amazon.smithy.intellij.psi.SmithyModelExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyModelMixin"
