@@ -41,7 +41,7 @@ class SmithyCompletionContributor : CompletionContributor() {
                 ) {
                     val element = parameters.originalPosition ?: return
                     if (getParentOfType(element, PsiErrorElement::class.java) != null) return
-                    getParentOfType(element, SmithyShapeId::class.java)?.let { addShapes(it, parameters, results) }
+                    getParentOfType(element, SmithyShapeId::class.java)?.let { addShapes(it, results) }
                     getParentOfType(element, SmithyEntry::class.java)?.let { addMembers(it, it.key, results) }
                     getParentOfType(element, SmithyIncompleteEntry::class.java)?.let { addMembers(it, it.key, results) }
                     getParentOfType(element, SmithyMemberId::class.java)?.let {
@@ -55,10 +55,9 @@ class SmithyCompletionContributor : CompletionContributor() {
     }
 }
 
-private fun addShapes(element: PsiElement, parameters: CompletionParameters, results: CompletionResultSet) {
+private fun addShapes(element: PsiElement, results: CompletionResultSet) {
     val addImports = getParentOfType(element, SmithyImport::class.java) == null
-    val project = parameters.editor.project!!
-    SmithyDefinedShapeIdIndex.forEach(project) {
+    SmithyDefinedShapeIdIndex.forEach(element.resolveScope) {
         val (namespace, shapeName) = it.split('#', limit = 2)
         results.addElement(shapeElement(namespace, shapeName, addImports))
     }
@@ -90,7 +89,7 @@ private fun shapeElement(namespace: String, shapeName: String, addImports: Boole
                     val model = it.model ?: return@let
                     if (model.namespace == namespace) return@let
                     if (namespace == "smithy.api"
-                        && !SmithyDefinedShapeIdIndex.exists(model.namespace, shapeName, it.project)
+                        && !SmithyDefinedShapeIdIndex.exists(model.namespace, shapeName, it.resolveScope)
                     ) return@let
                     SmithyElementFactory.addImport(it, namespace, shapeName)
                 }

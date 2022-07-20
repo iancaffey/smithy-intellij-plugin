@@ -1,9 +1,8 @@
 package software.amazon.smithy.intellij
 
-import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager.getCachedValue
 import com.intellij.psi.util.PsiModificationTracker
@@ -26,34 +25,33 @@ object SmithyShapeResolver {
     fun getDefinitions(member: SmithyMemberDefinition): List<SmithyShapeDefinition> =
         getCachedValue(member) {
             val namespace = member.resolvedTargetNamespace
-            val definitions =
-                namespace?.let { getDefinitions(it, member.targetShapeName, member.project) } ?: emptyList()
+            val definitions = namespace?.let {
+                getDefinitions(it, member.targetShapeName, member.resolveScope)
+            } ?: emptyList()
             CachedValueProvider.Result.create(definitions, dependencies)
         }
 
     fun getDefinitions(shapeId: SmithyShapeId): List<SmithyShapeDefinition> =
         getCachedValue(shapeId) {
             val namespace = shapeId.resolvedNamespace
-            val definitions = namespace?.let { getDefinitions(it, shapeId.shapeName, shapeId.project) } ?: emptyList()
+            val definitions =
+                namespace?.let { getDefinitions(it, shapeId.shapeName, shapeId.resolveScope) } ?: emptyList()
             CachedValueProvider.Result.create(definitions, dependencies)
         }
 
     fun getDefinitions(trait: SmithyTraitDefinition): List<SmithyShapeDefinition> =
         getCachedValue(trait) {
             val namespace = trait.resolvedNamespace
-            val definitions = namespace?.let { getDefinitions(it, trait.shapeName, trait.project) } ?: emptyList()
+            val definitions = namespace?.let { getDefinitions(it, trait.shapeName, trait.resolveScope) } ?: emptyList()
             CachedValueProvider.Result.create(definitions, dependencies)
         }
 
-    fun getNamespace(scope: PsiElement, shapeName: String): String? = getCachedValue(scope) {
-        CachedValueProvider.Result.create(getNamespace(scope.containingFile, shapeName), dependencies)
-    }
-
-    fun getDefinitions(namespace: String, shapeName: String, project: Project): List<SmithyShapeDefinition> {
+    fun getDefinitions(namespace: String, shapeName: String, scope: GlobalSearchScope): List<SmithyShapeDefinition> {
+        val project = scope.project ?: return emptyList()
         val psi = PsiManager.getInstance(project)
         val definitions = mutableListOf<SmithyShapeDefinition>()
-        definitions += SmithyAstShapeIndex.getShapes(namespace, shapeName, project)
-        SmithyDefinedShapeIdIndex.getFiles(namespace, shapeName, project).forEach { file ->
+        definitions += SmithyAstShapeIndex.getShapes(namespace, shapeName, scope)
+        SmithyDefinedShapeIdIndex.getFiles(namespace, shapeName, scope).forEach { file ->
             if (file.extension != "smithy") return@forEach
             (psi.findFile(file) as? SmithyFile)?.model?.shapes?.forEach { shape ->
                 if (shape.shapeName == shapeName && shape.namespace == namespace) {
@@ -64,14 +62,14 @@ object SmithyShapeResolver {
         return definitions
     }
 
-    private fun getNamespace(enclosingFile: PsiFile, shapeName: String): String? {
-        val project = enclosingFile.project
+    fun getNamespace(shapeName: String, enclosingFile: PsiFile): String? {
+        val scope = enclosingFile.resolveScope
         val hint = SmithyShapeNameResolutionHintIndex.getHint(shapeName, enclosingFile)
         return when {
             hint == null -> null //Note: only happens when the project hasn't completed indexing
             hint.resolvedNamespace != null -> hint.resolvedNamespace
-            SmithyDefinedShapeIdIndex.exists(hint.enclosingNamespace, shapeName, project) -> hint.enclosingNamespace
-            SmithyDefinedShapeIdIndex.exists("smithy.api", shapeName, project) -> "smithy.api"
+            SmithyDefinedShapeIdIndex.exists(hint.enclosingNamespace, shapeName, scope) -> hint.enclosingNamespace
+            SmithyDefinedShapeIdIndex.exists("smithy.api", shapeName, scope) -> "smithy.api"
             else -> null
         }
     }

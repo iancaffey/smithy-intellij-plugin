@@ -307,7 +307,7 @@ abstract class SmithyShapeIdMixin(node: ASTNode) : SmithyPrimitiveImpl(node), Sm
     override val shapeName: String get() = getChildOfType(this, SmithyId::class.java)!!.text
     override val declaredNamespace get() = namespaceId?.id
     override val enclosingNamespace get() = (containingFile as SmithyFile).model?.namespace
-    override val resolvedNamespace: String? get() = declaredNamespace ?: getNamespace(this, shapeName)
+    override val resolvedNamespace: String? get() = declaredNamespace ?: getNamespace(shapeName, containingFile)
     override fun asString() = resolvedNamespace?.let { "$it#$shapeName" } ?: shapeName
 }
 

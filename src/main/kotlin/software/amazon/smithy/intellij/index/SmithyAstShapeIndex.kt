@@ -2,7 +2,6 @@ package software.amazon.smithy.intellij.index
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.intellij.openapi.project.DumbService
-import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.indexing.DataIndexer
@@ -12,7 +11,6 @@ import com.intellij.util.indexing.FileContent
 import com.intellij.util.indexing.ID
 import com.intellij.util.io.DataExternalizer
 import com.intellij.util.io.EnumeratorStringDescriptor
-import com.jetbrains.rd.util.getOrCreate
 import software.amazon.smithy.intellij.SmithyAst
 import software.amazon.smithy.intellij.SmithyJson
 import software.amazon.smithy.intellij.psi.SmithyAstShape
@@ -28,16 +26,15 @@ import java.io.DataOutput
 class SmithyAstShapeIndex : FileBasedIndexExtension<String, SmithyAstShape>() {
     companion object {
         val NAME = ID.create<String, SmithyAstShape>("smithy.ast-shapes")
-        private val scopes = mutableMapOf<Project, GlobalSearchScope>()
-
-        fun getShapes(namespace: String, shapeName: String, project: Project): List<SmithyAstShape> {
+        fun getShapes(namespace: String, shapeName: String, scope: GlobalSearchScope): List<SmithyAstShape> {
+            val project = scope.project ?: return emptyList()
             if (DumbService.isDumb(project)) return emptyList()
             val shapes = mutableListOf<SmithyAstShape>()
             val psi = PsiManager.getInstance(project)
             FileBasedIndex.getInstance().processValues(NAME, "$namespace#$shapeName", null, { file, shape ->
                 psi.findFile(file)?.let { shapes += shape.within(it) }
                 true
-            }, scopes.getOrCreate(project) { GlobalSearchScope.allScope(it) })
+            }, scope)
             return shapes
         }
     }

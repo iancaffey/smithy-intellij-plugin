@@ -15,7 +15,7 @@ import software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex
  * @since 1.0
  */
 class SmithyImportShapeQuickFix(val shapeName: String, val file: PsiFile) : BaseIntentionAction() {
-    private val options = SmithyDefinedShapeIdIndex.getShapeIdsByName(shapeName, file.project)
+    private val options = SmithyDefinedShapeIdIndex.getShapeIdsByName(shapeName, file.resolveScope)
     override fun getText() = "Import \"$shapeName\""
     override fun getFamilyName() = "Import"
     override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?) =

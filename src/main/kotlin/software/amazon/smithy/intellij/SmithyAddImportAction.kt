@@ -23,7 +23,7 @@ class SmithyAddImportAction(
     override fun execute(): Boolean {
         val shapes = shapeIds.flatMap {
             val (namespace, shapeName) = it.split('#', limit = 2)
-            SmithyShapeResolver.getDefinitions(namespace, shapeName, file.project)
+            SmithyShapeResolver.getDefinitions(namespace, shapeName, file.resolveScope)
         }
         val step = object : BaseListPopupStep<SmithyShapeDefinition>("Imports", shapes) {
             override fun onChosen(selectedValue: SmithyShapeDefinition?, finalChoice: Boolean): PopupStep<*>? {

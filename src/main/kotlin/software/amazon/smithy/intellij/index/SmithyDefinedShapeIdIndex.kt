@@ -2,7 +2,6 @@ package software.amazon.smithy.intellij.index
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.intellij.openapi.project.DumbService
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.indexing.DataIndexer
@@ -11,7 +10,6 @@ import com.intellij.util.indexing.FileContent
 import com.intellij.util.indexing.ID
 import com.intellij.util.indexing.ScalarIndexExtension
 import com.intellij.util.io.EnumeratorStringDescriptor
-import com.jetbrains.rd.util.getOrCreate
 import software.amazon.smithy.intellij.SmithyAst
 import software.amazon.smithy.intellij.SmithyFile
 import software.amazon.smithy.intellij.SmithyJson
@@ -28,11 +26,7 @@ import software.amazon.smithy.intellij.SmithyJson
 class SmithyDefinedShapeIdIndex : ScalarIndexExtension<String>() {
     companion object {
         val NAME = ID.create<String, Void>("smithy.defined-shapes")
-        private val scopes = mutableMapOf<Project, GlobalSearchScope>()
-
-        fun exists(namespace: String, shapeName: String, project: Project): Boolean {
-            if (DumbService.isDumb(project)) return false
-            val scope = scopes.getOrCreate(project) { GlobalSearchScope.allScope(it) }
+        fun exists(namespace: String, shapeName: String, scope: GlobalSearchScope): Boolean {
             var exists = false
             FileBasedIndex.getInstance().processValues(NAME, "$namespace#$shapeName", null, { _, _ ->
                 exists = true
@@ -41,23 +35,24 @@ class SmithyDefinedShapeIdIndex : ScalarIndexExtension<String>() {
             return exists
         }
 
-        fun forEach(project: Project, action: (String) -> Unit) {
+        fun forEach(scope: GlobalSearchScope, action: (String) -> Unit) {
+            val project = scope.project ?: return
             if (DumbService.isDumb(project)) return
             FileBasedIndex.getInstance().processAllKeys(NAME, {
                 action(it)
                 true
-            }, project)
+            }, scope, null)
         }
 
-        fun getFiles(namespace: String, shapeName: String, project: Project): Collection<VirtualFile> =
-            if (DumbService.isDumb(project)) emptyList()
-            else FileBasedIndex.getInstance().getContainingFiles(
-                NAME, "$namespace#$shapeName", scopes.getOrCreate(project) { GlobalSearchScope.allScope(it) }
-            )
+        fun getFiles(namespace: String, shapeName: String, scope: GlobalSearchScope): Collection<VirtualFile> {
+            val project = scope.project ?: return emptyList()
+            if (DumbService.isDumb(project)) return emptyList()
+            return FileBasedIndex.getInstance().getContainingFiles(NAME, "$namespace#$shapeName", scope)
+        }
 
-        fun getShapeIdsByName(shapeName: String, project: Project): List<String> {
+        fun getShapeIdsByName(shapeName: String, scope: GlobalSearchScope): List<String> {
             val shapeIds = mutableListOf<String>()
-            forEach(project) {
+            forEach(scope) {
                 //Note: to avoid doing a string split for every defined shape id, we'll do an efficient check for
                 //the shape id ending with '#{shapeName}'
                 if (it.length > shapeName.length && it[it.length - shapeName.length - 1] == '#' && it.endsWith(shapeName)) {
