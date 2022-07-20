@@ -14,6 +14,7 @@ import com.intellij.util.io.EnumeratorStringDescriptor
 import com.jetbrains.rd.util.getOrCreate
 import software.amazon.smithy.intellij.SmithyAst
 import software.amazon.smithy.intellij.SmithyFile
+import software.amazon.smithy.intellij.SmithyJson
 
 /**
  * A [FileBasedIndex] which caches defined shape ids.
@@ -74,7 +75,7 @@ class SmithyDefinedShapeIdIndex : ScalarIndexExtension<String>() {
                 //Note: all AST will have a "smithy" version field, so we can quickly ignore irrelevant files without parsing the JSON
                 val ast = inputData.contentAsText.takeIf {
                     "\"smithy\"" in it
-                }?.let { SmithyAst.SERIALIZER.readValue<SmithyAst>(it.toString()) }
+                }?.let { SmithyJson.readValue<SmithyAst>(it.toString()) }
                 ast?.shapes?.entries?.filter {
                     it.value !is SmithyAst.AppliedTrait
                 }?.associate { it.key to null } ?: emptyMap()

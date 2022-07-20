@@ -2,9 +2,9 @@ package software.amazon.smithy.intellij.psi
 
 import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil
 import com.intellij.psi.impl.FakePsiElement
-import software.amazon.smithy.intellij.SmithyAst
 import software.amazon.smithy.intellij.SmithyAstValue
 import software.amazon.smithy.intellij.SmithyColorSettings
+import software.amazon.smithy.intellij.SmithyJson
 import software.amazon.smithy.intellij.SmithyLanguage
 import software.amazon.smithy.intellij.SmithyValueType
 
@@ -31,7 +31,7 @@ data class SmithyAstTrait(
                         SmithyColorSettings.KEY, it.key, 1f
                     )
                     val value = HtmlSyntaxInfoUtil.getHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
-                        project, SmithyLanguage, SmithyAst.SERIALIZER.writeValueAsString(it.value), 1f
+                        project, SmithyLanguage, SmithyJson.writeValueAsString(it.value), 1f
                     )
                     "$key: $value"
                 }.joinToString(", ", "(", ")"))
@@ -40,7 +40,7 @@ data class SmithyAstTrait(
             append("(")
             append(
                 HtmlSyntaxInfoUtil.getHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
-                    project, SmithyLanguage, SmithyAst.SERIALIZER.writeValueAsString(value), 1f
+                    project, SmithyLanguage, SmithyJson.writeValueAsString(value), 1f
                 )
             )
             append(")")

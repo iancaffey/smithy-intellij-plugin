@@ -14,6 +14,7 @@ import com.intellij.util.io.DataExternalizer
 import com.intellij.util.io.EnumeratorStringDescriptor
 import com.jetbrains.rd.util.getOrCreate
 import software.amazon.smithy.intellij.SmithyAst
+import software.amazon.smithy.intellij.SmithyJson
 import software.amazon.smithy.intellij.psi.SmithyAstShape
 import java.io.DataInput
 import java.io.DataOutput
@@ -46,7 +47,7 @@ class SmithyAstShapeIndex : FileBasedIndexExtension<String, SmithyAstShape>() {
         val ast = try {
             //Note: all AST will have a "smithy" version field, so we can quickly ignore irrelevant files without parsing the JSON
             inputData.contentAsText.takeIf { "\"smithy\"" in it }?.let {
-                SmithyAst.SERIALIZER.readValue<SmithyAst>(it.toString())
+                SmithyJson.readValue<SmithyAst>(it.toString())
             }
         } catch (e: Exception) {
             //Note: there's no way to filter down to only Smithy AST JSON files, so any parsing exception will be
@@ -61,12 +62,12 @@ class SmithyAstShapeIndex : FileBasedIndexExtension<String, SmithyAstShape>() {
     override fun getValueExternalizer(): DataExternalizer<SmithyAstShape> = object : DataExternalizer<SmithyAstShape> {
         override fun save(out: DataOutput, value: SmithyAstShape) {
             out.writeUTF(value.shapeId)
-            out.writeUTF(SmithyAst.SERIALIZER.writeValueAsString(value.shape))
+            out.writeUTF(SmithyJson.writeValueAsString(value.shape))
         }
 
         override fun read(`in`: DataInput): SmithyAstShape {
             val shapeId = `in`.readUTF()
-            val shape = SmithyAst.SERIALIZER.readValue<SmithyAst.Shape>(`in`.readUTF())
+            val shape = SmithyJson.readValue<SmithyAst.Shape>(`in`.readUTF())
             return SmithyAstShape(shapeId, shape)
         }
     }

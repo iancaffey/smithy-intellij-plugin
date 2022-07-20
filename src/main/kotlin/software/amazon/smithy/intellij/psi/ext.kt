@@ -174,10 +174,12 @@ abstract class SmithyMetadataMixin(node: ASTNode) : SmithyKeyedElementImpl(node)
 
 interface SmithyModelExt : SmithyElement {
     val namespace: String
+    val metadata: List<SmithyMetadata>
 }
 
 abstract class SmithyModelMixin(node: ASTNode) : SmithyPsiElement(node), SmithyModel {
     override val namespace get() = getChildOfType(this, SmithyNamespace::class.java)!!.namespaceId.id
+    override val metadata: List<SmithyMetadata> get() = getChildrenOfTypeAsList(this, SmithyMetadata::class.java)
 }
 
 interface SmithyNamespaceExt : SmithyStatement

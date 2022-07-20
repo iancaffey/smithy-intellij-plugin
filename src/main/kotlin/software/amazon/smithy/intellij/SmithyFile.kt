@@ -2,6 +2,7 @@ package software.amazon.smithy.intellij
 
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.psi.FileViewProvider
+import software.amazon.smithy.intellij.index.SmithyBuildConfigurationIndex
 import software.amazon.smithy.intellij.psi.SmithyModel
 
 /**
@@ -12,6 +13,9 @@ import software.amazon.smithy.intellij.psi.SmithyModel
  */
 class SmithyFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, SmithyLanguage) {
     val model: SmithyModel? get() = findChildByClass(SmithyModel::class.java)
+    val requiredVersion get() = model?.metadata?.find { it.name == "version" }?.value?.asString()
+    val buildVersion get() = SmithyBuildConfigurationIndex.getConfig(this)?.version
+
     override fun getFileType() = SmithyFileType
     override fun toString() = "Smithy File"
 }

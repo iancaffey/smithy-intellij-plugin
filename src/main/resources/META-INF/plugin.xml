@@ -64,6 +64,7 @@
         <defaultLiveTemplates file="/liveTemplates/Smithy.xml"/>
         <enterHandlerDelegate implementation="software.amazon.smithy.intellij.SmithyDocumentationEnterHandler"/>
         <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyAstShapeIndex"/>
+        <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyBuildConfigurationIndex"/>
         <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex"/>
         <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyShapeNameResolutionHintIndex"/>
         <gotoClassContributor implementation="software.amazon.smithy.intellij.SmithyGotoShapeContributor"/>

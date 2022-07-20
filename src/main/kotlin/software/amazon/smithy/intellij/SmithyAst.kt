@@ -1,7 +1,6 @@
 package software.amazon.smithy.intellij
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
@@ -13,7 +12,6 @@ import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.TreeNode
 import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
@@ -25,7 +23,6 @@ import com.fasterxml.jackson.databind.node.NumericNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import java.math.BigDecimal
 
 /**
@@ -39,13 +36,6 @@ data class SmithyAst(
     val metadata: kotlin.collections.Map<kotlin.String, SmithyAstValue>? = null,
     val shapes: kotlin.collections.Map<kotlin.String, Shape>? = null
 ) {
-    companion object {
-        val SERIALIZER = jacksonObjectMapper().apply {
-            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            setSerializationInclusion(Include.NON_NULL)
-        }
-    }
-
     data class Reference(
         val target: kotlin.String,
         val traits: kotlin.collections.Map<kotlin.String, SmithyAstValue>? = null
