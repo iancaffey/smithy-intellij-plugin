@@ -62,6 +62,8 @@
         <completion.contributor language="Smithy"
                                 implementationClass="software.amazon.smithy.intellij.SmithyCompletionContributor"/>
         <defaultLiveTemplates file="/liveTemplates/Smithy.xml"/>
+        <editorNotificationProvider
+                implementation="software.amazon.smithy.intellij.SmithyMissingSourceRootNotificationProvider"/>
         <enterHandlerDelegate implementation="software.amazon.smithy.intellij.SmithyDocumentationEnterHandler"/>
         <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyAstShapeIndex"/>
         <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyBuildConfigurationIndex"/>
