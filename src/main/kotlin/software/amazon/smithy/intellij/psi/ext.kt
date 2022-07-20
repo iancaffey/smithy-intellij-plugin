@@ -265,6 +265,7 @@ interface SmithyShapeExt : SmithyNamedElement, SmithyShapeDefinition, SmithyStat
     val model: SmithyModel
     val requiredMembers: Set<String> get() = emptySet()
     val supportedMembers: Set<String>? get() = requiredMembers.takeIf { it.isNotEmpty() }
+    override fun getNameIdentifier(): SmithyShapeName
     override fun findTrait(namespace: String, shapeName: String): SmithyTraitDefinition?
 }
 

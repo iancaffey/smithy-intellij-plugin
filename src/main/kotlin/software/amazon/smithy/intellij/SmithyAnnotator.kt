@@ -256,12 +256,19 @@ private enum class Annotation : Annotator {
     },
     IMPORT_CONFLICT {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-            if (element is SmithyImport && getParentOfType(element, SmithyModel::class.java)?.shapes?.any {
-                    it.name == element.shapeId.shapeName
-                } == true) {
-                holder.newAnnotation(HighlightSeverity.ERROR, "'${element.shapeId.shapeName}' is already defined")
-                    .withFix(SmithyRemoveImportQuickFix(element))
-                    .create()
+            if (element is SmithyShape) {
+                val conflictingImport = getParentOfType(element, SmithyModel::class.java)?.imports?.find {
+                    element.shapeName == it.shapeId.shapeName
+                }
+                if (conflictingImport != null) {
+                    holder.newAnnotation(
+                        HighlightSeverity.ERROR,
+                        "'${element.shapeName}' conflicts with the imported shape '${conflictingImport.shapeId.text}'"
+                    )
+                        .range(element.nameIdentifier.textRange)
+                        .withFix(SmithyRemoveImportQuickFix(conflictingImport))
+                        .create()
+                }
             }
         }
     },
