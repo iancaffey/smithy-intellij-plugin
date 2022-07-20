@@ -15,7 +15,6 @@ import com.intellij.util.applyIf
 import software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyImport
-import software.amazon.smithy.intellij.psi.SmithyIncompleteEntry
 import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyMemberId
 import software.amazon.smithy.intellij.psi.SmithyObject
@@ -43,7 +42,6 @@ class SmithyCompletionContributor : CompletionContributor() {
                     if (getParentOfType(element, PsiErrorElement::class.java) != null) return
                     getParentOfType(element, SmithyShapeId::class.java)?.let { addShapes(it, parameters, results) }
                     getParentOfType(element, SmithyEntry::class.java)?.let { addMembers(it, it.key, results) }
-                    getParentOfType(element, SmithyIncompleteEntry::class.java)?.let { addMembers(it, it.key, results) }
                     getParentOfType(element, SmithyMemberId::class.java)?.let {
                         val parent = it.shapeId.reference.resolve()
                         parent?.members?.forEach { member ->

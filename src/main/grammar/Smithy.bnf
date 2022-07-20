@@ -80,8 +80,8 @@
 }
 //https://awslabs.github.io/smithy/1.0/spec/core/idl.html
 root ::= model
-model ::= control* metadata* [namespace import* (applied_trait | incomplete_applied_trait | shape)*] {
-    methods=[control="" metadata="" namespace="" imports="import" applied_traits="applied_trait" incomplete_applied_trait="" shapes="shape"]
+model ::= control* metadata* [namespace import* (applied_trait | shape)*] {
+    methods=[control="" metadata="" namespace="" imports="import" applied_traits="applied_trait" shapes="shape"]
     implements="software.amazon.smithy.intellij.psi.SmithyModelExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyModelMixin"
 }
@@ -140,8 +140,8 @@ resource ::= [documentation] trait* TOKEN_RESOURCE shape_name object {
     methods=[trait="" shape_name="" body="object"]
     mixin="software.amazon.smithy.intellij.psi.SmithyResourceMixin"
 }
-shape_body ::= TOKEN_OPEN_BRACE [member (TOKEN_COMMA member)* [TOKEN_COMMA] [incomplete_member]] TOKEN_CLOSE_BRACE {
-    methods=[members="member" incomplete_member=""]
+shape_body ::= TOKEN_OPEN_BRACE (member [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
+    methods=[members="member"]
 }
 member ::= [documentation] trait* member_name TOKEN_COLON shape_id {
     methods=[declared_traits="trait" name_identifier="member_name"]
@@ -160,9 +160,9 @@ trait ::= TOKEN_AT shape_id [trait_body] {
     mixin="software.amazon.smithy.intellij.psi.SmithyTraitMixin"
 }
 trait_body ::= TOKEN_OPEN_PAREN [trait_values | value] TOKEN_CLOSE_PAREN {
-    methods=[entries="entry" incomplete_entry=""]
+    methods=[entries="entry"]
 }
-private trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_entry]
+private trait_values ::= (entry [TOKEN_COMMA])+
 
 //Node values
 key ::= id | string {
@@ -177,12 +177,12 @@ entry ::= key TOKEN_COLON value {
     implements="software.amazon.smithy.intellij.psi.SmithyEntryExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyEntryMixin"
 }
-array ::= TOKEN_OPEN_BRACKET [value (TOKEN_COMMA value)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACKET {
+array ::= TOKEN_OPEN_BRACKET (value [TOKEN_COMMA])* TOKEN_CLOSE_BRACKET {
     methods=[values="value"]
     mixin="software.amazon.smithy.intellij.psi.SmithyArrayMixin"
 }
-object ::= TOKEN_OPEN_BRACE [entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_entry]] TOKEN_CLOSE_BRACE {
-    methods=[entries="entry" incomplete_entry=""]
+object ::= TOKEN_OPEN_BRACE (entry [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
+    methods=[entries="entry"]
     mixin="software.amazon.smithy.intellij.psi.SmithyObjectMixin"
 }
 primitive ::= null | boolean | number | string | text_block | shape_id
@@ -211,15 +211,6 @@ id ::= symbol | null | boolean | simple_type_name
        | TOKEN_UPDATE | TOKEN_DELETE | TOKEN_COLLECTION_OPERATIONS {
     methods=[null="" boolean=""]
 }
-
-//Incomplete/intermediate elements which allow for a seamless parsing experience when typing out new entries in higher-level nodes
-//Without these "incomplete" members, the entire file would lose its parser state (and all syntax highlighting/annotations) until the member/entry was completed
-incomplete_applied_trait ::= TOKEN_APPLY (member_id | shape_id){
-    implements="software.amazon.smithy.intellij.psi.SmithyIncompleteAppliedTraitExt"
-    mixin="software.amazon.smithy.intellij.psi.SmithyIncompleteAppliedTraitMixin"
-}
-incomplete_member ::= member_name [TOKEN_COLON]
-incomplete_entry ::= key [TOKEN_COLON]
 
 //Re-declared tokens which will receive a dedicated AST node instead of raw PsiElement (since they are used in a meaningful way, like as a variant within another AST node)
 null ::= TOKEN_NULL {

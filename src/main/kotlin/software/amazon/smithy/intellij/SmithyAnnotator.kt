@@ -1,14 +1,19 @@
 package software.amazon.smithy.intellij
 
+import com.intellij.codeInsight.intention.impl.BaseIntentionAction
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.TextAttributesKey
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiWhiteSpace
+import com.intellij.psi.util.PsiTreeUtil.collectElements
 import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.nextLeaf
@@ -16,9 +21,6 @@ import com.intellij.psi.util.nextLeafs
 import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyImport
-import software.amazon.smithy.intellij.psi.SmithyIncompleteAppliedTrait
-import software.amazon.smithy.intellij.psi.SmithyIncompleteEntry
-import software.amazon.smithy.intellij.psi.SmithyIncompleteMember
 import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyMap
 import software.amazon.smithy.intellij.psi.SmithyMember
@@ -143,20 +145,6 @@ private enum class Annotation : Annotator {
             }
         }
     },
-    INCOMPLETE_TRAIT {
-        override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-            if (element is SmithyIncompleteAppliedTrait) {
-                holder.highlight(HighlightSeverity.ERROR, "Missing trait")
-            }
-        }
-    },
-    INCOMPLETE_MEMBER {
-        override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-            if (element is SmithyIncompleteEntry || element is SmithyIncompleteMember) {
-                holder.highlight(HighlightSeverity.ERROR, "Missing shape id")
-            }
-        }
-    },
     MISSING_MEMBERS {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element is SmithyShape) {
@@ -217,6 +205,25 @@ private enum class Annotation : Annotator {
                 if (target != null && target.type != "string") {
                     holder.highlight(HighlightSeverity.ERROR, "'key' must target a string shape")
                 }
+            }
+        }
+    },
+    REMOVE_COMMAS {
+        override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+            if (element.elementType == SmithyTypes.TOKEN_COMMA) {
+                holder.newAnnotation(HighlightSeverity.INFORMATION, "Remove unnecessary commas")
+                    .withFix(object : BaseIntentionAction() {
+                        override fun getText() = "Remove unnecessary commas"
+                        override fun getFamilyName() = "Remove unnecessary commas"
+                        override fun isAvailable(project: Project, editor: Editor, file: PsiFile) = true
+                        override fun invoke(project: Project, editor: Editor, file: PsiFile) {
+                            val commas = collectElements(file) {
+                                it.elementType == SmithyTypes.TOKEN_COMMA
+                            }
+                            commas.forEach { it.delete() }
+                        }
+                    })
+                    .create()
             }
         }
     },

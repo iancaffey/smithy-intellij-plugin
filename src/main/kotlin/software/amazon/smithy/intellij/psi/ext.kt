@@ -101,9 +101,6 @@ abstract class SmithyEntryMixin(node: ASTNode) : SmithyKeyedElementImpl(node), S
 interface SmithyImportExt : SmithyStatement
 abstract class SmithyImportMixin(node: ASTNode) : SmithyPsiElement(node), SmithyImport
 
-interface SmithyIncompleteAppliedTraitExt : SmithyStatement
-abstract class SmithyIncompleteAppliedTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyIncompleteAppliedTrait
-
 interface SmithyKeyExt : SmithyElement {
     val reference: SmithyKeyReference
     fun stringValue(): String
