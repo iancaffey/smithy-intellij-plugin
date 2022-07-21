@@ -2,6 +2,15 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [1.5.5]
+### Added
+- Added support for an editor notification when a Smithy file is not located in a source root.
+- Added support for resolving shape references which have been defined multiple times across dependencies (which will ultimately get merged during build time).
+- Added support for treating document shape references (and any nested member/value shape references) as soft (which prevents it being highlighted as an error).
+
+### Fixed
+- Fixed NPE thrown when attempting to index Smithy files without a namespace (e.g. validation files with only a version + metadata).
+
 ## [1.5.4]
 ### Added
 - Added support for incremental shape resolution (with file-based indexes to improve overall resolution performance).
