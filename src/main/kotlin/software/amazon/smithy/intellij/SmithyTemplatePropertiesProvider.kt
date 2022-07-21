@@ -27,8 +27,6 @@ class SmithyTemplatePropertiesProvider : DefaultTemplatePropertiesProvider {
     }.minOrNull()
 
     private fun findDefaultVersion(dir: PsiDirectory) = dir.files.mapNotNull { file ->
-        (file as? SmithyFile)?.model?.control?.firstNotNullOfOrNull {
-            if (it.name == "version") it.value.asString() else null
-        }
+        (file as? SmithyFile)?.model?.version
     }.minOrNull()
 }

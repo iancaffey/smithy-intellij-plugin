@@ -14,7 +14,6 @@ import software.amazon.smithy.intellij.psi.SmithyModel
 class SmithyFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, SmithyLanguage) {
     val buildConfig get() = ModuleUtil.findModuleForFile(this)?.let { SmithyModule.findBuildConfig(it) }
     val model: SmithyModel? get() = findChildByClass(SmithyModel::class.java)
-    val version get() = model?.control?.find { it.name == "version" }?.value?.asString()
     override fun getFileType() = SmithyFileType
     override fun toString() = "Smithy File"
 }
