@@ -11,6 +11,7 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager.getCachedValue
 import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.psi.util.PsiTreeUtil.getParentOfType
+import software.amazon.smithy.intellij.SmithyShapeResolver.getDefinitions
 import software.amazon.smithy.intellij.psi.SmithyArray
 import software.amazon.smithy.intellij.psi.SmithyDefinition
 import software.amazon.smithy.intellij.psi.SmithyEntry
@@ -84,7 +85,10 @@ class SmithyKeyReference(val key: SmithyKey) : SmithyReference<SmithyKey>(key, f
             return _ref
         }
 
-    override fun isSoft() = ref == null
+    override fun isSoft() = ref.let {
+        it == null || it.enclosing?.reference?.isSoft ?: it.trait.shape.reference.isSoft
+    }
+
     override fun getAbsoluteRange(): TextRange = myElement.textRange
     override fun resolve() = ref?.let { getCachedValue(it, resolver(it)) }
     override fun handleElementRename(newElementName: String): SmithyKey {
@@ -114,6 +118,7 @@ class SmithyKeyReference(val key: SmithyKey) : SmithyReference<SmithyKey>(key, f
  */
 class SmithyMemberReference(val id: SmithyMemberId) : SmithyReference<SmithyMemberId>(id, false) {
     private val delegate = SmithyShapeReference(id.shapeId)
+    override fun isSoft() = delegate.isSoft
     override fun getAbsoluteRange(): TextRange = myElement.textRange
     override fun resolve() = delegate.resolve()?.getMember(myElement.memberName.text)
     override fun handleElementRename(newElementName: String): SmithyMemberId {
@@ -158,7 +163,10 @@ data class SmithyShapeReference(val value: SmithyValue) : SmithyReference<Smithy
             return _ref
         }
 
-    override fun isSoft() = ref == null
+    override fun isSoft() = ref.let {
+        it == null || it.path != null && getDefinitions(it.shapeId).firstOrNull()?.type == "document"
+    }
+
     override fun getAbsoluteRange(): TextRange = myElement.textRange
     override fun resolve() = ref?.let { getCachedValue(if (value is SmithyShapeId) value else it, resolver(it)) }
     override fun handleElementRename(newElementName: String): SmithyValue {
@@ -205,7 +213,7 @@ data class ValuePath(val path: List<String> = emptyList()) {
     }
 
     fun resolve(shapeId: SmithyShapeId): SmithyShapeDefinition? {
-        val root = SmithyShapeResolver.getDefinitions(shapeId).firstOrNull() ?: return null
+        val root = getDefinitions(shapeId).firstOrNull() ?: return null
         if (path.isEmpty()) return root
         var current: SmithyMemberDefinition? = null
         path.forEach { name ->
