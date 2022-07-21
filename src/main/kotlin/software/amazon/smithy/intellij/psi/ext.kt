@@ -173,13 +173,13 @@ interface SmithyMetadataExt : SmithyStatement
 abstract class SmithyMetadataMixin(node: ASTNode) : SmithyKeyedElementImpl(node), SmithyMetadata
 
 interface SmithyModelExt : SmithyElement {
-    val namespace: String
+    val namespace: String?
     val control: List<SmithyControl>
     val metadata: List<SmithyMetadata>
 }
 
 abstract class SmithyModelMixin(node: ASTNode) : SmithyPsiElement(node), SmithyModel {
-    override val namespace get() = getChildOfType(this, SmithyNamespace::class.java)!!.namespaceId.id
+    override val namespace get() = getChildOfType(this, SmithyNamespace::class.java)?.namespaceId?.id
     override val control: List<SmithyControl> get() = getChildrenOfTypeAsList(this, SmithyControl::class.java)
     override val metadata: List<SmithyMetadata> get() = getChildrenOfTypeAsList(this, SmithyMetadata::class.java)
 }
@@ -276,7 +276,7 @@ abstract class SmithyShapeMixin(node: ASTNode) : SmithyPsiElement(node), SmithyS
         get() = nameIdentifier.siblings(forward = false, withSelf = false).first {
             it !is PsiWhiteSpace && it !is PsiComment
         }
-    override val namespace get() = model.namespace
+    override val namespace get() = model.namespace!!
     override val shapeName: String get() = nameIdentifier.text
     override val shapeId get() = "$namespace#$shapeName"
     override val model get() = parent as SmithyModel

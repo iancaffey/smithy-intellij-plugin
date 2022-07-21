@@ -53,7 +53,7 @@ class SmithyShapeNameResolutionHintIndex : FileBasedIndexExtension<String, Shape
         override fun map(inputData: FileContent): Map<String, ShapeNameResolutionHint> {
             val file = inputData.psiFile as? SmithyFile ?: return emptyMap()
             val model = file.model ?: return emptyMap()
-            val enclosingNamespace = model.namespace
+            val enclosingNamespace = model.namespace ?: return emptyMap()
             val imports = model.imports
             val shapes = model.shapes
             val hints = mutableMapOf<String, ShapeNameResolutionHint>()
