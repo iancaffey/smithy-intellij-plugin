@@ -1,0 +1,131 @@
+{
+    parserClass="software.amazon.smithy.intellij.selector.SmithySelectorParser"
+    parserUtilClass="com.intellij.lang.parser.GeneratedParserUtilBase"
+    psiClassPrefix="Smithy"
+    psiImplClassSuffix="Impl"
+    psiPackage="software.amazon.smithy.intellij.selector.psi"
+    psiImplPackage="software.amazon.smithy.intellij.selector.psi.impl"
+    elementTypeHolderClass="software.amazon.smithy.intellij.selector.psi.SmithySelectorTypes"
+    elementTypeClass="software.amazon.smithy.intellij.selector.SmithySelectorElementType"
+    tokenTypeClass="software.amazon.smithy.intellij.selector.SmithySelectorTokenType"
+    tokens=[
+        TOKEN_FORWARD_RECURSIVE_NEIGHBOR="~>"
+        TOKEN_FORWARD_DIRECTED_NEIGHBOR_START="-["
+        TOKEN_FORWARD_DIRECTED_NEIGHBOR_END="]->"
+        TOKEN_REVERSE_DIRECTED_NEIGHBOR_START="<-["
+        TOKEN_REVERSE_DIRECTED_NEIGHBOR_END="]-"
+        TOKEN_EQUALS="="
+        TOKEN_NOT_EQUALS="!="
+        TOKEN_GREATER_THAN=">"
+        TOKEN_GREATER_THAN_EQUALS=">="
+        TOKEN_LESS_THAN="<"
+        TOKEN_LESS_THAN_EQUALS="<="
+        TOKEN_STARTS_WITH="^="
+        TOKEN_ENDS_WITH="$="
+        TOKEN_CONTAINS="*="
+        TOKEN_EXISTS="?="
+        TOKEN_PROJECTION_EQUALS="{=}"
+        TOKEN_PROJECTION_NOT_EQUALS="{!=}"
+        TOKEN_SUBSET="{<}"
+        TOKEN_PROPER_SUBSET="{<<}"
+        TOKEN_SCOPED_ATTRIBUTE_START="[@"
+        TOKEN_AND="&&"
+        TOKEN_CONTEXT_VALUE_START="@{"
+        TOKEN_VARIABLE_GET_START="${"
+        TOKEN_PIPE="|"
+        TOKEN_INVERSE="i"
+        TOKEN_STRING="regexp:('[^']*')|(\"[^\"]*\")"
+        TOKEN_OPEN_PAREN="("
+        TOKEN_CLOSE_PAREN=")"
+        TOKEN_CLOSE_BRACE="}"
+        TOKEN_OPEN_BRACKET="["
+        TOKEN_CLOSE_BRACKET="]"
+        TOKEN_COLON=":"
+        TOKEN_COMMA=","
+        TOKEN_PERIOD="."
+        TOKEN_DOLLAR_SIGN="$"
+        TOKEN_HASH="#"
+        TOKEN_ASTERISK="*"
+        TOKEN_COLLECTION_TYPE="collection"
+        TOKEN_MEMBER_TYPE="member"
+        TOKEN_NUMBER_TYPE="number"
+        TOKEN_SIMPLE_TYPE="simpleType"
+        TOKEN_LIST="list"
+        TOKEN_SET="set"
+        TOKEN_MAP="map"
+        TOKEN_STRUCTURE="structure"
+        TOKEN_UNION="union"
+        TOKEN_SERVICE="service"
+        TOKEN_OPERATION="operation"
+        TOKEN_RESOURCE="resource"
+        TOKEN_SIMPLE_TYPE_NAME="regexp:blob|boolean|document|string|byte|short|integer|long|float|double|bigInteger|bigDecimal|timestamp"
+        TOKEN_SYMBOL="regexp:_*[A-Za-z][A-Za-z0-9_]*"
+        TOKEN_NUMBER="regexp:-?(0|([1-9][0-9]*))(\.[0-9]+)?(e[+-]?[0-9]+)?"
+    ]
+}
+//https://awslabs.github.io/smithy/1.0/spec/core/selectors.html
+root ::= selector
+selector ::= selector_expression*
+selector_expression ::= selector_shape_types | selector_attribute | selector_scoped_attribute | selector_function
+                        | selector_forward_undirected_neighbor | selector_reverse_undirected_neighbor
+                        | selector_forward_directed_neighbor | selector_reverse_directed_neighbor
+                        | selector_forward_recursive_neighbor | selector_variable_set | selector_variable_get
+selector_shape_types ::= TOKEN_ASTERISK | TOKEN_NUMBER_TYPE | TOKEN_SIMPLE_TYPE | TOKEN_COLLECTION_TYPE | TOKEN_SIMPLE_TYPE_NAME
+                         | TOKEN_LIST | TOKEN_SET | TOKEN_MAP | TOKEN_STRUCTURE | TOKEN_UNION | TOKEN_SERVICE | TOKEN_OPERATION
+                         | TOKEN_RESOURCE | TOKEN_MEMBER_TYPE {
+    extends=selector_expression
+}
+selector_forward_undirected_neighbor ::= TOKEN_GREATER_THAN {
+    extends=selector_expression
+}
+selector_reverse_undirected_neighbor ::= TOKEN_LESS_THAN {
+    extends=selector_expression
+}
+selector_forward_recursive_neighbor ::= TOKEN_FORWARD_RECURSIVE_NEIGHBOR {
+    extends=selector_expression
+}
+selector_forward_directed_neighbor ::= TOKEN_FORWARD_DIRECTED_NEIGHBOR_START selector_id (TOKEN_COMMA selector_id)* TOKEN_FORWARD_DIRECTED_NEIGHBOR_END {
+    extends=selector_expression
+}
+selector_reverse_directed_neighbor ::= TOKEN_REVERSE_DIRECTED_NEIGHBOR_START selector_id (TOKEN_COMMA selector_id)* TOKEN_REVERSE_DIRECTED_NEIGHBOR_END {
+    extends=selector_expression
+}
+selector_attribute ::= TOKEN_OPEN_BRACKET selector_key [selector_attribute_comparison] TOKEN_CLOSE_BRACKET {
+    extends=selector_expression
+}
+selector_scoped_attribute ::= TOKEN_SCOPED_ATTRIBUTE_START [selector_key] TOKEN_COLON selector_scoped_assertions TOKEN_CLOSE_BRACKET {
+    extends=selector_expression
+}
+selector_function ::= TOKEN_COLON selector_id TOKEN_OPEN_PAREN selector ("," selector)* TOKEN_CLOSE_PAREN {
+    extends=selector_expression
+}
+selector_variable_set ::= TOKEN_DOLLAR_SIGN selector_id TOKEN_OPEN_PAREN selector TOKEN_CLOSE_PAREN {
+    extends=selector_expression
+}
+selector_variable_get ::= TOKEN_VARIABLE_GET_START selector_id TOKEN_CLOSE_BRACE {
+    extends=selector_expression
+}
+selector_key ::= selector_id [TOKEN_PIPE selector_path]
+selector_path ::= selector_path_segment (TOKEN_PIPE selector_path_segment)*
+selector_path_segment ::= selector_value | selector_function_property
+selector_attribute_comparison ::= selector_comparator selector_value (TOKEN_COMMA selector_value) [TOKEN_INVERSE]
+selector_scoped_assertion ::= selector_scoped_value selector_comparator selector_scoped_values [TOKEN_INVERSE]
+selector_scoped_assertions ::= selector_scoped_assertion (TOKEN_AND selector_scoped_assertion)*
+selector_scoped_value ::= selector_value | selector_context_value
+selector_scoped_values ::= selector_scoped_value (TOKEN_COMMA selector_scoped_value)*
+selector_context_value ::= TOKEN_CONTEXT_VALUE_START selector_path TOKEN_CLOSE_BRACE
+selector_value ::= selector_string | selector_number | selector_shape_id
+selector_function_property ::= TOKEN_OPEN_PAREN selector_id TOKEN_CLOSE_PAREN
+selector_comparator ::= selector_string_comparator | selector_numeric_comparator | selector_projection_comparator
+selector_string_comparator ::= TOKEN_EQUALS | TOKEN_NOT_EQUALS | TOKEN_EXISTS | TOKEN_STARTS_WITH | TOKEN_ENDS_WITH | TOKEN_CONTAINS
+selector_numeric_comparator ::= TOKEN_GREATER_THAN | TOKEN_GREATER_THAN_EQUALS | TOKEN_LESS_THAN | TOKEN_LESS_THAN_EQUALS
+selector_projection_comparator ::= TOKEN_PROJECTION_EQUALS | TOKEN_PROJECTION_NOT_EQUALS | TOKEN_SUBSET | TOKEN_PROPER_SUBSET
+selector_shape_id ::= [selector_namespace_id TOKEN_HASH] selector_id
+selector_namespace_id ::= selector_id (TOKEN_PERIOD selector_id)*
+selector_id ::= selector_symbol | selector_simple_type_name
+       | TOKEN_LIST | TOKEN_SET | TOKEN_MAP | TOKEN_STRUCTURE | TOKEN_UNION | TOKEN_SERVICE | TOKEN_OPERATION | TOKEN_RESOURCE
+       | TOKEN_COLLECTION_TYPE | TOKEN_MEMBER_TYPE | TOKEN_NUMBER_TYPE | TOKEN_SIMPLE_TYPE | TOKEN_INVERSE
+selector_string ::= TOKEN_STRING
+selector_number ::= TOKEN_NUMBER
+selector_symbol ::= TOKEN_SYMBOL
+selector_simple_type_name ::= TOKEN_SIMPLE_TYPE_NAME

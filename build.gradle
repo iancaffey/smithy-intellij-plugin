@@ -62,7 +62,24 @@ task generateSmithyParser(type: GenerateParser, dependsOn: generateSmithyLexer) 
     outputs.upToDateWhen { false }
 }
 
+task generateSmithySelectorLexer(type: GenerateLexer) {
+    source 'src/main/grammar/SmithySelector.flex'
+    targetDir 'src/main/gen/software/amazon/smithy/intellij/selector/'
+    targetClass '_SmithySelectorLexer'
+    purgeOldFiles true
+    outputs.upToDateWhen { false }
+}
+
+task generateSmithySelectorParser(type: GenerateParser, dependsOn: generateSmithySelectorLexer) {
+    source 'src/main/grammar/SmithySelector.bnf'
+    targetRoot 'src/main/gen/'
+    pathToParser 'SmithySelectorParser'
+    pathToPsiRoot 'psi/'
+    purgeOldFiles true
+    outputs.upToDateWhen { false }
+}
+
 compileKotlin {
-    dependsOn generateSmithyParser
+    dependsOn generateSmithyParser, generateSmithySelectorParser
     kotlinOptions.freeCompilerArgs += ["-Xjvm-default=all-compatibility"]
 }

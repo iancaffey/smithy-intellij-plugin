@@ -72,7 +72,11 @@
         <gotoClassContributor implementation="software.amazon.smithy.intellij.SmithyGotoShapeContributor"/>
         <gotoSymbolContributor implementation="software.amazon.smithy.intellij.SmithyGotoMemberContributor"/>
         <iconProvider implementation="software.amazon.smithy.intellij.SmithyIconProvider"/>
+        <languageInjectionContributor language="Smithy"
+                                      implementationClass="software.amazon.smithy.intellij.selector.SmithySelectorInjectionContributor"/>
         <liveTemplateContext implementation="software.amazon.smithy.intellij.SmithyContextType"/>
         <navbar implementation="software.amazon.smithy.intellij.SmithyNavBar"/>
+        <lang.parserDefinition language="Smithy (selector)"
+                               implementationClass="software.amazon.smithy.intellij.selector.SmithySelectorParserDefinition"/>
     </extensions>
 </idea-plugin>
