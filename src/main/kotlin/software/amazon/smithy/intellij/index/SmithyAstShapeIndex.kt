@@ -4,13 +4,9 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.intellij.openapi.project.DumbService
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.util.indexing.DataIndexer
 import com.intellij.util.indexing.FileBasedIndex
-import com.intellij.util.indexing.FileBasedIndexExtension
-import com.intellij.util.indexing.FileContent
 import com.intellij.util.indexing.ID
 import com.intellij.util.io.DataExternalizer
-import com.intellij.util.io.EnumeratorStringDescriptor
 import software.amazon.smithy.intellij.SmithyAst
 import software.amazon.smithy.intellij.SmithyJson
 import software.amazon.smithy.intellij.psi.SmithyAstShape
@@ -23,7 +19,7 @@ import java.io.DataOutput
  * @author Ian Caffey
  * @since 1.0
  */
-class SmithyAstShapeIndex : FileBasedIndexExtension<String, SmithyAstShape>() {
+class SmithyAstShapeIndex : SmithyStringIndex<SmithyAstShape>(excludePsi = true) {
     companion object {
         val NAME = ID.create<String, SmithyAstShape>("smithy.ast-shapes")
         fun getShapes(namespace: String, shapeName: String, scope: GlobalSearchScope): List<SmithyAstShape> {
@@ -40,22 +36,7 @@ class SmithyAstShapeIndex : FileBasedIndexExtension<String, SmithyAstShape>() {
     }
 
     override fun getName() = NAME
-    override fun getIndexer() = DataIndexer<String, SmithyAstShape, FileContent> { inputData ->
-        val ast = try {
-            //Note: all AST will have a "smithy" version field, so we can quickly ignore irrelevant files without parsing the JSON
-            inputData.contentAsText.takeIf { "\"smithy\"" in it }?.let {
-                SmithyJson.readValue<SmithyAst>(it.toString())
-            }
-        } catch (e: Exception) {
-            //Note: there's no way to filter down to only Smithy AST JSON files, so any parsing exception will be
-            //treated as an invalid or irrelevant JSON file
-            null
-        }
-        ast?.shapes?.entries?.associate { (shapeId, shape) ->
-            shapeId to SmithyAstShape(shapeId, shape)
-        } ?: emptyMap()
-    }
-
+    override fun getVersion() = 0
     override fun getValueExternalizer(): DataExternalizer<SmithyAstShape> = object : DataExternalizer<SmithyAstShape> {
         override fun save(out: DataOutput, value: SmithyAstShape) {
             out.writeUTF(value.shapeId)
@@ -69,9 +50,7 @@ class SmithyAstShapeIndex : FileBasedIndexExtension<String, SmithyAstShape>() {
         }
     }
 
-    override fun getVersion() = 0
-    override fun getInputFilter() = FileBasedIndex.InputFilter { it.extension == "json" }
-    override fun getKeyDescriptor() = EnumeratorStringDescriptor()
-    override fun dependsOnFileContent() = true
-    override fun traceKeyHashToVirtualFileMapping() = true
+    override fun process(ast: SmithyAst) = ast.shapes?.entries?.associate { (shapeId, shape) ->
+        shapeId to SmithyAstShape(shapeId, shape)
+    } ?: emptyMap()
 }
