@@ -14,5 +14,10 @@ interface SmithyShapeDefinition : SmithyDefinition {
     val shapeName: String
     val namespace: String
     val members: List<@JvmWildcard SmithyMemberDefinition>
+    val enumValues
+        get() = findTrait("smithy.api", "enum")?.value?.values?.mapNotNull {
+            it.fields["value"]?.asString()
+        } ?: emptyList()
+
     fun getMember(name: String): SmithyMemberDefinition? = members.find { it.name == name }
 }
