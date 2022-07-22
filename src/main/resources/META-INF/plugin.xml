@@ -58,6 +58,8 @@
         <lang.syntaxHighlighterFactory language="Smithy"
                                        implementationClass="software.amazon.smithy.intellij.SmithySyntaxHighlighterFactory"/>
         <annotator language="Smithy" implementationClass="software.amazon.smithy.intellij.SmithyAnnotator"/>
+        <codeInsight.lineMarkerProvider language="Smithy"
+                                        implementationClass="software.amazon.smithy.intellij.SmithyAppliedTraitLineMarkerProvider"/>
         <colorSettingsPage implementation="software.amazon.smithy.intellij.SmithyColorSettingsPage"/>
         <completion.contributor language="Smithy"
                                 implementationClass="software.amazon.smithy.intellij.SmithyCompletionContributor"/>
@@ -67,6 +69,9 @@
         <editorNotificationProvider
                 implementation="software.amazon.smithy.intellij.SmithyMissingSourceRootNotificationProvider"/>
         <enterHandlerDelegate implementation="software.amazon.smithy.intellij.SmithyDocumentationEnterHandler"/>
+        <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyAppliedTraitMemberIndex"/>
+        <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyAppliedTraitShapeIndex"/>
+        <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyAstAppliedTraitIndex"/>
         <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyAstShapeIndex"/>
         <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyBuildConfigurationIndex"/>
         <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex"/>

@@ -120,7 +120,7 @@ class SmithyMemberReference(val id: SmithyMemberId) : SmithyReference<SmithyMemb
     private val delegate = SmithyShapeReference(id.shapeId)
     override fun isSoft() = delegate.isSoft
     override fun getAbsoluteRange(): TextRange = myElement.textRange
-    override fun resolve() = delegate.resolve()?.getMember(myElement.memberName.text)
+    override fun resolve() = delegate.resolve()?.getMember(myElement.memberName)
     override fun handleElementRename(newElementName: String): SmithyMemberId {
         val textRange = myElement.textRange
         val document = FileDocumentManager.getInstance().getDocument(myElement.containingFile.virtualFile)

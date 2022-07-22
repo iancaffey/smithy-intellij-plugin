@@ -29,10 +29,6 @@ data class SmithyAstMember(
     override fun getParent(): SmithyAstShape = enclosingShape
     override fun getLocationString(): String = enclosingShape.locationString
     override fun getIcon(unused: Boolean) = SmithyIcons.MEMBER
-    override fun findTrait(namespace: String, shapeName: String) = declaredTraits.find {
-        it.shapeName == shapeName && it.resolvedNamespace == namespace
-    }
-
     override fun resolve() = SmithyShapeResolver.getDefinitions(this).firstOrNull()
     override fun toString() = "$parent$$memberName"
 }

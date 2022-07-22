@@ -15,6 +15,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.psi.NavigatablePsiElement
 import com.intellij.psi.PsiFile
 import software.amazon.smithy.intellij.psi.SmithyAggregateShape
+import software.amazon.smithy.intellij.psi.SmithyDefinition
 import software.amazon.smithy.intellij.psi.SmithyMember
 import software.amazon.smithy.intellij.psi.SmithyShape
 
@@ -63,7 +64,15 @@ class SmithyStructureViewElement(val element: NavigatablePsiElement) : Structure
     override fun getPresentation() = element.presentation ?: PresentationData()
     override fun getChildren(): Array<out TreeElement> = when (element) {
         is SmithyFile -> (element.model?.shapes ?: emptyList()).map { SmithyStructureViewElement(it) }.toTypedArray()
-        is SmithyAggregateShape -> element.body.members.map { SmithyStructureViewElement(it) }.toTypedArray()
+        is SmithyAggregateShape -> listOf(
+            element.appliedTraits.map { SmithyStructureViewElement(it) },
+            element.declaredTraits.map { SmithyStructureViewElement(it) },
+            element.body.members.map { SmithyStructureViewElement(it) }
+        ).flatten().toTypedArray()
+        is SmithyDefinition -> listOf(
+            element.appliedTraits.map { SmithyStructureViewElement(it) },
+            element.declaredTraits.map { SmithyStructureViewElement(it) }
+        ).flatten().toTypedArray()
         else -> StructureViewTreeElement.EMPTY_ARRAY
     }
 

@@ -34,10 +34,6 @@ data class SmithyAstShape(
     }
 
     override fun getName() = shapeName
-    override fun findTrait(namespace: String, shapeName: String) = declaredTraits.find {
-        it.shapeName == shapeName && it.resolvedNamespace == namespace
-    }
-
     override fun getMember(name: String) = members.find { it.name == name }
     override fun getParent() = file
     override fun getLocationString() = namespace

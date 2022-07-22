@@ -1,5 +1,7 @@
 package software.amazon.smithy.intellij.psi
 
+import com.intellij.psi.NavigatablePsiElement
+import com.intellij.psi.PsiNamedElement
 import software.amazon.smithy.intellij.SmithyShapeResolver
 import software.amazon.smithy.intellij.SmithyValueDefinition
 
@@ -11,7 +13,7 @@ import software.amazon.smithy.intellij.SmithyValueDefinition
  * @see SmithyTrait
  * @see SmithyAstTrait
  */
-interface SmithyTraitDefinition : SmithyElement {
+interface SmithyTraitDefinition : SmithyElement, NavigatablePsiElement, PsiNamedElement {
     val shapeName: String
     val declaredNamespace: String?
     val resolvedNamespace: String?

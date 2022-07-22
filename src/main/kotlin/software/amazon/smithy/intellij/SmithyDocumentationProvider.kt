@@ -28,19 +28,19 @@ import java.util.function.Consumer
 class SmithyDocumentationProvider : AbstractDocumentationProvider() {
     override fun getQuickNavigateInfo(element: PsiElement, originalElement: PsiElement?): String? = when (element) {
         is SmithyMemberDefinition -> buildString {
-            val docs = element.findTrait("smithy.api", "documentation")
-            val externalDocs = element.findTrait("smithy.api", "externalDocumentation")
-            element.declaredTraits.forEach {
-                if (it != docs && it != externalDocs) append(getQuickNavigateInfo(it, it)).append("<br/>")
+            sequenceOf(element.appliedTraits, element.declaredTraits).flatten().forEach {
+                if ((it.shapeName != "documentation" && it.shapeName != "externalDocumentation") || it.resolvedNamespace != "smithy.api") {
+                    append(getQuickNavigateInfo(it, it)).append("<br/>")
+                }
             }
             HtmlSyntaxInfoUtil.appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
             append(": ${element.targetShapeName}")
         }
         is SmithyShapeDefinition -> buildString {
-            val docs = element.findTrait("smithy.api", "documentation")
-            val externalDocs = element.findTrait("smithy.api", "externalDocumentation")
-            element.declaredTraits.forEach {
-                if (it != docs && it != externalDocs) append(getQuickNavigateInfo(it, it)).append("<br/>")
+            sequenceOf(element.appliedTraits, element.declaredTraits).flatten().forEach {
+                if ((it.shapeName != "documentation" && it.shapeName != "externalDocumentation") || it.resolvedNamespace != "smithy.api") {
+                    append(getQuickNavigateInfo(it, it)).append("<br/>")
+                }
             }
             HtmlSyntaxInfoUtil.appendStyledSpan(this, SmithyColorSettings.KEYWORD, element.type, 1f)
             append(" ").append(element.name)

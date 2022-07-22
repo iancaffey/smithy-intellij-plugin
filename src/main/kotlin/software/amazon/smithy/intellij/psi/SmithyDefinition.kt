@@ -13,8 +13,11 @@ import com.intellij.psi.PsiNamedElement
  */
 sealed interface SmithyDefinition : SmithyElement, NavigatablePsiElement, PsiNamedElement {
     override fun getName(): String
+    val appliedTraits: List<@JvmWildcard SmithyTraitDefinition>
     val declaredTraits: List<@JvmWildcard SmithyTraitDefinition>
     val documentation: SmithyDocumentationDefinition?
     fun hasTrait(namespace: String, shapeName: String) = findTrait(namespace, shapeName) != null
-    fun findTrait(namespace: String, shapeName: String): SmithyTraitDefinition?
+    fun findTrait(namespace: String, shapeName: String) = declaredTraits.find {
+        it.shapeName == shapeName && it.resolvedNamespace == namespace
+    } ?: appliedTraits.find { it.shapeName == shapeName && it.resolvedNamespace == namespace }
 }

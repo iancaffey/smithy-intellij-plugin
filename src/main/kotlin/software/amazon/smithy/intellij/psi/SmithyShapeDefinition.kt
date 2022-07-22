@@ -1,5 +1,7 @@
 package software.amazon.smithy.intellij.psi
 
+import software.amazon.smithy.intellij.SmithyAppliedTraitResolver.getAppliedTraits
+
 /**
  * A [shape](https://awslabs.github.io/smithy/1.0/spec/core/model.html#shapes) definition (either in an AST or IDL) in [Smithy](https://awslabs.github.io/smithy).
  *
@@ -9,6 +11,7 @@ package software.amazon.smithy.intellij.psi
  * @see SmithyAstShape
  */
 interface SmithyShapeDefinition : SmithyDefinition {
+    override val appliedTraits get() = getAppliedTraits(this)
     val type: String
     val shapeId: String
     val shapeName: String

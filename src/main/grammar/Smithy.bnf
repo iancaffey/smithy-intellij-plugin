@@ -194,6 +194,7 @@ shape_id ::= [namespace_id TOKEN_HASH] id {
     mixin="software.amazon.smithy.intellij.psi.SmithyShapeIdMixin"
 }
 member_id ::= shape_id TOKEN_DOLLAR_SIGN member_name {
+    methods=[member="member_name"]
     implements="software.amazon.smithy.intellij.psi.SmithyMemberIdExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyMemberIdMixin"
 }

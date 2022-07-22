@@ -2,8 +2,9 @@ package software.amazon.smithy.intellij
 
 import com.intellij.ide.IconProvider
 import com.intellij.psi.PsiElement
-import software.amazon.smithy.intellij.psi.SmithyMember
-import software.amazon.smithy.intellij.psi.SmithyShape
+import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
+import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
+import software.amazon.smithy.intellij.psi.SmithyTraitDefinition
 
 /**
  * An [IconProvider] for [SmithyElement].
@@ -13,8 +14,9 @@ import software.amazon.smithy.intellij.psi.SmithyShape
  */
 class SmithyIconProvider : IconProvider() {
     override fun getIcon(element: PsiElement, flags: Int) = when (element) {
-        is SmithyShape -> SmithyIcons.SHAPE
-        is SmithyMember -> SmithyIcons.MEMBER
+        is SmithyShapeDefinition -> SmithyIcons.SHAPE
+        is SmithyMemberDefinition -> SmithyIcons.MEMBER
+        is SmithyTraitDefinition -> SmithyIcons.TRAIT
         else -> null
     }
 }

@@ -9,6 +9,7 @@ import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
+import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
@@ -45,7 +46,10 @@ open class SmithyPsiElement(node: ASTNode) : ASTWrapperPsiElement(node) {
 
 interface SmithyElement : PsiElement
 interface SmithyContainer : SmithyElement
-interface SmithyNamedElement : SmithyElement, PsiNameIdentifierOwner
+interface SmithyNamedElement : SmithyElement, PsiNameIdentifierOwner {
+    override fun getNameIdentifier(): PsiElement
+}
+
 interface SmithyStatement : SmithyElement {
     val type: String get() = typeIdentifier.text
     val typeIdentifier: PsiElement get() = firstChild
@@ -138,7 +142,6 @@ interface SmithyMemberExt : SmithyNamedElement, SmithyMemberDefinition {
     override val enclosingShape: SmithyShape
     override val documentation: SmithyDocumentation?
     override val declaredTraits: List<SmithyTrait>
-    override fun findTrait(namespace: String, shapeName: String): SmithyTrait?
 }
 
 abstract class SmithyMemberMixin(node: ASTNode) : SmithyPsiElement(node), SmithyMember {
@@ -155,17 +158,15 @@ abstract class SmithyMemberMixin(node: ASTNode) : SmithyPsiElement(node), Smithy
         override fun getLocationString() = (parent.parent as SmithyShape).shapeName
         override fun getIcon(unused: Boolean) = getIcon(0)
     }
-
-    override fun findTrait(namespace: String, shapeName: String) = declaredTraits.find {
-        it.shapeName == shapeName && it.resolvedNamespace == namespace
-    }
 }
 
 interface SmithyMemberIdExt : SmithyElement {
+    val memberName: String
     val reference: SmithyMemberReference
 }
 
 abstract class SmithyMemberIdMixin(node: ASTNode) : SmithyPsiElement(node), SmithyMemberId {
+    override val memberName: String get() = member.text
     override val reference by lazy { SmithyMemberReference(this) }
 }
 
@@ -270,7 +271,6 @@ interface SmithyShapeExt : SmithyNamedElement, SmithyShapeDefinition, SmithyStat
     val requiredMembers: Set<String> get() = emptySet()
     val supportedMembers: Set<String>? get() = requiredMembers.takeIf { it.isNotEmpty() }
     override fun getNameIdentifier(): SmithyShapeName
-    override fun findTrait(namespace: String, shapeName: String): SmithyTraitDefinition?
 }
 
 abstract class SmithyShapeMixin(node: ASTNode) : SmithyPsiElement(node), SmithyShape {
@@ -295,13 +295,9 @@ abstract class SmithyShapeMixin(node: ASTNode) : SmithyPsiElement(node), SmithyS
         override fun getLocationString(): String = namespace
         override fun getIcon(unused: Boolean) = getIcon(0)
     }
-
-    override fun findTrait(namespace: String, shapeName: String) = declaredTraits.find {
-        it.shapeName == shapeName && it.resolvedNamespace == namespace
-    }
 }
 
-interface SmithyShapeIdExt : SmithyCharSequence {
+interface SmithyShapeIdExt : SmithyCharSequence, PsiNamedElement {
     val shapeName: String
     val declaredNamespace: String?
     val enclosingNamespace: String?
@@ -309,11 +305,15 @@ interface SmithyShapeIdExt : SmithyCharSequence {
 }
 
 abstract class SmithyShapeIdMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyShapeId {
-    override val shapeName: String get() = getChildOfType(this, SmithyId::class.java)!!.text
+    private val id get() = getChildOfType(this, SmithyId::class.java)!!
+    override val shapeName: String get() = id.text
     override val declaredNamespace get() = namespaceId?.id
     override val enclosingNamespace get() = (containingFile as SmithyFile).model?.namespace
     override val resolvedNamespace: String? get() = declaredNamespace ?: getNamespace(shapeName, containingFile)
     override fun asString() = resolvedNamespace?.let { "$it#$shapeName" } ?: shapeName
+    override fun getName() = shapeName
+    override fun setName(newName: String) = setName<SmithyShapeId>(this, id, newName)
+    override fun getTextOffset() = id.textOffset
 }
 
 private fun parseInnerText(text: String, start: Int = 0, end: Int = text.length - start): String? = buildString {
@@ -409,7 +409,7 @@ private val emptyObject = object : SmithyValueDefinition {
     override val type = SmithyValueType.OBJECT
 }
 
-interface SmithyTraitExt : SmithyElement, SmithyTraitDefinition
+interface SmithyTraitExt : SmithyTraitDefinition
 
 abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyTrait {
     private var parsed = false
@@ -432,6 +432,20 @@ abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyT
 
     override fun subtreeChanged() {
         parsed = false
+    }
+
+    override fun getName() = shapeName
+    override fun setName(newName: String) = also { shape.setName(newName) }
+    override fun getTextOffset() = shape.textOffset
+    override fun getPresentation() = object : ItemPresentation {
+        override fun getPresentableText(): String = shapeName
+        override fun getLocationString(): String? = when (val parent = parent) {
+            is SmithyAppliedTrait -> containingFile.name
+            is SmithyDefinition -> parent.name
+            else -> null
+        }
+
+        override fun getIcon(unused: Boolean) = getIcon(0)
     }
 
     override fun toDocString() = buildString {
@@ -471,10 +485,13 @@ abstract class SmithyValueMixin(node: ASTNode) : SmithyPsiElement(node), SmithyV
 }
 
 private fun <T : SmithyNamedElement> setName(element: T, newName: String?): T {
-    val name = element.nameIdentifier ?: return element
-    val textRange = name.textRange
-    val document = FileDocumentManager.getInstance().getDocument(name.containingFile.virtualFile)
+    return setName(element, element.nameIdentifier, newName)
+}
+
+private fun <T : PsiNamedElement> setName(element: T, nameIdentifier: PsiElement, newName: String?): T {
+    val textRange = nameIdentifier.textRange
+    val document = FileDocumentManager.getInstance().getDocument(element.containingFile.virtualFile)
     document!!.replaceString(textRange.startOffset, textRange.endOffset, newName!!)
-    PsiDocumentManager.getInstance(name.project).commitDocument(document)
+    PsiDocumentManager.getInstance(element.project).commitDocument(document)
     return element
 }

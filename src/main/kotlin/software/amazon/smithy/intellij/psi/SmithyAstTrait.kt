@@ -21,7 +21,11 @@ data class SmithyAstTrait(
     override val shapeName = parts[1]
     override val declaredNamespace = parts[0]
     override val resolvedNamespace = parts[0]
+    override fun getName() = shapeName
     override fun getParent() = target
+    override fun getPresentableText() = shapeName
+    override fun getLocationString() = target.name
+    override fun getIcon(unused: Boolean) = getIcon(0)
     override fun toDocString() = buildString {
         HtmlSyntaxInfoUtil.appendStyledSpan(this, SmithyColorSettings.TRAIT_NAME, "@$shapeName", 1f)
         if (value.type == SmithyValueType.OBJECT) {
