@@ -16,7 +16,6 @@ import software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyIncompleteEntry
-import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyMemberId
 import software.amazon.smithy.intellij.psi.SmithyObject
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
@@ -36,14 +35,28 @@ class SmithyCompletionContributor : CompletionContributor() {
         extend(CompletionType.BASIC,
             PlatformPatterns.psiElement(SmithyTypes.TOKEN_SYMBOL),
             object : CompletionProvider<CompletionParameters>() {
+                val unwrappedShapeTypes = setOf("map", "structure", "union")
                 override fun addCompletions(
                     parameters: CompletionParameters, context: ProcessingContext, results: CompletionResultSet
                 ) {
                     val element = parameters.originalPosition ?: return
                     if (getParentOfType(element, PsiErrorElement::class.java) != null) return
-                    getParentOfType(element, SmithyShapeId::class.java)?.let { addShapes(it, results) }
-                    getParentOfType(element, SmithyEntry::class.java)?.let { addMembers(it, it.key, results) }
-                    getParentOfType(element, SmithyIncompleteEntry::class.java)?.let { addMembers(it, it.key, results) }
+                    getParentOfType(element, SmithyShapeId::class.java)?.let {
+                        val startingTraitMember = it.parent.let { parent ->
+                            parent is SmithyTraitBody && parent.parent.let { trait ->
+                                trait is SmithyTrait && trait.resolve()?.type in unwrappedShapeTypes
+                            }
+                        }
+                        if (startingTraitMember) {
+                            addMembers(it, it.text, results)
+                        } else {
+                            addShapes(it, results)
+                        }
+                    }
+                    getParentOfType(element, SmithyEntry::class.java)?.let { addMembers(it, it.key.text, results) }
+                    getParentOfType(element, SmithyIncompleteEntry::class.java)?.let {
+                        addMembers(it, it.key.text, results)
+                    }
                     getParentOfType(element, SmithyMemberId::class.java)?.let {
                         val parent = it.shapeId.reference.resolve()
                         parent?.members?.forEach { member ->
@@ -63,8 +76,8 @@ private fun addShapes(element: PsiElement, results: CompletionResultSet) {
     }
 }
 
-private fun addMembers(element: PsiElement, key: SmithyKey, results: CompletionResultSet) {
-    val memberResults = results.withPrefixMatcher(key.text)
+private fun addMembers(element: PsiElement, prefix: String, results: CompletionResultSet) {
+    val memberResults = results.withPrefixMatcher(prefix)
     val enclosingShape = when (val parent = element.parent) {
         is SmithyObject -> parent.reference.resolve()
         is SmithyTraitBody -> (parent.parent as? SmithyTrait)?.resolve()
