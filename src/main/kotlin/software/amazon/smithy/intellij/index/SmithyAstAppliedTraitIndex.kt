@@ -1,6 +1,7 @@
 package software.amazon.smithy.intellij.index
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.intellij.openapi.project.DumbService
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.indexing.FileBasedIndex
 import com.intellij.util.indexing.ID
@@ -36,6 +37,8 @@ class SmithyAstAppliedTraitIndex : SmithyStringIndex<AppliedTrait>(excludePsi = 
         }
 
         private fun forEach(shapeId: String, scope: GlobalSearchScope, action: (AppliedTrait) -> Unit) {
+            val project = scope.project ?: return
+            if (DumbService.isDumb(project)) return
             FileBasedIndex.getInstance().processValues(NAME, shapeId, null, { _, trait ->
                 action(trait)
                 true

@@ -22,6 +22,8 @@ class SmithyDefinedShapeIdIndex : SmithyStringIndex<Void?>() {
     companion object {
         val NAME = ID.create<String, Void?>("smithy.defined-shapes")
         fun exists(namespace: String, shapeName: String, scope: GlobalSearchScope): Boolean {
+            val project = scope.project ?: return false
+            if (DumbService.isDumb(project)) return false
             var exists = false
             FileBasedIndex.getInstance().processValues(NAME, "$namespace#$shapeName", null, { _, _ ->
                 exists = true
