@@ -1,7 +1,6 @@
 package software.amazon.smithy.intellij.psi
 
 import com.intellij.psi.NavigatablePsiElement
-import com.intellij.psi.PsiNamedElement
 
 /**
  * A definition in [Smithy](https://awslabs.github.io/smithy) (either within an AST or IDL).
@@ -11,7 +10,7 @@ import com.intellij.psi.PsiNamedElement
  * @see SmithyMemberDefinition
  * @see SmithyShapeDefinition
  */
-sealed interface SmithyDefinition : SmithyElement, NavigatablePsiElement, PsiNamedElement {
+sealed interface SmithyDefinition : SmithyNamedElement, NavigatablePsiElement {
     override fun getName(): String
     val appliedTraits: List<@JvmWildcard SmithyTraitDefinition>
     val declaredTraits: List<@JvmWildcard SmithyTraitDefinition>

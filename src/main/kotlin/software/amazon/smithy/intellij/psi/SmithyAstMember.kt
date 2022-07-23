@@ -14,6 +14,11 @@ import software.amazon.smithy.intellij.SmithyShapeResolver
 data class SmithyAstMember(
     override val enclosingShape: SmithyAstShape, val memberName: String, val reference: SmithyAst.Reference
 ) : FakePsiElement(), SmithyAstDefinition, SmithyMemberDefinition {
+    private val id = object : FakePsiElement() {
+        override fun getText() = name
+        override fun getParent() = this@SmithyAstMember
+    }
+
     private val targetParts = reference.target.split('#', limit = 2)
     override val targetShapeName = targetParts[1]
     override val declaredTargetNamespace = targetParts[0]
@@ -26,6 +31,7 @@ data class SmithyAstMember(
     }
 
     override fun getName() = memberName
+    override fun getNameIdentifier() = id
     override fun getParent(): SmithyAstShape = enclosingShape
     override fun getLocationString(): String = enclosingShape.locationString
     override fun getIcon(unused: Boolean) = SmithyIcons.MEMBER

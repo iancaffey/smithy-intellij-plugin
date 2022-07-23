@@ -8,7 +8,6 @@ import com.intellij.psi.PsiElement
 import software.amazon.smithy.intellij.psi.SmithyAppliedTrait
 import software.amazon.smithy.intellij.psi.SmithyDefinition
 import software.amazon.smithy.intellij.psi.SmithyMember
-import software.amazon.smithy.intellij.psi.SmithyNamedElement
 import software.amazon.smithy.intellij.psi.SmithyShape
 
 /**
@@ -29,7 +28,7 @@ class SmithyAppliedTraitLineMarkerProvider : RelatedItemLineMarkerProvider() {
                     NavigationGutterIconBuilder.create(SmithyIcons.Gutter.APPLIED_TRAITS)
                         .setTargets(appliedTraits)
                         .setTooltipText("Externally applied traits")
-                        .createLineMarkerInfo((element as? SmithyNamedElement)?.nameIdentifier ?: element)
+                        .createLineMarkerInfo(element.nameIdentifier)
                 )
             }
             is SmithyAppliedTrait -> {

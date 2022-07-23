@@ -14,6 +14,11 @@ import software.amazon.smithy.intellij.SmithyIcons
 data class SmithyAstShape(
     override val shapeId: String, val shape: SmithyAst.Shape
 ) : FakePsiElement(), SmithyAstDefinition, SmithyShapeDefinition {
+    private val id = object : FakePsiElement() {
+        override fun getText() = name
+        override fun getParent() = this@SmithyAstShape
+    }
+
     //Note: SmithyAstShape loaded from SmithyAstShapeIndex will have a lazily-initialized parent file, so that way
     //dependencies can be cached in a FileBasedIndex and a shallow copy performed to get a valid PSI element on reads
     private var file: PsiFile? = null
@@ -34,6 +39,7 @@ data class SmithyAstShape(
     }
 
     override fun getName() = shapeName
+    override fun getNameIdentifier() = id
     override fun getMember(name: String) = members.find { it.name == name }
     override fun getParent() = file
     override fun getLocationString() = namespace
