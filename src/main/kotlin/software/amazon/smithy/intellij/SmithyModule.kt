@@ -7,6 +7,8 @@ import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.psi.PsiDirectory
+import com.intellij.psi.PsiFile
 import software.amazon.smithy.intellij.index.SmithyBuildConfigurationIndex
 
 /**
@@ -50,4 +52,24 @@ object SmithyModule {
     fun findSourceRoot(file: VirtualFile, model: ModifiableRootModel) = model.sourceRoots.find {
         VfsUtil.isAncestor(it, file, true)
     }
+
+    fun defaultNamespace(file: PsiFile) =
+        file.parent?.let { findDefaultNamespace(it) }
+            ?: file.parent?.parent?.let { findDefaultNamespace(it) }
+            ?: file.name.replace(Regex("[^A-Za-z0-9_.]"), "").split(".").filter { it.isEmpty() }.joinToString(".")
+                .let { name ->
+                    when {
+                        name.isEmpty() -> "smithy"
+                        name[0] in 'A'..'Z' || name[0] == '_' -> name
+                        else -> "_$name"
+                    }
+                }
+
+    fun findDefaultNamespace(dir: PsiDirectory) = dir.files.mapNotNull {
+        (it as? SmithyFile)?.model?.namespace
+    }.minOrNull()
+
+    fun findDefaultVersion(dir: PsiDirectory) = dir.files.mapNotNull { file ->
+        (file as? SmithyFile)?.model?.version
+    }.minOrNull()
 }

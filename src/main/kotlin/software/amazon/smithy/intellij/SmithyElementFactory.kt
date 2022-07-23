@@ -3,6 +3,9 @@ package software.amazon.smithy.intellij
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.PsiTreeUtil.getChildOfType
+import software.amazon.smithy.intellij.SmithyModule.defaultNamespace
+import software.amazon.smithy.intellij.psi.SmithyElement
 import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyNamespace
 
@@ -31,7 +34,9 @@ object SmithyElementFactory {
         } else {
             model.addAfter(
                 createImport(file.project, namespace, shapeName),
-                PsiTreeUtil.getChildOfType(model, SmithyNamespace::class.java)
+                getChildOfType(model, SmithyNamespace::class.java) ?: model.add(
+                    createNamespace(file.project, defaultNamespace(file))
+                )
             )
         }
     }
@@ -44,7 +49,12 @@ object SmithyElementFactory {
             use ${if (namespace != null) "$namespace#$shapeName" else shapeName}
         """.trimIndent()
         )
-        return PsiTreeUtil.getChildOfType(file.model!!, SmithyImport::class.java)!!
+        return file.model!!.imports.first()
+    }
+
+    fun createNamespace(project: Project, namespace: String): SmithyNamespace {
+        val file = createFile(project, "namespace $namespace")
+        return getChildOfType(file.model!!, SmithyNamespace::class.java)!!
     }
 
     fun createShapeId(project: Project, namespace: String?, shapeName: String) =

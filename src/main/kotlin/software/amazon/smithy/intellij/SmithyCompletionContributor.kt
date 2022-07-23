@@ -100,9 +100,9 @@ private fun shapeElement(namespace: String, shapeName: String, addImports: Boole
             withInsertHandler { context, _ ->
                 context.file.let { it as? SmithyFile }?.let {
                     val model = it.model ?: return@let
-                    val enclosingNamespace = model.namespace ?: return@let
+                    val enclosingNamespace = model.namespace
                     if (enclosingNamespace == namespace) return@let
-                    if (namespace == "smithy.api"
+                    if (enclosingNamespace != null && namespace == "smithy.api"
                         && !SmithyDefinedShapeIdIndex.exists(enclosingNamespace, shapeName, it.resolveScope)
                     ) return@let
                     SmithyElementFactory.addImport(it, namespace, shapeName)
