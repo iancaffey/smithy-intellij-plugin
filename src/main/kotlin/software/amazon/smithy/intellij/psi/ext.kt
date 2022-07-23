@@ -305,7 +305,6 @@ interface SmithyShapeIdExt : SmithyCharSequence, PsiNamedElement {
 }
 
 abstract class SmithyShapeIdMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyShapeId {
-    private val id get() = getChildOfType(this, SmithyId::class.java)!!
     override val shapeName: String get() = id.text
     override val declaredNamespace get() = namespaceId?.id
     override val enclosingNamespace get() = (containingFile as SmithyFile).model?.namespace

@@ -189,7 +189,6 @@ primitive ::= null | boolean | number | string | text_block | shape_id
 
 //Shape ID
 shape_id ::= [namespace_id TOKEN_HASH] id {
-    methods=[id=""]
     implements="software.amazon.smithy.intellij.psi.SmithyShapeIdExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyShapeIdMixin"
 }

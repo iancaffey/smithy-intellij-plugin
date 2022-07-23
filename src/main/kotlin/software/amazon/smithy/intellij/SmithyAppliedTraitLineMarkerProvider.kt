@@ -4,8 +4,8 @@ import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
-import com.intellij.icons.AllIcons
 import com.intellij.psi.PsiElement
+import software.amazon.smithy.intellij.psi.SmithyAppliedTrait
 import software.amazon.smithy.intellij.psi.SmithyDefinition
 import software.amazon.smithy.intellij.psi.SmithyMember
 import software.amazon.smithy.intellij.psi.SmithyNamedElement
@@ -22,13 +22,25 @@ class SmithyAppliedTraitLineMarkerProvider : RelatedItemLineMarkerProvider() {
         element: PsiElement,
         result: MutableCollection<in RelatedItemLineMarkerInfo<*>>
     ) {
-        val source = element as? SmithyNamedElement
-        val appliedTraits = (source as? SmithyDefinition)?.appliedTraits?.takeIf { it.isNotEmpty() } ?: return
-        result.add(
-            NavigationGutterIconBuilder.create(AllIcons.Gutter.ExtAnnotation)
-                .setTargets(appliedTraits)
-                .setTooltipText("Externally applied traits")
-                .createLineMarkerInfo(source.nameIdentifier)
-        )
+        when (element) {
+            is SmithyDefinition -> {
+                val appliedTraits = element.appliedTraits.takeIf { it.isNotEmpty() } ?: return
+                result.add(
+                    NavigationGutterIconBuilder.create(SmithyIcons.Gutter.APPLIED_TRAITS)
+                        .setTargets(appliedTraits)
+                        .setTooltipText("Externally applied traits")
+                        .createLineMarkerInfo((element as? SmithyNamedElement)?.nameIdentifier ?: element)
+                )
+            }
+            is SmithyAppliedTrait -> {
+                val target = element.shapeId?.reference?.resolve() ?: element.memberId?.reference?.resolve() ?: return
+                result.add(
+                    NavigationGutterIconBuilder.create(SmithyIcons.Gutter.APPLIED_TRAIT)
+                        .setTarget(target)
+                        .setTooltipText("Navigate to target")
+                        .createLineMarkerInfo(element.shapeId?.id ?: element.memberId?.member ?: element)
+                )
+            }
+        }
     }
 }

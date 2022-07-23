@@ -16,4 +16,12 @@ object SmithyIcons {
     val TRAIT = icon("trait")
 
     private fun icon(name: String) = IconLoader.getIcon("META-INF/${name}Icon.svg", SmithyIcons.javaClass)
+
+    object Gutter {
+        val APPLIED_TRAIT = icon("appliedTrait")
+        val APPLIED_TRAITS = icon("appliedTraits")
+
+        private fun icon(name: String) = SmithyIcons.icon("${name}Gutter")
+
+    }
 }
