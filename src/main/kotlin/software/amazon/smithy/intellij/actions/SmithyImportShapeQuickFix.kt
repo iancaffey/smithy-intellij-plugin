@@ -1,4 +1,4 @@
-package software.amazon.smithy.intellij
+package software.amazon.smithy.intellij.actions
 
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction
@@ -6,6 +6,8 @@ import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
+import software.amazon.smithy.intellij.SmithyElementFactory
+import software.amazon.smithy.intellij.SmithyFile
 import software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex
 
 /**

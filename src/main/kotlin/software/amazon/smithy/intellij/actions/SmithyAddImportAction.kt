@@ -1,4 +1,4 @@
-package software.amazon.smithy.intellij
+package software.amazon.smithy.intellij.actions
 
 import com.intellij.codeInsight.hint.QuestionAction
 import com.intellij.codeInsight.navigation.NavigationUtil
@@ -9,6 +9,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.PopupStep
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep
+import software.amazon.smithy.intellij.SmithyElementFactory
+import software.amazon.smithy.intellij.SmithyFile
+import software.amazon.smithy.intellij.SmithyShapeResolver
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 
 /**

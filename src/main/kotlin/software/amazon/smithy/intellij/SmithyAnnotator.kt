@@ -13,6 +13,11 @@ import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.nextLeaf
 import com.intellij.psi.util.nextLeafs
+import software.amazon.smithy.intellij.actions.SmithyImportShapeQuickFix
+import software.amazon.smithy.intellij.actions.SmithyOptimizeShapeIdQuickFix
+import software.amazon.smithy.intellij.actions.SmithyRemoveImportQuickFix
+import software.amazon.smithy.intellij.actions.SmithyRemoveMemberQuickFix
+import software.amazon.smithy.intellij.actions.SmithyRemoveUnusedImportsQuickFix
 import software.amazon.smithy.intellij.psi.SmithyBoolean
 import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyEntry

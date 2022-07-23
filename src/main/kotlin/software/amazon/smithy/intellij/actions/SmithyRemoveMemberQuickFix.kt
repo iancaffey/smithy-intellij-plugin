@@ -1,4 +1,4 @@
-package software.amazon.smithy.intellij
+package software.amazon.smithy.intellij.actions
 
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction

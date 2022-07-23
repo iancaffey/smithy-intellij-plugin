@@ -23,8 +23,8 @@
     ]]></description>
     <depends>com.intellij.modules.platform</depends>
     <actions>
-        <action id="software.amazon.smithy.intellij.CreateSmithyFileAction"
-                class="software.amazon.smithy.intellij.CreateSmithyFileAction"
+        <action id="software.amazon.smithy.intellij.actions.SmithyCreateFileAction"
+                class="software.amazon.smithy.intellij.actions.SmithyCreateFileAction"
                 text="Smithy File"
                 description="Creates a new Smithy file">
             <add-to-group group-id="NewGroup" anchor="first"/>
