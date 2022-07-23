@@ -60,6 +60,10 @@
         <annotator language="Smithy" implementationClass="software.amazon.smithy.intellij.SmithyAnnotator"/>
         <codeInsight.lineMarkerProvider language="Smithy"
                                         implementationClass="software.amazon.smithy.intellij.SmithyAppliedTraitLineMarkerProvider"/>
+        <codeInsight.parameterInfo language="Smithy"
+                                   implementationClass="software.amazon.smithy.intellij.SmithyKeyParameterInfoHandler"/>
+        <codeInsight.parameterInfo language="Smithy"
+                                   implementationClass="software.amazon.smithy.intellij.SmithyValueParameterInfoHandler"/>
         <colorSettingsPage implementation="software.amazon.smithy.intellij.SmithyColorSettingsPage"/>
         <completion.contributor language="Smithy"
                                 implementationClass="software.amazon.smithy.intellij.SmithyCompletionContributor"/>
