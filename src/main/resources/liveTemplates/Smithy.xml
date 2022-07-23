@@ -1,4 +1,13 @@
 <templateSet group="Smithy">
+    <template name="annotation"
+              value="@trait&#10;structure $SHAPE_NAME$ {$END$}"
+              description="Adds an annotation trait shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
     <template name="apply"
               value="apply $SHAPE_ID$ @$TRAIT_SHAPE_ID$$END$"
               description="Applies a trait to a shape"
