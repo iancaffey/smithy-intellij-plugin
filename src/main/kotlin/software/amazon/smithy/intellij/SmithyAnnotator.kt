@@ -13,6 +13,7 @@ import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.nextLeaf
 import com.intellij.psi.util.nextLeafs
+import software.amazon.smithy.intellij.psi.SmithyBoolean
 import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyImport
@@ -52,7 +53,7 @@ class SmithyAnnotator : Annotator {
 private enum class Annotation : Annotator {
     KEYWORD {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-            if (element is SmithyNull) {
+            if (element is SmithyBoolean || element is SmithyNull) {
                 holder.highlight(SmithyColorSettings.KEYWORD)
             }
             getParentOfType(element, SmithyStatement::class.java)?.takeIf { element == it.typeIdentifier }?.let {
