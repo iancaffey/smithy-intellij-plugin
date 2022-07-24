@@ -11,4 +11,8 @@ import software.amazon.smithy.intellij.psi.SmithyTypes
  * @author Ian Caffey
  * @since 1.0
  */
-class SmithyQuoteHandler : SimpleTokenSetQuoteHandler(SmithyTypes.TOKEN_STRING, TokenType.BAD_CHARACTER)
+class SmithyQuoteHandler : SimpleTokenSetQuoteHandler(
+    TokenType.BAD_CHARACTER,
+    SmithyTypes.TOKEN_INCOMPLETE_STRING,
+    SmithyTypes.TOKEN_STRING,
+)
