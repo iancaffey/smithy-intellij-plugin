@@ -250,6 +250,8 @@ abstract class SmithyMetadataMixin(node: ASTNode) : SmithyKeyedElementImpl(node)
 interface SmithyModelExt : SmithyElement {
     val namespace: String?
     val version: String?
+    val operationInputSuffix: String
+    val operationOutputSuffix: String
     val control: List<SmithyControl>
     val metadata: List<SmithyMetadata>
 }
@@ -257,6 +259,14 @@ interface SmithyModelExt : SmithyElement {
 abstract class SmithyModelMixin(node: ASTNode) : SmithyPsiElement(node), SmithyModel {
     override val namespace get() = getChildOfType(this, SmithyNamespace::class.java)?.namespaceId?.id
     override val version get() = control.firstNotNullOfOrNull { if (it.name == "version") it.value.asString() else null }
+    override val operationInputSuffix
+        get() = control.firstNotNullOfOrNull {
+            if (it.name == "operationInputSuffix") it.value.asString() else null
+        } ?: "Input"
+    override val operationOutputSuffix
+        get() = control.firstNotNullOfOrNull {
+            if (it.name == "operationOutputSuffix") it.value.asString() else null
+        } ?: "Output"
     override val control: List<SmithyControl> get() = getChildrenOfTypeAsList(this, SmithyControl::class.java)
     override val metadata: List<SmithyMetadata> get() = getChildrenOfTypeAsList(this, SmithyMetadata::class.java)
 }
