@@ -5,6 +5,7 @@ import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.PsiTreeUtil.getDeepestFirst
 import software.amazon.smithy.intellij.psi.SmithyAppliedTrait
 import software.amazon.smithy.intellij.psi.SmithyDefinition
 
@@ -26,7 +27,7 @@ class SmithyAppliedTraitLineMarkerProvider : RelatedItemLineMarkerProvider() {
                     NavigationGutterIconBuilder.create(SmithyIcons.Gutter.APPLIED_TRAITS)
                         .setTargets(appliedTraits)
                         .setTooltipText("Externally applied traits")
-                        .createLineMarkerInfo(element.nameIdentifier)
+                        .createLineMarkerInfo(getDeepestFirst(element.nameIdentifier))
                 )
             }
             is SmithyAppliedTrait -> {
@@ -35,7 +36,7 @@ class SmithyAppliedTraitLineMarkerProvider : RelatedItemLineMarkerProvider() {
                     NavigationGutterIconBuilder.create(SmithyIcons.Gutter.APPLIED_TRAIT)
                         .setTarget(target)
                         .setTooltipText("Navigate to target")
-                        .createLineMarkerInfo(element.shapeId?.id ?: element.memberId?.member ?: element)
+                        .createLineMarkerInfo(getDeepestFirst(element.shapeId?.id ?: element.memberId?.member ?: element))
                 )
             }
         }
