@@ -2,6 +2,7 @@ package software.amazon.smithy.intellij.actions
 
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
@@ -23,10 +24,12 @@ object SmithyRemoveCommasQuickFix : BaseIntentionAction() {
     override fun isAvailable(project: Project, editor: Editor, file: PsiFile) = true
     override fun invoke(project: Project, editor: Editor, file: PsiFile) {
         val commas = PsiTreeUtil.collectElements(file) { it.elementType == SmithyTypes.TOKEN_COMMA }
-        commas.forEach {
-            if (it.nextSibling is PsiWhiteSpace) it.delete() else it.replace(
-                project.getService(PsiParserFacade::class.java).createWhiteSpaceFromText(" ")
-            )
+        WriteCommandAction.runWriteCommandAction(project) {
+            commas.forEach {
+                if (it.nextSibling is PsiWhiteSpace) it.delete() else it.replace(
+                    project.getService(PsiParserFacade::class.java).createWhiteSpaceFromText(" ")
+                )
+            }
         }
     }
 }

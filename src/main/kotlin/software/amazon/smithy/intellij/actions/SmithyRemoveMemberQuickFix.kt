@@ -2,6 +2,7 @@ package software.amazon.smithy.intellij.actions
 
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
@@ -21,7 +22,12 @@ data class SmithyRemoveMemberQuickFix(val member: SmithyMemberDefinition) : Base
     override fun getText() = "Remove member '${member.name}'"
     override fun getFamilyName() = "Remove member"
     override fun isAvailable(project: Project, editor: Editor, file: PsiFile) = true
-    override fun invoke(project: Project, editor: Editor, file: PsiFile) = member.siblings().takeWhile {
-        it == member || it is PsiWhiteSpace || it.elementType == SmithyTypes.TOKEN_COMMA
-    }.toList().forEach { if (it.isValid) it.delete() }
+    override fun invoke(project: Project, editor: Editor, file: PsiFile) {
+        val toRemove = member.siblings().takeWhile {
+            it == member || it is PsiWhiteSpace || it.elementType == SmithyTypes.TOKEN_COMMA
+        }.toList()
+        WriteCommandAction.runWriteCommandAction(project) {
+            toRemove.forEach { if (it.isValid) it.delete() }
+        }
+    }
 }
