@@ -50,7 +50,7 @@ class SmithyAstShapeIndex : SmithyStringIndex<SmithyAstShape>(excludePsi = true)
         }
     }
 
-    override fun process(ast: SmithyAst) = ast.shapes?.entries?.associate { (shapeId, shape) ->
-        shapeId to SmithyAstShape(shapeId, shape)
-    } ?: emptyMap()
+    override fun process(ast: SmithyAst) = ast.definitions?.entries?.mapNotNull { (shapeId, definition) ->
+        if (definition is SmithyAst.Shape) shapeId to SmithyAstShape(shapeId, definition) else null
+    }?.toMap() ?: emptyMap()
 }

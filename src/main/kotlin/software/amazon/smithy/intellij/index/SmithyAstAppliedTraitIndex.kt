@@ -55,7 +55,7 @@ class SmithyAstAppliedTraitIndex : SmithyStringIndex<AppliedTrait>(excludePsi = 
         }
     }
 
-    override fun process(ast: SmithyAst) = ast.shapes?.entries?.filter { it.value is AppliedTrait }?.associate {
-        it.key to it.value as AppliedTrait
-    } ?: emptyMap()
+    override fun process(ast: SmithyAst) = ast.definitions?.entries?.mapNotNull { (shapeId, definition) ->
+        if (definition is AppliedTrait) shapeId to definition else null
+    }?.toMap() ?: emptyMap()
 }

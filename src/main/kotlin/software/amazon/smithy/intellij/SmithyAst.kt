@@ -33,7 +33,8 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer
 data class SmithyAst(
     @JsonProperty("smithy") val version: kotlin.String,
     val metadata: kotlin.collections.Map<kotlin.String, Value>? = null,
-    val shapes: kotlin.collections.Map<kotlin.String, Shape>? = null
+    @JsonProperty("shapes")
+    val definitions: kotlin.collections.Map<kotlin.String, Definition>? = null
 ) {
     data class Reference(
         val target: kotlin.String,
@@ -67,9 +68,13 @@ data class SmithyAst(
         Type(value = Operation::class, name = "operation"),
         Type(value = AppliedTrait::class, name = "apply")
     )
-    sealed interface Shape {
+    sealed interface Definition {
         val type: kotlin.String
         val traits: kotlin.collections.Map<kotlin.String, Value>?
+    }
+
+    sealed interface Shape : Definition {
+        val mixins: kotlin.collections.List<Reference>?
     }
 
     sealed interface Collection : ComplexShape {
@@ -80,73 +85,113 @@ data class SmithyAst(
         val members: kotlin.collections.Map<kotlin.String, Reference>?
     }
 
-    data class Blob(override val traits: kotlin.collections.Map<kotlin.String, Value>? = null) : Shape {
+    data class Blob(
+        override val mixins: kotlin.collections.List<Reference>? = null,
+        override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
+    ) : Shape {
         @JsonIgnore
         override val type = "blob"
     }
 
-    data class Boolean(override val traits: kotlin.collections.Map<kotlin.String, Value>? = null) : Shape {
+    data class Boolean(
+        override val mixins: kotlin.collections.List<Reference>? = null,
+        override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
+    ) : Shape {
         @JsonIgnore
         override val type = "boolean"
     }
 
-    data class Document(override val traits: kotlin.collections.Map<kotlin.String, Value>? = null) : Shape {
+    data class Document(
+        override val mixins: kotlin.collections.List<Reference>? = null,
+        override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
+    ) : Shape {
         @JsonIgnore
         override val type = "document"
     }
 
-    data class String(override val traits: kotlin.collections.Map<kotlin.String, Value>? = null) : Shape {
+    data class String(
+        override val mixins: kotlin.collections.List<Reference>? = null,
+        override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
+    ) : Shape {
         @JsonIgnore
         override val type = "string"
     }
 
-    data class Byte(override val traits: kotlin.collections.Map<kotlin.String, Value>? = null) : Shape {
+    data class Byte(
+        override val mixins: kotlin.collections.List<Reference>? = null,
+        override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
+    ) : Shape {
         @JsonIgnore
         override val type = "byte"
     }
 
-    data class Short(override val traits: kotlin.collections.Map<kotlin.String, Value>? = null) : Shape {
+    data class Short(
+        override val mixins: kotlin.collections.List<Reference>? = null,
+        override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
+    ) : Shape {
         @JsonIgnore
         override val type = "short"
     }
 
-    data class Integer(override val traits: kotlin.collections.Map<kotlin.String, Value>? = null) : Shape {
+    data class Integer(
+        override val mixins: kotlin.collections.List<Reference>? = null,
+        override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
+    ) : Shape {
         @JsonIgnore
         override val type = "integer"
     }
 
-    data class Long(override val traits: kotlin.collections.Map<kotlin.String, Value>? = null) : Shape {
+    data class Long(
+        override val mixins: kotlin.collections.List<Reference>? = null,
+        override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
+    ) : Shape {
         @JsonIgnore
         override val type = "long"
     }
 
-    data class Float(override val traits: kotlin.collections.Map<kotlin.String, Value>? = null) : Shape {
+    data class Float(
+        override val mixins: kotlin.collections.List<Reference>? = null,
+        override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
+    ) : Shape {
         @JsonIgnore
         override val type = "float"
     }
 
-    data class Double(override val traits: kotlin.collections.Map<kotlin.String, Value>? = null) : Shape {
+    data class Double(
+        override val mixins: kotlin.collections.List<Reference>? = null,
+        override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
+    ) : Shape {
         @JsonIgnore
         override val type = "double"
     }
 
-    data class BigInteger(override val traits: kotlin.collections.Map<kotlin.String, Value>? = null) : Shape {
+    data class BigInteger(
+        override val mixins: kotlin.collections.List<Reference>? = null,
+        override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
+    ) : Shape {
         @JsonIgnore
         override val type = "bigInteger"
     }
 
-    data class BigDecimal(override val traits: kotlin.collections.Map<kotlin.String, Value>? = null) : Shape {
+    data class BigDecimal(
+        override val mixins: kotlin.collections.List<Reference>? = null,
+        override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
+    ) : Shape {
         @JsonIgnore
         override val type = "bigDecimal"
     }
 
-    data class Timestamp(override val traits: kotlin.collections.Map<kotlin.String, Value>? = null) : Shape {
+    data class Timestamp(
+        override val mixins: kotlin.collections.List<Reference>? = null,
+        override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
+    ) : Shape {
         @JsonIgnore
         override val type = "timestamp"
     }
 
     data class Enum(
         override val members: kotlin.collections.Map<kotlin.String, Reference>? = null,
+        override val mixins: kotlin.collections.List<Reference>? = null,
         override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
     ) : ComplexShape {
         @JsonIgnore
@@ -155,6 +200,7 @@ data class SmithyAst(
 
     data class IntEnum(
         override val members: kotlin.collections.Map<kotlin.String, Reference>? = null,
+        override val mixins: kotlin.collections.List<Reference>? = null,
         override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
     ) : ComplexShape {
         @JsonIgnore
@@ -163,6 +209,7 @@ data class SmithyAst(
 
     data class List(
         override val member: Reference,
+        override val mixins: kotlin.collections.List<Reference>? = null,
         override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
     ) : Collection {
         @JsonIgnore
@@ -174,6 +221,7 @@ data class SmithyAst(
 
     data class Set(
         override val member: Reference,
+        override val mixins: kotlin.collections.List<Reference>? = null,
         override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
     ) : Collection {
         @JsonIgnore
@@ -186,6 +234,7 @@ data class SmithyAst(
     data class Map(
         val key: Reference,
         val value: Reference,
+        override val mixins: kotlin.collections.List<Reference>? = null,
         override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
     ) : ComplexShape {
         @JsonIgnore
@@ -197,6 +246,7 @@ data class SmithyAst(
 
     data class Structure(
         override val members: kotlin.collections.Map<kotlin.String, Reference>? = null,
+        override val mixins: kotlin.collections.List<Reference>? = null,
         override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
     ) : ComplexShape {
         @JsonIgnore
@@ -205,6 +255,7 @@ data class SmithyAst(
 
     data class Union(
         override val members: kotlin.collections.Map<kotlin.String, Reference>? = null,
+        override val mixins: kotlin.collections.List<Reference>? = null,
         override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
     ) : ComplexShape {
         @JsonIgnore
@@ -217,6 +268,7 @@ data class SmithyAst(
         val resources: kotlin.collections.List<Reference>? = null,
         val errors: kotlin.collections.List<Reference>? = null,
         val rename: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
+        override val mixins: kotlin.collections.List<Reference>? = null,
         override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
     ) : Shape {
         @JsonIgnore
@@ -234,6 +286,7 @@ data class SmithyAst(
         val operations: kotlin.collections.List<Reference>? = null,
         val collectionOperations: kotlin.collections.List<Reference>? = null,
         val resources: kotlin.collections.List<Reference>? = null,
+        override val mixins: kotlin.collections.List<Reference>? = null,
         override val traits: kotlin.collections.Map<kotlin.String, Value>? = null,
     ) : Shape {
         @JsonIgnore
@@ -244,6 +297,7 @@ data class SmithyAst(
         val input: Reference? = null,
         val output: Reference? = null,
         val errors: kotlin.collections.List<Reference>? = null,
+        override val mixins: kotlin.collections.List<Reference>? = null,
         override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
     ) : Shape {
         @JsonIgnore
@@ -252,7 +306,7 @@ data class SmithyAst(
 
     data class AppliedTrait(
         override val traits: kotlin.collections.Map<kotlin.String, Value>? = null
-    ) : Shape {
+    ) : Definition {
         @JsonIgnore
         override val type = "apply"
     }

@@ -63,9 +63,9 @@ class SmithyDefinedShapeIdIndex : SmithyStringIndex<Void?>() {
     override fun getName() = NAME
     override fun getVersion() = 0
     override fun getValueExternalizer(): VoidDataExternalizer = VoidDataExternalizer.INSTANCE
-    override fun process(ast: SmithyAst) = ast.shapes?.entries?.filter {
-        it.value !is SmithyAst.AppliedTrait
-    }?.associate { it.key to null } ?: emptyMap()
+    override fun process(ast: SmithyAst) = ast.definitions?.entries?.mapNotNull { (shapeId, definition) ->
+        if (definition !is SmithyAst.AppliedTrait) shapeId to null else null
+    }?.toMap() ?: emptyMap()
 
     override fun process(file: SmithyFile) = file.model?.shapes?.associate {
         "${it.namespace}#${it.shapeName}" to null
