@@ -51,11 +51,16 @@ import java.util.*
 class SmithyAnnotator : Annotator {
     private val annotations = EnumSet.allOf(Annotation::class.java)
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-        annotations.forEach { it.annotate(element, holder) }
+        val version = (element.containingFile as? SmithyFile)?.let { it.buildConfig?.version }
+        annotations.forEach {
+            if (it.untilVersion == null || version != null && SmithyVersion.compare(version, it.untilVersion) <= 0) {
+                it.annotate(element, holder)
+            }
+        }
     }
 }
 
-private enum class Annotation : Annotator {
+private enum class Annotation(val untilVersion: String? = null) : Annotator {
     KEYWORD {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element is SmithyBoolean || element is SmithyNull) {
@@ -129,7 +134,7 @@ private enum class Annotation : Annotator {
             }
         }
     },
-    TRAILING_NEW_LINE {
+    TRAILING_NEW_LINE(untilVersion = "1.0") {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element.elementType in SmithyFormattingModelBuilder.TOKENS_REQUIRING_TRAILING_NEW_LINE && element.nextLeaf() != null) {
                 val trailingWhiteSpace = element.nextLeafs.takeWhile { it is PsiComment || it is PsiWhiteSpace }
