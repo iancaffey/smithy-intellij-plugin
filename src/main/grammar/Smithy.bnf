@@ -117,7 +117,7 @@ enum ::= [documentation] trait* TOKEN_ENUM shape_name enum_body {
     implements="software.amazon.smithy.intellij.psi.SmithyEnumExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyEnumMixin"
 }
-enum_body ::= TOKEN_OPEN_BRACE [enum_member (TOKEN_COMMA enum_member)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE {
+enum_body ::= TOKEN_OPEN_BRACE (enum_member [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
     methods=[members="enum_member"]
 }
 enum_member ::= [documentation] trait* member_name [TOKEN_EQUALS (string | text_block)] {
@@ -130,7 +130,7 @@ int_enum ::= [documentation] trait* TOKEN_INT_ENUM shape_name int_enum_body {
     implements="software.amazon.smithy.intellij.psi.SmithyIntEnumExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyIntEnumMixin"
 }
-int_enum_body ::= TOKEN_OPEN_BRACE [int_enum_member (TOKEN_COMMA int_enum_member)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE {
+int_enum_body ::= TOKEN_OPEN_BRACE (int_enum_member [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
     methods=[members="int_enum_member"]
 }
 int_enum_member ::= [documentation] trait* member_name [TOKEN_EQUALS number] {
@@ -168,7 +168,7 @@ resource ::= [documentation] trait* TOKEN_RESOURCE shape_name object {
     methods=[trait="" shape_name="" body="object"]
     mixin="software.amazon.smithy.intellij.psi.SmithyResourceMixin"
 }
-container_body ::= TOKEN_OPEN_BRACE [container_member (TOKEN_COMMA container_member)* [TOKEN_COMMA] [incomplete_container_member]] TOKEN_CLOSE_BRACE {
+container_body ::= TOKEN_OPEN_BRACE ((container_member | incomplete_container_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
     methods=[members="container_member" incomplete_container_member=""]
 }
 container_member ::= [documentation] trait* member_name TOKEN_COLON shape_id {
@@ -190,7 +190,8 @@ trait ::= TOKEN_AT shape_id [trait_body] {
 trait_body ::= TOKEN_OPEN_PAREN [trait_values | value] TOKEN_CLOSE_PAREN {
     methods=[entries="entry" incomplete_entry=""]
 }
-private trait_values ::= entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_entry]
+//Note: value and incomplete_entry conflict, so the initial entry in the values list has to be complete entry
+private trait_values ::= entry [TOKEN_COMMA] ((entry | incomplete_entry) [TOKEN_COMMA])*
 
 //Node values
 key ::= id | string {
@@ -205,11 +206,11 @@ entry ::= key TOKEN_COLON value {
     implements="software.amazon.smithy.intellij.psi.SmithyEntryExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyEntryMixin"
 }
-array ::= TOKEN_OPEN_BRACKET [value (TOKEN_COMMA value)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACKET {
+array ::= TOKEN_OPEN_BRACKET (value [TOKEN_COMMA])* TOKEN_CLOSE_BRACKET {
     methods=[values="value"]
     mixin="software.amazon.smithy.intellij.psi.SmithyArrayMixin"
 }
-object ::= TOKEN_OPEN_BRACE [entry (TOKEN_COMMA entry)* [TOKEN_COMMA] [incomplete_entry]] TOKEN_CLOSE_BRACE {
+object ::= TOKEN_OPEN_BRACE ((entry | incomplete_entry) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
     methods=[entries="entry" incomplete_entry=""]
     mixin="software.amazon.smithy.intellij.psi.SmithyObjectMixin"
 }

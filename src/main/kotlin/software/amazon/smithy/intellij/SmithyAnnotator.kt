@@ -13,8 +13,10 @@ import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.nextLeaf
 import com.intellij.psi.util.nextLeafs
+import com.intellij.psi.util.siblings
 import software.amazon.smithy.intellij.actions.SmithyImportShapeQuickFix
 import software.amazon.smithy.intellij.actions.SmithyOptimizeShapeIdQuickFix
+import software.amazon.smithy.intellij.actions.SmithyRemoveCommasQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveImportQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveMemberQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveUnusedImportsQuickFix
@@ -53,14 +55,16 @@ class SmithyAnnotator : Annotator {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
         val version = (element.containingFile as? SmithyFile)?.let { it.buildConfig?.version }
         annotations.forEach {
-            if (it.untilVersion == null || version != null && SmithyVersion.compare(version, it.untilVersion) <= 0) {
+            if ((it.sinceVersion == null || version != null && SmithyVersion.compare(version, it.sinceVersion) >= 0)
+                && (it.untilVersion == null || version != null && SmithyVersion.compare(version, it.untilVersion) <= 0)
+            ) {
                 it.annotate(element, holder)
             }
         }
     }
 }
 
-private enum class Annotation(val untilVersion: String? = null) : Annotator {
+private enum class Annotation(val sinceVersion: String? = null, val untilVersion: String? = null) : Annotator {
     KEYWORD {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element is SmithyBoolean || element is SmithyNull) {
@@ -141,6 +145,38 @@ private enum class Annotation(val untilVersion: String? = null) : Annotator {
                 if (trailingWhiteSpace.none { it.textContains('\n') }) {
                     holder.highlight(HighlightSeverity.ERROR, "Expecting trailing line break '\\n'")
                 }
+            }
+        }
+    },
+    MISSING_COMMA(untilVersion = "1.0") {
+        val tokensRequiringCommaDelimiter = setOf(
+            SmithyTypes.CONTAINER_MEMBER,
+            SmithyTypes.ENTRY,
+            SmithyTypes.ENUM_MEMBER,
+            SmithyTypes.INT_ENUM_MEMBER,
+            SmithyTypes.VALUE
+        )
+
+        override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+            val type = element.elementType
+            if (type in tokensRequiringCommaDelimiter) {
+                val nextComma = element.siblings(withSelf = false).indexOfFirst {
+                    it.elementType == SmithyTypes.TOKEN_COMMA
+                }
+                val nextSibling = element.siblings(withSelf = false).indexOfFirst { it.elementType == type }
+                if (nextSibling != -1 && (nextComma == -1 || nextSibling < nextComma)) {
+                    holder.highlight(HighlightSeverity.ERROR, "Expecting trailing comma ','")
+                }
+            }
+        }
+    },
+    UNNECESSARY_COMMAS(sinceVersion = "2.0") {
+        override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+            if (element.elementType == SmithyTypes.TOKEN_COMMA) {
+                holder.newAnnotation(HighlightSeverity.INFORMATION, "Remove unnecessary commas")
+                    .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL)
+                    .withFix(SmithyRemoveCommasQuickFix)
+                    .create()
             }
         }
     },
@@ -254,7 +290,7 @@ private enum class Annotation(val untilVersion: String? = null) : Annotator {
                     if (!conflicts) {
                         val fix = SmithyOptimizeShapeIdQuickFix(element.project, element)
                         holder.newAnnotation(
-                            HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING,
+                            HighlightSeverity.INFORMATION,
                             if (fix.hasImport) "Remove unnecessary qualifier" else "Add import for: ${element.shapeName}"
                         ).range(namespaceId.textRange)
                             .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL)
@@ -286,7 +322,7 @@ private enum class Annotation(val untilVersion: String? = null) : Annotator {
     UNUSED_IMPORT {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element is SmithyImport && element in SmithyImportOptimizer.unusedImports(element.containingFile)) {
-                holder.newAnnotation(HighlightSeverity.GENERIC_SERVER_ERROR_OR_WARNING, "Unused import")
+                holder.newAnnotation(HighlightSeverity.INFORMATION, "Unused import")
                     .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL)
                     .withFix(SmithyRemoveUnusedImportsQuickFix)
                     .create()
