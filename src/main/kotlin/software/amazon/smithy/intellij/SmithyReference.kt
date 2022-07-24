@@ -6,7 +6,6 @@ import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceBase
-import com.intellij.psi.impl.FakePsiElement
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager.getCachedValue
 import com.intellij.psi.util.PsiModificationTracker
@@ -21,6 +20,7 @@ import software.amazon.smithy.intellij.psi.SmithyMemberId
 import software.amazon.smithy.intellij.psi.SmithyObject
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeId
+import software.amazon.smithy.intellij.psi.SmithySyntheticElement
 import software.amazon.smithy.intellij.psi.SmithyTrait
 import software.amazon.smithy.intellij.psi.SmithyTraitBody
 import software.amazon.smithy.intellij.psi.SmithyValue
@@ -103,7 +103,7 @@ class SmithyKeyReference(val key: SmithyKey) : SmithyReference<SmithyKey>(key, f
     //this PsiElement serves as the representative context for the CachedValue computation (with a well-formed equals/hashCode)
     private data class Ref(
         val trait: SmithyTrait, val enclosing: SmithyObject?, val memberName: String
-    ) : FakePsiElement() {
+    ) : SmithySyntheticElement() {
         override fun getParent() = trait
     }
 }
@@ -179,7 +179,7 @@ data class SmithyShapeReference(val value: SmithyValue) : SmithyReference<Smithy
 
     //Note: the path from the enclosing trait to the value can change (e.g. if the enclosing field is renamed), so
     //this PsiElement serves as the representative context for the CachedValue computation (with a well-formed equals/hashCode)
-    private data class Ref(val shapeId: SmithyShapeId, val path: ValuePath?) : FakePsiElement() {
+    private data class Ref(val shapeId: SmithyShapeId, val path: ValuePath?) : SmithySyntheticElement() {
         override fun getParent() = shapeId
     }
 }

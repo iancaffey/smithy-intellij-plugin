@@ -1,6 +1,5 @@
-package software.amazon.smithy.intellij
+package software.amazon.smithy.intellij.psi
 
-import software.amazon.smithy.intellij.psi.SmithyValue
 import java.math.BigDecimal
 
 /**
@@ -11,7 +10,7 @@ import java.math.BigDecimal
  * @see SmithyValue
  * @see SmithyAstValue
  */
-interface SmithyValueDefinition {
+interface SmithyValueDefinition : SmithyElement {
     val type: SmithyValueType
     val values: List<@JvmWildcard SmithyValueDefinition> get() = emptyList()
     val fields: Map<String, @JvmWildcard SmithyValueDefinition> get() = emptyMap()

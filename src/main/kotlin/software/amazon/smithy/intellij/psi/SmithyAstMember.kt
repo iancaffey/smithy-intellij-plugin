@@ -1,6 +1,5 @@
 package software.amazon.smithy.intellij.psi
 
-import com.intellij.psi.impl.FakePsiElement
 import software.amazon.smithy.intellij.SmithyAst
 import software.amazon.smithy.intellij.SmithyIcons
 import software.amazon.smithy.intellij.SmithyShapeResolver.getDefinitions
@@ -13,8 +12,8 @@ import software.amazon.smithy.intellij.SmithyShapeResolver.getDefinitions
  */
 data class SmithyAstMember(
     override val enclosingShape: SmithyAstShape, val memberName: String, val reference: SmithyAst.Reference
-) : FakePsiElement(), SmithyAstDefinition, SmithyMemberDefinition {
-    private val id = object : FakePsiElement() {
+) : SmithySyntheticElement(), SmithyMemberDefinition {
+    private val id = object : SmithySyntheticElement() {
         override fun getText() = name
         override fun getParent() = this@SmithyAstMember
     }
@@ -23,8 +22,8 @@ data class SmithyAstMember(
     override val targetShapeName = targetParts[1]
     override val declaredTargetNamespace = targetParts[0]
     override val resolvedTargetNamespace = targetParts[0]
-    override val documentation = reference.traits?.get("smithy.api#documentation")?.asString()?.let {
-        SmithyAstDocumentation(this, it)
+    override val documentation = reference.traits?.get("smithy.api#documentation")?.let {
+        (it as? SmithyAst.Value.String)?.value?.let { docs -> SmithyAstDocumentation(this, docs) }
     }
     override val declaredTraits = (reference.traits ?: emptyMap()).entries.map { (key, value) ->
         SmithyAstTrait(this, key, value)

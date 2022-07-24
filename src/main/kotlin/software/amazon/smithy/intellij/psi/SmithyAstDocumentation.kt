@@ -1,6 +1,5 @@
 package software.amazon.smithy.intellij.psi
 
-import com.intellij.psi.impl.FakePsiElement
 import com.intellij.psi.tree.IElementType
 
 /**
@@ -11,7 +10,7 @@ import com.intellij.psi.tree.IElementType
  */
 data class SmithyAstDocumentation(
     val target: SmithyDefinition, val markdown: String
-) : FakePsiElement(), SmithyDocumentationDefinition {
+) : SmithySyntheticElement(), SmithyDocumentationDefinition {
     override fun getOwner() = target
     override fun getParent() = target
     override fun getTokenType(): IElementType = SmithyTypes.DOCUMENTATION

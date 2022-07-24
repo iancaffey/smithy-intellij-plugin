@@ -3,7 +3,6 @@ package software.amazon.smithy.intellij.psi
 import com.intellij.psi.NavigatablePsiElement
 import com.intellij.psi.PsiNamedElement
 import software.amazon.smithy.intellij.SmithyShapeResolver
-import software.amazon.smithy.intellij.SmithyValueDefinition
 
 /**
  * A [trait](https://awslabs.github.io/smithy/1.0/spec/core/model.html#traits) definition (either in an AST or IDL) in [Smithy](https://awslabs.github.io/smithy).

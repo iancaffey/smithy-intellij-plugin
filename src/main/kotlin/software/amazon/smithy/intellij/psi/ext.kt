@@ -4,6 +4,8 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.navigation.ItemPresentation
 import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil
+import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.appendHighlightedByLexerAndEncodedAsHtmlCodeSnippet
+import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.getHighlightedByLexerAndEncodedAsHtmlCodeSnippet
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiDocumentManager
@@ -11,6 +13,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.PsiWhiteSpace
+import com.intellij.psi.impl.FakePsiElement
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.PsiTreeUtil.getChildOfType
@@ -25,8 +28,6 @@ import software.amazon.smithy.intellij.SmithyMemberReference
 import software.amazon.smithy.intellij.SmithyShapeReference
 import software.amazon.smithy.intellij.SmithyShapeResolver.getDefinitions
 import software.amazon.smithy.intellij.SmithyShapeResolver.getNamespace
-import software.amazon.smithy.intellij.SmithyValueDefinition
-import software.amazon.smithy.intellij.SmithyValueType
 import software.amazon.smithy.intellij.psi.impl.SmithyContainerShapeImpl
 import software.amazon.smithy.intellij.psi.impl.SmithyKeyedElementImpl
 import software.amazon.smithy.intellij.psi.impl.SmithyPrimitiveImpl
@@ -50,6 +51,10 @@ interface SmithyContainer : SmithyElement
 interface SmithyNamedElement : SmithyElement, PsiNameIdentifierOwner {
     override fun getName(): String
     override fun getNameIdentifier(): PsiElement
+}
+
+abstract class SmithySyntheticElement : FakePsiElement(), SmithyElement {
+    override fun getLanguage() = SmithyLanguage
 }
 
 interface SmithyStatement : SmithyElement {
@@ -473,22 +478,24 @@ abstract class SmithyTextBlockMixin(node: ASTNode) : SmithyPrimitiveImpl(node), 
     }
 }
 
-private val emptyObject = object : SmithyValueDefinition {
+private class EmptyObject(private val element: PsiElement) : SmithySyntheticElement(), SmithyValueDefinition {
     override val type = SmithyValueType.OBJECT
+    override fun getParent() = element
 }
 
 interface SmithyTraitExt : SmithyTraitDefinition
 
 abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyTrait {
     private var parsed = false
-    private var _value: SmithyValueDefinition = emptyObject
+    private var _value: SmithyValueDefinition = EmptyObject(this)
     override val value: SmithyValueDefinition
         get() =
             if (parsed) _value else when (val body = body) {
-                null -> emptyObject
-                else -> body.value ?: object : SmithyValueDefinition {
+                null -> EmptyObject(this)
+                else -> body.value ?: object : SmithySyntheticElement(), SmithyValueDefinition {
                     override val type = SmithyValueType.OBJECT
                     override val fields = body.entries.associate { it.name to it.value }
+                    override fun getParent() = this@SmithyTraitMixin
                 }
             }.also {
                 _value = it
@@ -530,13 +537,13 @@ abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyT
                     val key = HtmlSyntaxInfoUtil.getStyledSpan(
                         SmithyColorSettings.KEY, it.key.text, 1f
                     )
-                    val value = HtmlSyntaxInfoUtil.getHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
+                    val value = getHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
                         project, SmithyLanguage, it.value.text, 1f
                     )
                     "$key: $value"
                 })
             } else {
-                HtmlSyntaxInfoUtil.appendHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
+                appendHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
                     this, project, SmithyLanguage, body.text, 1f
                 )
             }

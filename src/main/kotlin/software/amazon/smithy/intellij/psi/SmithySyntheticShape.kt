@@ -1,7 +1,6 @@
 package software.amazon.smithy.intellij.psi
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.impl.FakePsiElement
 import software.amazon.smithy.intellij.SmithyLanguage
 
 /**
@@ -15,9 +14,9 @@ import software.amazon.smithy.intellij.SmithyLanguage
 class SmithySyntheticShape(
     private val enclosing: PsiElement,
     override val type: String
-) : FakePsiElement(), SmithyShapeDefinition {
+) : SmithySyntheticElement(), SmithyShapeDefinition {
     private val id = let {
-        object : FakePsiElement() {
+        object : SmithySyntheticElement() {
             override fun getName() = type
             override fun getParent() = it
         }

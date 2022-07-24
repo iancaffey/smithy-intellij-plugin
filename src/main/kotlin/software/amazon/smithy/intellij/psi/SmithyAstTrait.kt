@@ -1,12 +1,12 @@
 package software.amazon.smithy.intellij.psi
 
 import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil
-import com.intellij.psi.impl.FakePsiElement
-import software.amazon.smithy.intellij.SmithyAstValue
+import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.getHighlightedByLexerAndEncodedAsHtmlCodeSnippet
+import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.getStyledSpan
+import software.amazon.smithy.intellij.SmithyAst
 import software.amazon.smithy.intellij.SmithyColorSettings
 import software.amazon.smithy.intellij.SmithyJson
 import software.amazon.smithy.intellij.SmithyLanguage
-import software.amazon.smithy.intellij.SmithyValueType
 
 /**
  * A [trait](https://awslabs.github.io/smithy/1.0/spec/core/model.html#traits) definition in the [Smithy](https://awslabs.github.io/smithy) [AST](https://awslabs.github.io/smithy/1.0/spec/core/json-ast.html).
@@ -15,8 +15,9 @@ import software.amazon.smithy.intellij.SmithyValueType
  * @since 1.0
  */
 data class SmithyAstTrait(
-    val target: SmithyDefinition, val shapeId: String, override val value: SmithyAstValue
-) : FakePsiElement(), SmithyTraitDefinition {
+    val target: SmithyDefinition, val shapeId: String, val body: SmithyAst.Value
+) : SmithySyntheticElement(), SmithyTraitDefinition {
+    override val value = SmithyAstValue(this, body)
     private val parts = shapeId.split('#', limit = 2)
     override val shapeName = parts[1]
     override val declaredNamespace = parts[0]
@@ -31,10 +32,10 @@ data class SmithyAstTrait(
         if (value.type == SmithyValueType.OBJECT) {
             value.fields.takeIf { it.isNotEmpty() }?.let { fields ->
                 append(fields.map {
-                    val key = HtmlSyntaxInfoUtil.getStyledSpan(
+                    val key = getStyledSpan(
                         SmithyColorSettings.KEY, it.key, 1f
                     )
-                    val value = HtmlSyntaxInfoUtil.getHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
+                    val value = getHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
                         project, SmithyLanguage, SmithyJson.writeValueAsString(it.value), 1f
                     )
                     "$key: $value"
@@ -43,7 +44,7 @@ data class SmithyAstTrait(
         } else {
             append("(")
             append(
-                HtmlSyntaxInfoUtil.getHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
+                getHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
                     project, SmithyLanguage, SmithyJson.writeValueAsString(value), 1f
                 )
             )
