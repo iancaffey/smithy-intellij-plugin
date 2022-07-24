@@ -47,6 +47,7 @@ open class SmithyPsiElement(node: ASTNode) : ASTWrapperPsiElement(node) {
 interface SmithyElement : PsiElement
 interface SmithyContainer : SmithyElement
 interface SmithyNamedElement : SmithyElement, PsiNameIdentifierOwner {
+    override fun getName(): String
     override fun getNameIdentifier(): PsiElement
 }
 
@@ -120,7 +121,6 @@ abstract class SmithyKeyMixin(node: ASTNode) : SmithyPsiElement(node), SmithyKey
 
 interface SmithyKeyedElementExt : SmithyNamedElement {
     val nameIdentifier: SmithyKey
-    override fun getName(): String
 }
 
 abstract class SmithyKeyedElementMixin(node: ASTNode) : SmithyPsiElement(node), SmithyKeyedElement {
