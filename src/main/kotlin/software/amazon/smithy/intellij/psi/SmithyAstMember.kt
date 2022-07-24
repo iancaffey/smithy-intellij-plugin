@@ -3,7 +3,7 @@ package software.amazon.smithy.intellij.psi
 import com.intellij.psi.impl.FakePsiElement
 import software.amazon.smithy.intellij.SmithyAst
 import software.amazon.smithy.intellij.SmithyIcons
-import software.amazon.smithy.intellij.SmithyShapeResolver
+import software.amazon.smithy.intellij.SmithyShapeResolver.getDefinitions
 
 /**
  * A [shape member](https://awslabs.github.io/smithy/1.0/spec/core/model.html#member) definition in the [Smithy](https://awslabs.github.io/smithy) [AST](https://awslabs.github.io/smithy/1.0/spec/core/json-ast.html).
@@ -35,6 +35,6 @@ data class SmithyAstMember(
     override fun getParent(): SmithyAstShape = enclosingShape
     override fun getLocationString(): String = enclosingShape.locationString
     override fun getIcon(unused: Boolean) = SmithyIcons.MEMBER
-    override fun resolve() = SmithyShapeResolver.getDefinitions(this).firstOrNull()
+    override fun resolve() = getDefinitions(this).firstOrNull()
     override fun toString() = "$parent$$memberName"
 }

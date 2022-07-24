@@ -9,6 +9,7 @@ import software.amazon.smithy.intellij.SmithyAppliedTraitResolver.getAppliedTrai
  * @since 1.0
  * @see SmithyShape
  * @see SmithyAstShape
+ * @see SmithySyntheticShape
  */
 interface SmithyShapeDefinition : SmithyDefinition {
     override val appliedTraits get() = getAppliedTraits(this)

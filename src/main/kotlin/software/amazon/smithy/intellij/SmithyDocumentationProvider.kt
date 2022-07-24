@@ -2,7 +2,8 @@ package software.amazon.smithy.intellij
 
 import com.intellij.lang.documentation.AbstractDocumentationProvider
 import com.intellij.lang.documentation.DocumentationProvider
-import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil
+import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.appendStyledSpan
+import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.getStyledSpan
 import com.intellij.psi.PsiDocCommentBase
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -33,8 +34,17 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                     append(getQuickNavigateInfo(it, it)).append("<br/>")
                 }
             }
-            HtmlSyntaxInfoUtil.appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
-            append(": ${element.targetShapeName}")
+            when (val enclosingShapeType = element.enclosingShape.type) {
+                "enum", "intEnum" -> {
+                    appendStyledSpan(this, SmithyColorSettings.KEYWORD, "$enclosingShapeType member", 1f)
+                    append(" ")
+                    appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
+                }
+                else -> {
+                    appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
+                    append(": ${element.targetShapeName}")
+                }
+            }
         }
         is SmithyShapeDefinition -> buildString {
             sequenceOf(element.appliedTraits, element.declaredTraits).flatten().forEach {
@@ -42,7 +52,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                     append(getQuickNavigateInfo(it, it)).append("<br/>")
                 }
             }
-            HtmlSyntaxInfoUtil.appendStyledSpan(this, SmithyColorSettings.KEYWORD, element.type, 1f)
+            appendStyledSpan(this, SmithyColorSettings.KEYWORD, element.type, 1f)
             append(" ").append(element.name)
         }
         is SmithyTraitDefinition -> element.toDocString()
@@ -63,7 +73,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 "Parent" to element.enclosingShape.name
             )
             element.resolve()?.let { target ->
-                additionalInfo["Type"] = HtmlSyntaxInfoUtil.getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
+                additionalInfo["Type"] = getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
             }
             element.findTrait("smithy.api", "externalDocumentation")?.let {
                 additionalInfo["See also"] = it.value.fields.mapNotNull { (title, value) ->

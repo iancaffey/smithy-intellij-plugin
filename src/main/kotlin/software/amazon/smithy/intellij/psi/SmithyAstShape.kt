@@ -3,7 +3,6 @@ package software.amazon.smithy.intellij.psi
 import com.intellij.psi.PsiFile
 import com.intellij.psi.impl.FakePsiElement
 import software.amazon.smithy.intellij.SmithyAst
-import software.amazon.smithy.intellij.SmithyAst.ContainerShape
 import software.amazon.smithy.intellij.SmithyIcons
 
 /**
@@ -27,7 +26,7 @@ data class SmithyAstShape(
     override val shapeName = parts[1]
     override val namespace = parts[0]
     override val type = shape.type
-    override val members = shape.let { it as? ContainerShape }?.let {
+    override val members = shape.let { it as? SmithyAst.ComplexShape }?.let {
         (it.members ?: emptyMap()).entries.map { (memberName, reference) ->
             SmithyAstMember(this, memberName, reference)
         }

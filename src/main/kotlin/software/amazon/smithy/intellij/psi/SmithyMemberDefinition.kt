@@ -7,8 +7,10 @@ import software.amazon.smithy.intellij.SmithyAppliedTraitResolver.getAppliedTrai
  *
  * @author Ian Caffey
  * @since 1.0
- * @see SmithyMember
  * @see SmithyAstMember
+ * @see SmithyContainerMember
+ * @see SmithyEnumMember
+ * @see SmithyIntEnumMember
  */
 interface SmithyMemberDefinition : SmithyDefinition {
     override val appliedTraits get() = getAppliedTraits(this)

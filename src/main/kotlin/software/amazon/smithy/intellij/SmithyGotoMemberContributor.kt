@@ -7,7 +7,6 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.Processor
 import com.intellij.util.indexing.FindSymbolParameters
 import com.intellij.util.indexing.IdFilter
-import software.amazon.smithy.intellij.psi.SmithyContainerShape
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
 
 /**
@@ -32,9 +31,5 @@ class SmithyGotoMemberContributor : ChooseByNameContributorEx {
     }
 
     private fun processFile(file: SmithyFile, action: (SmithyMemberDefinition) -> Unit) =
-        file.model?.shapes?.forEach { shape ->
-            if (shape is SmithyContainerShape) {
-                shape.body.members.forEach(action)
-            }
-        }
+        file.model?.shapes?.forEach { shape -> shape.members.forEach(action) }
 }

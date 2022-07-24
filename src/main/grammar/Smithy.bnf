@@ -28,6 +28,8 @@
         //Symbols (keywords (not reserved words), identifiers, object keys, etc.)
         TOKEN_APPLY="apply"
         TOKEN_USE="use"
+        TOKEN_ENUM="enum"
+        TOKEN_INT_ENUM="intEnum"
         TOKEN_LIST="list"
         TOKEN_SET="set"
         TOKEN_MAP="map"
@@ -70,11 +72,11 @@
         TOKEN_INCOMPLETE_TEXT_BLOCK="regexp:\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))+"
     ]
     implements("^(?!.*element).*")="software.amazon.smithy.intellij.psi.SmithyElement"
-    implements("array|object|container_body|trait_body")="software.amazon.smithy.intellij.psi.SmithyContainer"
+    implements("array|object|container_body|enum_body|int_enum_body|trait_body")="software.amazon.smithy.intellij.psi.SmithyContainer"
     extends("array|object|primitive")=value
     extends("null|boolean|number|string|text_block|shape_id")=primitive
     extends("symbol|null|boolean|simple_type_name")=id
-    extends("container_shape|simple_shape|service|operation|resource")=shape
+    extends("container_shape|simple_shape|enum|int_enum|service|operation|resource")=shape
     extends("list|set|map|structure|union")=container_shape
     extends("control|entry|metadata")=keyed_element
 }
@@ -103,12 +105,38 @@ import ::= TOKEN_USE shape_id {
 }
 
 //Shapes
-shape ::= simple_shape | list | set | map | structure | union | service | operation | resource {
+shape ::= simple_shape | enum | int_enum | list | set | map | structure | union | service | operation | resource {
     implements="software.amazon.smithy.intellij.psi.SmithyShapeExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyShapeMixin"
 }
 simple_shape ::= [documentation] trait* simple_type_name shape_name {
     methods=[trait="" simple_type_name="" shape_name=""]
+}
+enum ::= [documentation] trait* TOKEN_ENUM shape_name enum_body {
+    methods=[trait="" shape_name="" body="enum_body"]
+    implements="software.amazon.smithy.intellij.psi.SmithyEnumExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyEnumMixin"
+}
+enum_body ::= TOKEN_OPEN_BRACE [enum_member (TOKEN_COMMA enum_member)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE {
+    methods=[members="enum_member"]
+}
+enum_member ::= [documentation] trait* member_name [TOKEN_EQUALS (string | text_block)] {
+    methods=[declared_traits="trait" name_identifier="member_name"]
+    implements="software.amazon.smithy.intellij.psi.SmithyEnumMemberExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyEnumMemberMixin"
+}
+int_enum ::= [documentation] trait* TOKEN_INT_ENUM shape_name int_enum_body {
+    methods=[trait="" shape_name="" body="int_enum_body"]
+    implements="software.amazon.smithy.intellij.psi.SmithyIntEnumExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyIntEnumMixin"
+}
+int_enum_body ::= TOKEN_OPEN_BRACE [int_enum_member (TOKEN_COMMA int_enum_member)* [TOKEN_COMMA]] TOKEN_CLOSE_BRACE {
+    methods=[members="int_enum_member"]
+}
+int_enum_member ::= [documentation] trait* member_name [TOKEN_EQUALS number] {
+    methods=[declared_traits="trait" name_identifier="member_name"]
+    implements="software.amazon.smithy.intellij.psi.SmithyIntEnumMemberExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyIntEnumMemberMixin"
 }
 list ::= [documentation] trait* TOKEN_LIST shape_name container_body {
     methods=[trait="" shape_name="" body="container_body"]
@@ -208,7 +236,7 @@ id ::= symbol | null | boolean | simple_type_name
        | TOKEN_APPLY | TOKEN_USE | TOKEN_LIST | TOKEN_SET | TOKEN_MAP | TOKEN_METADATA | TOKEN_NAMESPACE | TOKEN_STRUCTURE
        | TOKEN_UNION | TOKEN_SERVICE | TOKEN_OPERATION | TOKEN_RESOURCE | TOKEN_VERSION | TOKEN_OPERATIONS | TOKEN_RESOURCES
        | TOKEN_RENAME | TOKEN_INPUT | TOKEN_OUTPUT | TOKEN_ERRORS | TOKEN_IDENTIFIERS | TOKEN_CREATE | TOKEN_PUT | TOKEN_READ
-       | TOKEN_UPDATE | TOKEN_DELETE | TOKEN_COLLECTION_OPERATIONS {
+       | TOKEN_UPDATE | TOKEN_DELETE | TOKEN_COLLECTION_OPERATIONS | TOKEN_ENUM | TOKEN_INT_ENUM {
     methods=[null="" boolean=""]
 }
 
@@ -255,6 +283,7 @@ documentation ::= TOKEN_DOCUMENTATION_LINE+ {
 //Fake rules (for introducing superinterfaces into the AST)
 fake container_shape ::= container_body {
     methods=[body="container_body"]
+    implements="software.amazon.smithy.intellij.psi.SmithyContainerShapeExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyContainerShapeMixin"
 }
 fake keyed_element ::= key {

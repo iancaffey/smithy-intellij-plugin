@@ -55,6 +55,8 @@ TOKEN_INCOMPLETE_TEXT_BLOCK=\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[
   "#"                                { return TOKEN_HASH; }
   "apply"                            { return TOKEN_APPLY; }
   "use"                              { return TOKEN_USE; }
+  "enum"                             { return TOKEN_ENUM; }
+  "intEnum"                          { return TOKEN_INT_ENUM; }
   "list"                             { return TOKEN_LIST; }
   "set"                              { return TOKEN_SET; }
   "map"                              { return TOKEN_MAP; }

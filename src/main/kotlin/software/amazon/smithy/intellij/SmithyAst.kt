@@ -56,6 +56,8 @@ data class SmithyAst(
         Type(value = BigInteger::class, name = "bigInteger"),
         Type(value = BigDecimal::class, name = "bigDecimal"),
         Type(value = Timestamp::class, name = "timestamp"),
+        Type(value = Enum::class, name = "enum"),
+        Type(value = IntEnum::class, name = "intEnum"),
         Type(value = List::class, name = "list"),
         Type(value = Set::class, name = "set"),
         Type(value = Map::class, name = "map"),
@@ -71,11 +73,11 @@ data class SmithyAst(
         val traits: kotlin.collections.Map<kotlin.String, SmithyAstValue>?
     }
 
-    sealed interface Collection : ContainerShape {
+    sealed interface Collection : ComplexShape {
         val member: Reference
     }
 
-    sealed interface ContainerShape : Shape {
+    sealed interface ComplexShape : Shape {
         val members: kotlin.collections.Map<kotlin.String, Reference>?
     }
 
@@ -144,6 +146,22 @@ data class SmithyAst(
         override val type = "timestamp"
     }
 
+    data class Enum(
+        override val members: kotlin.collections.Map<kotlin.String, Reference>? = null,
+        override val traits: kotlin.collections.Map<kotlin.String, SmithyAstValue>? = null
+    ) : ComplexShape {
+        @JsonIgnore
+        override val type = "enum"
+    }
+
+    data class IntEnum(
+        override val members: kotlin.collections.Map<kotlin.String, Reference>? = null,
+        override val traits: kotlin.collections.Map<kotlin.String, SmithyAstValue>? = null
+    ) : ComplexShape {
+        @JsonIgnore
+        override val type = "intEnum"
+    }
+
     data class List(
         override val member: Reference,
         override val traits: kotlin.collections.Map<kotlin.String, SmithyAstValue>? = null
@@ -170,7 +188,7 @@ data class SmithyAst(
         val key: Reference,
         val value: Reference,
         override val traits: kotlin.collections.Map<kotlin.String, SmithyAstValue>? = null
-    ) : ContainerShape {
+    ) : ComplexShape {
         @JsonIgnore
         override val type = "map"
 
@@ -181,7 +199,7 @@ data class SmithyAst(
     data class Structure(
         override val members: kotlin.collections.Map<kotlin.String, Reference>? = null,
         override val traits: kotlin.collections.Map<kotlin.String, SmithyAstValue>? = null
-    ) : ContainerShape {
+    ) : ComplexShape {
         @JsonIgnore
         override val type = "structure"
     }
@@ -189,7 +207,7 @@ data class SmithyAst(
     data class Union(
         override val members: kotlin.collections.Map<kotlin.String, Reference>? = null,
         override val traits: kotlin.collections.Map<kotlin.String, SmithyAstValue>? = null
-    ) : ContainerShape {
+    ) : ComplexShape {
         @JsonIgnore
         override val type = "union"
     }

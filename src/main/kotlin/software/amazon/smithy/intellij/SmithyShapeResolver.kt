@@ -12,6 +12,7 @@ import software.amazon.smithy.intellij.index.SmithyShapeNameResolutionHintIndex
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeId
+import software.amazon.smithy.intellij.psi.SmithySyntheticShape
 import software.amazon.smithy.intellij.psi.SmithyTraitDefinition
 
 /**
@@ -24,10 +25,16 @@ object SmithyShapeResolver {
     private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
     fun getDefinitions(member: SmithyMemberDefinition): List<SmithyShapeDefinition> =
         getCachedValue(member) {
-            val namespace = member.resolvedTargetNamespace
-            val definitions = namespace?.let {
-                getDefinitions(it, member.targetShapeName, member.resolveScope)
-            } ?: emptyList()
+            val definitions = when (member.enclosingShape.type) {
+                "enum" -> listOf(SmithySyntheticShape(member, "string"))
+                "intEnum" -> listOf(SmithySyntheticShape(member, "integer"))
+                else -> {
+                    val namespace = member.resolvedTargetNamespace
+                    namespace?.let {
+                        getDefinitions(it, member.targetShapeName, member.resolveScope)
+                    } ?: emptyList()
+                }
+            }
             CachedValueProvider.Result.create(definitions, dependencies)
         }
 
