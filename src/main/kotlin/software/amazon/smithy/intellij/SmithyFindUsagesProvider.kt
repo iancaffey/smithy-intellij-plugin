@@ -6,10 +6,10 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.TokenSet
 import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyEntry
-import software.amazon.smithy.intellij.psi.SmithyMember
+import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
 import software.amazon.smithy.intellij.psi.SmithyMetadata
 import software.amazon.smithy.intellij.psi.SmithyNamedElement
-import software.amazon.smithy.intellij.psi.SmithyShape
+import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyTypes
 
 
@@ -56,9 +56,9 @@ class SmithyFindUsagesProvider : FindUsagesProvider {
     override fun getType(element: PsiElement): String = when (element) {
         is SmithyControl -> "control"
         is SmithyEntry -> "entry"
-        is SmithyMember -> "member"
+        is SmithyMemberDefinition -> "member"
         is SmithyMetadata -> "metadata"
-        is SmithyShape -> "shape"
+        is SmithyShapeDefinition -> "shape"
         else -> ""
     }
 }

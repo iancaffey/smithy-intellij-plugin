@@ -7,11 +7,9 @@ import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
 import com.intellij.psi.PsiElement
 import software.amazon.smithy.intellij.psi.SmithyAppliedTrait
 import software.amazon.smithy.intellij.psi.SmithyDefinition
-import software.amazon.smithy.intellij.psi.SmithyMember
-import software.amazon.smithy.intellij.psi.SmithyShape
 
 /**
- * A [LineMarkerProvider] for externally applied traits to [SmithyShape] and [SmithyMember].
+ * A [LineMarkerProvider] for externally applied traits to [SmithyDefinition].
  *
  * @author Ian Caffey
  * @since 1.0

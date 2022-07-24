@@ -71,11 +71,11 @@ data class SmithyAst(
         val traits: kotlin.collections.Map<kotlin.String, SmithyAstValue>?
     }
 
-    sealed interface Collection : AggregateShape {
+    sealed interface Collection : ContainerShape {
         val member: Reference
     }
 
-    sealed interface AggregateShape : Shape {
+    sealed interface ContainerShape : Shape {
         val members: kotlin.collections.Map<kotlin.String, Reference>?
     }
 
@@ -170,7 +170,7 @@ data class SmithyAst(
         val key: Reference,
         val value: Reference,
         override val traits: kotlin.collections.Map<kotlin.String, SmithyAstValue>? = null
-    ) : AggregateShape {
+    ) : ContainerShape {
         @JsonIgnore
         override val type = "map"
 
@@ -181,7 +181,7 @@ data class SmithyAst(
     data class Structure(
         override val members: kotlin.collections.Map<kotlin.String, Reference>? = null,
         override val traits: kotlin.collections.Map<kotlin.String, SmithyAstValue>? = null
-    ) : AggregateShape {
+    ) : ContainerShape {
         @JsonIgnore
         override val type = "structure"
     }
@@ -189,7 +189,7 @@ data class SmithyAst(
     data class Union(
         override val members: kotlin.collections.Map<kotlin.String, Reference>? = null,
         override val traits: kotlin.collections.Map<kotlin.String, SmithyAstValue>? = null
-    ) : AggregateShape {
+    ) : ContainerShape {
         @JsonIgnore
         override val type = "union"
     }
@@ -250,8 +250,6 @@ data class SmithyAst(
 @JsonDeserialize(using = SmithyAstValue.Deserializer::class)
 sealed interface SmithyAstValue : SmithyValueDefinition {
     data class Array(@JsonValue override val values: List<SmithyAstValue>) : SmithyAstValue {
-        constructor(vararg values: SmithyAstValue) : this(listOf(*values))
-
         override val type = SmithyValueType.ARRAY
         override fun toString() = values.toString()
     }
@@ -282,17 +280,12 @@ sealed interface SmithyAstValue : SmithyValueDefinition {
     }
 
     data class Number(@JsonValue val value: BigDecimal) : SmithyAstValue {
-        constructor(value: Double) : this(value.toBigDecimal())
-        constructor(value: Long) : this(value.toBigDecimal())
-
         override val type = SmithyValueType.NUMBER
         override fun asNumber() = value
         override fun toString() = value.toString()
     }
 
     data class Object(@JsonValue override val fields: Map<kotlin.String, SmithyAstValue>) : SmithyAstValue {
-        constructor(vararg fields: Pair<kotlin.String, SmithyAstValue>) : this(mapOf(*fields))
-
         override val type = SmithyValueType.OBJECT
         override fun toString() = values.toString()
     }

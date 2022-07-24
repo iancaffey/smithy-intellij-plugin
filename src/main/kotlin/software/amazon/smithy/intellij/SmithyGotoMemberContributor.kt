@@ -7,11 +7,11 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.Processor
 import com.intellij.util.indexing.FindSymbolParameters
 import com.intellij.util.indexing.IdFilter
-import software.amazon.smithy.intellij.psi.SmithyAggregateShape
-import software.amazon.smithy.intellij.psi.SmithyMember
+import software.amazon.smithy.intellij.psi.SmithyContainerShape
+import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
 
 /**
- * A [ChooseByNameContributor] which finds all [SmithyMember] within the project to display in searches.
+ * A [ChooseByNameContributor] which finds all [SmithyMemberDefinition] within the project to display in searches.
  *
  * @author Ian Caffey
  * @since 1.0
@@ -27,13 +27,14 @@ class SmithyGotoMemberContributor : ChooseByNameContributorEx {
         processMembers(parameters.searchScope) { if (it.name == name) processor.process(it) }
     }
 
-    private fun processMembers(scope: GlobalSearchScope, action: (SmithyMember) -> Unit) {
+    private fun processMembers(scope: GlobalSearchScope, action: (SmithyMemberDefinition) -> Unit) {
         SmithyFileIndex.forEach(scope) { processFile(it, action) }
     }
 
-    private fun processFile(file: SmithyFile, action: (SmithyMember) -> Unit) = file.model?.shapes?.forEach { shape ->
-        if (shape is SmithyAggregateShape) {
-            shape.body.members.forEach(action)
+    private fun processFile(file: SmithyFile, action: (SmithyMemberDefinition) -> Unit) =
+        file.model?.shapes?.forEach { shape ->
+            if (shape is SmithyContainerShape) {
+                shape.body.members.forEach(action)
+            }
         }
-    }
 }

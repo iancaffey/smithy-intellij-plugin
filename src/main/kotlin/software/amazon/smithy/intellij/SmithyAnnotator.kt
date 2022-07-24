@@ -19,15 +19,15 @@ import software.amazon.smithy.intellij.actions.SmithyRemoveImportQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveMemberQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveUnusedImportsQuickFix
 import software.amazon.smithy.intellij.psi.SmithyBoolean
+import software.amazon.smithy.intellij.psi.SmithyContainerMember
 import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyIncompleteAppliedTrait
+import software.amazon.smithy.intellij.psi.SmithyIncompleteContainerMember
 import software.amazon.smithy.intellij.psi.SmithyIncompleteEntry
-import software.amazon.smithy.intellij.psi.SmithyIncompleteMember
 import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyMap
-import software.amazon.smithy.intellij.psi.SmithyMember
 import software.amazon.smithy.intellij.psi.SmithyMemberName
 import software.amazon.smithy.intellij.psi.SmithyModel
 import software.amazon.smithy.intellij.psi.SmithyNull
@@ -158,7 +158,7 @@ private enum class Annotation : Annotator {
     },
     INCOMPLETE_MEMBER {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-            if (element is SmithyIncompleteEntry || element is SmithyIncompleteMember) {
+            if (element is SmithyIncompleteEntry || element is SmithyIncompleteContainerMember) {
                 holder.highlight(HighlightSeverity.ERROR, "Missing shape id")
             }
         }
@@ -184,7 +184,7 @@ private enum class Annotation : Annotator {
     UNSUPPORTED_MEMBER {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             when (element) {
-                is SmithyMember -> element.name to element.parent //all normal shapes
+                is SmithyContainerMember -> element.name to element.parent //all container shapes
                 is SmithyEntry -> element.name to element.parent.parent //service, resource, operation
                 else -> null
             }?.takeIf { (_, parent) -> parent is SmithyShape }?.let { (name, parent) ->
@@ -207,8 +207,8 @@ private enum class Annotation : Annotator {
     },
     DUPLICATE_MEMBER {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-            if (element is SmithyMember && element.parent.children.any {
-                    it is SmithyMember && it != element && it.name == element.name
+            if (element is SmithyContainerMember && element.parent.children.any {
+                    it is SmithyContainerMember && it != element && it.name == element.name
                 }) {
                 holder.newAnnotation(HighlightSeverity.ERROR, "'${element.name}' is already defined")
                     .withFix(SmithyRemoveMemberQuickFix(element))
@@ -218,7 +218,7 @@ private enum class Annotation : Annotator {
     },
     MAP_KEY_STRING_TARGET {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-            if (element is SmithyMember && element.name == "key" && element.enclosingShape is SmithyMap) {
+            if (element is SmithyContainerMember && element.name == "key" && element.enclosingShape is SmithyMap) {
                 val target = element.resolve()
                 if (target != null && target.type != "string") {
                     holder.highlight(HighlightSeverity.ERROR, "'key' must target a string shape")

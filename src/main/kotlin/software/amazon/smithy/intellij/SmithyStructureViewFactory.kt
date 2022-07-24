@@ -14,15 +14,15 @@ import com.intellij.lang.PsiStructureViewFactory
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.NavigatablePsiElement
 import com.intellij.psi.PsiFile
-import software.amazon.smithy.intellij.psi.SmithyAggregateShape
+import software.amazon.smithy.intellij.psi.SmithyContainerShape
 import software.amazon.smithy.intellij.psi.SmithyDefinition
-import software.amazon.smithy.intellij.psi.SmithyMember
+import software.amazon.smithy.intellij.psi.SmithyContainerMember
 import software.amazon.smithy.intellij.psi.SmithyShape
 
 /**
  * A [PsiStructureViewFactory] for [Smithy](https://awslabs.github.io/smithy) IDL model files.
  *
- * [SmithyStructureViewFactory] provides a structure view of each [SmithyShape] within a [SmithyFile], as well as each [SmithyMember] within [SmithyAggregateShape].
+ * [SmithyStructureViewFactory] provides a structure view of each [SmithyShape] within a [SmithyFile], as well as each [SmithyContainerMember] within [SmithyContainerShape].
  *
  * @author Ian Caffey
  * @since 1.0
@@ -64,7 +64,7 @@ class SmithyStructureViewElement(val element: NavigatablePsiElement) : Structure
     override fun getPresentation() = element.presentation ?: PresentationData()
     override fun getChildren(): Array<out TreeElement> = when (element) {
         is SmithyFile -> (element.model?.shapes ?: emptyList()).map { SmithyStructureViewElement(it) }.toTypedArray()
-        is SmithyAggregateShape -> listOf(
+        is SmithyContainerShape -> listOf(
             element.appliedTraits.map { SmithyStructureViewElement(it) },
             element.declaredTraits.map { SmithyStructureViewElement(it) },
             element.body.members.map { SmithyStructureViewElement(it) }
