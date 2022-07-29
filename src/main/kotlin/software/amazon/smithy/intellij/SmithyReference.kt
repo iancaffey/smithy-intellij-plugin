@@ -34,9 +34,7 @@ import software.amazon.smithy.intellij.psi.SmithyValue
  * @see SmithyMemberReference
  * @see SmithyShapeReference
  */
-sealed class SmithyReference<T : PsiElement>(
-    element: T, soft: Boolean
-) : PsiReferenceBase<T>(element, soft) {
+sealed class SmithyReference(element: PsiElement, soft: Boolean) : PsiReferenceBase<PsiElement>(element, soft) {
     private var range = TextRange.from(0, element.textLength)
     override fun getRangeInElement(): TextRange {
         element.textLength.takeIf { it != range.length }?.let { range = TextRange.from(0, it) }
@@ -54,7 +52,7 @@ sealed class SmithyReference<T : PsiElement>(
  * @author Ian Caffey
  * @since 1.0
  */
-class SmithyKeyReference(val key: SmithyKey) : SmithyReference<SmithyKey>(key, false) {
+class SmithyKeyReference(val key: SmithyKey) : SmithyReference(key, false) {
     companion object {
         private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
         private fun resolver(ref: Ref) = CachedValueProvider {
@@ -92,11 +90,11 @@ class SmithyKeyReference(val key: SmithyKey) : SmithyReference<SmithyKey>(key, f
     override fun getAbsoluteRange(): TextRange = myElement.textRange
     override fun resolve() = ref?.let { getCachedValue(it, resolver(it)) }
     override fun handleElementRename(newElementName: String): SmithyKey {
-        val textRange = myElement.textRange
-        val document = FileDocumentManager.getInstance().getDocument(myElement.containingFile.virtualFile)
+        val textRange = key.textRange
+        val document = FileDocumentManager.getInstance().getDocument(key.containingFile.virtualFile)
         document!!.replaceString(textRange.startOffset, textRange.endOffset, newElementName)
-        PsiDocumentManager.getInstance(myElement.project).commitDocument(document)
-        return myElement
+        PsiDocumentManager.getInstance(key.project).commitDocument(document)
+        return key
     }
 
     //Note: the path from the enclosing trait to the value can change (e.g. if the enclosing field is renamed), so
@@ -116,17 +114,16 @@ class SmithyKeyReference(val key: SmithyKey) : SmithyReference<SmithyKey>(key, f
  * @author Ian Caffey
  * @since 1.0
  */
-class SmithyMemberReference(val id: SmithyMemberId) : SmithyReference<SmithyMemberId>(id, false) {
-    private val delegate = SmithyShapeReference(id.shapeId)
-    override fun isSoft() = delegate.isSoft
-    override fun getAbsoluteRange(): TextRange = myElement.textRange
-    override fun resolve() = delegate.resolve()?.getMember(myElement.memberName)
+class SmithyMemberReference(val id: SmithyMemberId) : SmithyReference(id, false) {
+    override fun isSoft() = id.shapeId.reference.isSoft
+    override fun getAbsoluteRange(): TextRange = id.textRange
+    override fun resolve() = id.shapeId.reference.resolve()?.getMember(id.memberName)
     override fun handleElementRename(newElementName: String): SmithyMemberId {
-        val textRange = myElement.textRange
-        val document = FileDocumentManager.getInstance().getDocument(myElement.containingFile.virtualFile)
+        val textRange = id.textRange
+        val document = FileDocumentManager.getInstance().getDocument(id.containingFile.virtualFile)
         document!!.replaceString(textRange.startOffset, textRange.endOffset, newElementName)
-        PsiDocumentManager.getInstance(myElement.project).commitDocument(document)
-        return myElement
+        PsiDocumentManager.getInstance(id.project).commitDocument(document)
+        return id
     }
 }
 
@@ -136,7 +133,28 @@ class SmithyMemberReference(val id: SmithyMemberId) : SmithyReference<SmithyMemb
  * @author Ian Caffey
  * @since 1.0
  */
-data class SmithyShapeReference(val value: SmithyValue) : SmithyReference<SmithyValue>(value, false) {
+sealed class SmithyShapeReference(element: PsiElement, soft: Boolean) : SmithyReference(element, soft) {
+    companion object {
+        operator fun invoke(value: SmithyValue) = if (value is SmithyShapeId) ById(value) else ByValue(value)
+    }
+
+    abstract override fun resolve(): SmithyShapeDefinition?
+}
+
+private data class ById(val shapeId: SmithyShapeId) : SmithyShapeReference(shapeId, false) {
+    companion object {
+        private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
+        private fun resolver(shapeId: SmithyShapeId) = CachedValueProvider {
+            CachedValueProvider.Result.create(getDefinitions(shapeId).firstOrNull(), dependencies)
+        }
+    }
+
+    override fun getAbsoluteRange(): TextRange = myElement.textRange
+    override fun handleElementRename(newElementName: String): PsiElement = shapeId.setName(newElementName)
+    override fun resolve(): SmithyShapeDefinition? = getCachedValue(shapeId, resolver(shapeId))
+}
+
+private data class ByValue(val value: SmithyValue) : SmithyShapeReference(value, false) {
     companion object {
         private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
         private fun resolver(ref: Ref) = CachedValueProvider {
@@ -153,11 +171,10 @@ data class SmithyShapeReference(val value: SmithyValue) : SmithyReference<Smithy
     private val ref: Ref?
         get() {
             modificationTracker.modificationCount.takeIf { it != lastModCount }?.let { modCount ->
-                _ref = when {
-                    value is SmithyShapeId -> value
-                    value.parent is SmithyKey -> null //the parent SmithyKey references the member while this value would resolve to the type of the member which conflicts when hovering the key
+                _ref = when (value.parent) {
+                    is SmithyKey -> null //the parent SmithyKey references the member while this value would resolve to the type of the member which conflicts when hovering the key
                     else -> getParentOfType(value, SmithyTrait::class.java)?.shape
-                }?.let { Ref(it, if (value is SmithyShapeId) null else ValuePath.buildTo(value)) }
+                }?.let { Ref(it, ValuePath.buildTo(value)) }
                 lastModCount = modCount
             }
             return _ref
@@ -168,13 +185,13 @@ data class SmithyShapeReference(val value: SmithyValue) : SmithyReference<Smithy
     }
 
     override fun getAbsoluteRange(): TextRange = myElement.textRange
-    override fun resolve() = ref?.let { getCachedValue(if (value is SmithyShapeId) value else it, resolver(it)) }
+    override fun resolve() = ref?.let { getCachedValue(it, resolver(it)) }
     override fun handleElementRename(newElementName: String): SmithyValue {
-        val textRange = myElement.textRange
-        val document = FileDocumentManager.getInstance().getDocument(myElement.containingFile.virtualFile)
+        val textRange = value.textRange
+        val document = FileDocumentManager.getInstance().getDocument(value.containingFile.virtualFile)
         document!!.replaceString(textRange.startOffset, textRange.endOffset, newElementName)
-        PsiDocumentManager.getInstance(myElement.project).commitDocument(document)
-        return myElement
+        PsiDocumentManager.getInstance(value.project).commitDocument(document)
+        return value
     }
 
     //Note: the path from the enclosing trait to the value can change (e.g. if the enclosing field is renamed), so
@@ -213,7 +230,7 @@ data class ValuePath(val path: List<String> = emptyList()) {
     }
 
     fun resolve(shapeId: SmithyShapeId): SmithyShapeDefinition? {
-        val root = getDefinitions(shapeId).firstOrNull() ?: return null
+        val root = shapeId.reference.resolve() ?: return null
         if (path.isEmpty()) return root
         var current: SmithyMemberDefinition? = null
         path.forEach { name ->
