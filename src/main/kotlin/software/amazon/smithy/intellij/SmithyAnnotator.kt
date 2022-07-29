@@ -23,10 +23,12 @@ import software.amazon.smithy.intellij.actions.SmithyRemoveUnusedImportsQuickFix
 import software.amazon.smithy.intellij.psi.SmithyBoolean
 import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyEntry
+import software.amazon.smithy.intellij.psi.SmithyEnumMember
 import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyIncompleteAppliedTrait
 import software.amazon.smithy.intellij.psi.SmithyIncompleteContainerMember
 import software.amazon.smithy.intellij.psi.SmithyIncompleteEntry
+import software.amazon.smithy.intellij.psi.SmithyIntEnumMember
 import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyMap
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
@@ -40,6 +42,7 @@ import software.amazon.smithy.intellij.psi.SmithyString
 import software.amazon.smithy.intellij.psi.SmithyTextBlock
 import software.amazon.smithy.intellij.psi.SmithyTrait
 import software.amazon.smithy.intellij.psi.SmithyTypes
+import software.amazon.smithy.intellij.psi.SmithyValue
 import java.util.*
 
 /**
@@ -177,6 +180,18 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                     .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL)
                     .withFix(SmithyRemoveCommasQuickFix)
                     .create()
+            }
+        }
+    },
+    INVALID_ENUM_MEMBER {
+        override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+            if (element is SmithyValue) {
+                if (element.parent is SmithyEnumMember && element.asString() == null) {
+                    holder.highlight(HighlightSeverity.ERROR, "Expected a string value")
+                }
+                if (element.parent is SmithyIntEnumMember && element.asNumber() == null) {
+                    holder.highlight(HighlightSeverity.ERROR, "Expected an integer value")
+                }
             }
         }
     },
