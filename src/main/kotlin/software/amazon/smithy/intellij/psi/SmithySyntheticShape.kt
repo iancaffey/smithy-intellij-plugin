@@ -32,3 +32,16 @@ class SmithySyntheticShape(
     override fun getLanguage() = SmithyLanguage
     override fun getParent() = enclosing
 }
+
+data class SmithySyntheticShapeTarget(
+    val member: SmithyMemberDefinition,
+    val type: String
+) : SmithySyntheticElement(), SmithyShapeTarget {
+    val shape = SmithySyntheticShape(member, type)
+    override val shapeName = shape.name
+    override val declaredNamespace = shape.namespace
+    override val resolvedNamespace = shape.namespace
+    override fun getName() = shapeName
+    override fun getParent() = member
+    override fun resolve() = shape
+}

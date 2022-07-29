@@ -174,7 +174,7 @@ container_body ::= TOKEN_OPEN_BRACE ((container_member | incomplete_container_me
     methods=[members="container_member" incomplete_container_member=""]
 }
 container_member ::= [documentation] trait* member_name TOKEN_COLON shape_id {
-    methods=[declared_traits="trait" name_identifier="member_name"]
+    methods=[declared_traits="trait" name_identifier="member_name" declared_target="shape_id"]
     implements="software.amazon.smithy.intellij.psi.SmithyContainerMemberExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyContainerMemberMixin"
 }

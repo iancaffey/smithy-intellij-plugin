@@ -15,8 +15,7 @@ import software.amazon.smithy.intellij.SmithyAppliedTraitResolver.getAppliedTrai
 interface SmithyMemberDefinition : SmithyDefinition {
     override val appliedTraits get() = getAppliedTraits(this)
     val enclosingShape: SmithyShapeDefinition
-    val targetShapeName: String
-    val declaredTargetNamespace: String?
-    val resolvedTargetNamespace: String?
-    fun resolve(): SmithyShapeDefinition?
+    val declaredTarget: SmithyShapeTarget?
+    val resolvedTarget: SmithyShapeTarget? get() = declaredTarget
+    fun resolve() = resolvedTarget?.resolve()
 }

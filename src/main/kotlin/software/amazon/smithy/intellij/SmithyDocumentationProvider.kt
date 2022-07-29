@@ -42,7 +42,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 }
                 else -> {
                     appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
-                    append(": ${element.targetShapeName}")
+                    element.resolvedTarget?.let { target -> append(": ${target.shapeName}") }
                 }
             }
         }

@@ -60,7 +60,9 @@ class SmithyCompletionContributor : CompletionContributor() {
                     getParentOfType(element, SmithyMemberId::class.java)?.let {
                         val parent = it.shapeId.reference.resolve()
                         parent?.members?.forEach { member ->
-                            results.addElement(memberElement(member.name, member.targetShapeName, parent))
+                            member.resolvedTarget?.let { target ->
+                                results.addElement(memberElement(member.name, target.shapeName, parent))
+                            }
                         }
                     }
                 }
@@ -84,7 +86,9 @@ private fun addMembers(element: PsiElement, prefix: String, results: CompletionR
         else -> null
     }
     enclosingShape?.members?.forEach { member ->
-        memberResults.addElement(memberElement(member.name, member.targetShapeName))
+        member.resolvedTarget?.let { target ->
+            memberResults.addElement(memberElement(member.name, target.shapeName))
+        }
     }
 }
 

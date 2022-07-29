@@ -1,5 +1,6 @@
 package software.amazon.smithy.intellij
 
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.GlobalSearchScope
@@ -9,10 +10,8 @@ import com.intellij.psi.util.PsiModificationTracker
 import software.amazon.smithy.intellij.index.SmithyAstShapeIndex
 import software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex
 import software.amazon.smithy.intellij.index.SmithyShapeNameResolutionHintIndex
-import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeId
-import software.amazon.smithy.intellij.psi.SmithySyntheticShape
 import software.amazon.smithy.intellij.psi.SmithyTraitDefinition
 
 /**
@@ -23,20 +22,6 @@ import software.amazon.smithy.intellij.psi.SmithyTraitDefinition
  */
 object SmithyShapeResolver {
     private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
-    fun getDefinitions(member: SmithyMemberDefinition): List<SmithyShapeDefinition> =
-        getCachedValue(member) {
-            val definitions = when (member.enclosingShape.type) {
-                "enum" -> listOf(SmithySyntheticShape(member, "string"))
-                "intEnum" -> listOf(SmithySyntheticShape(member, "integer"))
-                else -> {
-                    val namespace = member.resolvedTargetNamespace
-                    namespace?.let {
-                        getDefinitions(it, member.targetShapeName, member.resolveScope)
-                    } ?: emptyList()
-                }
-            }
-            CachedValueProvider.Result.create(definitions, dependencies)
-        }
 
     fun getDefinitions(shapeId: SmithyShapeId): List<SmithyShapeDefinition> =
         getCachedValue(shapeId) {
@@ -51,6 +36,11 @@ object SmithyShapeResolver {
             val namespace = trait.resolvedNamespace
             val definitions = namespace?.let { getDefinitions(it, trait.shapeName, trait.resolveScope) } ?: emptyList()
             CachedValueProvider.Result.create(definitions, dependencies)
+        }
+
+    fun getDefinitions(context: PsiElement, namespace: String, shapeName: String): List<SmithyShapeDefinition> =
+        getCachedValue(context) {
+            CachedValueProvider.Result.create(getDefinitions(namespace, shapeName, context.resolveScope), dependencies)
         }
 
     fun getDefinitions(namespace: String, shapeName: String, scope: GlobalSearchScope): List<SmithyShapeDefinition> {

@@ -26,7 +26,6 @@ import software.amazon.smithy.intellij.SmithyKeyReference
 import software.amazon.smithy.intellij.SmithyLanguage
 import software.amazon.smithy.intellij.SmithyMemberReference
 import software.amazon.smithy.intellij.SmithyShapeReference
-import software.amazon.smithy.intellij.SmithyShapeResolver.getDefinitions
 import software.amazon.smithy.intellij.SmithyShapeResolver.getNamespace
 import software.amazon.smithy.intellij.psi.impl.SmithyContainerShapeImpl
 import software.amazon.smithy.intellij.psi.impl.SmithyKeyedElementImpl
@@ -85,16 +84,12 @@ interface SmithyContainerMemberExt : SmithyNamedElement, SmithyMemberDefinition 
 }
 
 abstract class SmithyContainerMemberMixin(node: ASTNode) : SmithyPsiElement(node), SmithyContainerMember {
-    override val targetShapeName get() = shapeId.shapeName
-    override val declaredTargetNamespace get() = shapeId.declaredNamespace
-    override val resolvedTargetNamespace get() = shapeId.resolvedNamespace
     override val enclosingShape: SmithyContainerShape get() = getParentOfType(this, SmithyContainerShape::class.java)!!
     override fun getName(): String = nameIdentifier.text
     override fun setName(newName: String) = setName<SmithyContainerMember>(this, newName)
     override fun getTextOffset() = nameIdentifier.textOffset
-    override fun resolve(): SmithyShapeDefinition? = shapeId.reference.resolve()
     override fun getPresentation() = object : ItemPresentation {
-        override fun getPresentableText(): String = "$name: ${shapeId.shapeName}"
+        override fun getPresentableText(): String = resolvedTarget?.let { "$name: ${it.shapeName}" } ?: name
         override fun getLocationString() = enclosingShape.shapeName
         override fun getIcon(unused: Boolean) = getIcon(0)
     }
@@ -145,21 +140,19 @@ abstract class SmithyEnumMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyEnu
 
 interface SmithyEnumMemberExt : SmithyNamedElement, SmithyMemberDefinition {
     override val enclosingShape: SmithyEnum
-    override val declaredTargetNamespace: String
-    override val resolvedTargetNamespace: String
+    override val declaredTarget: SmithySyntheticShapeTarget
+    override val resolvedTarget: SmithySyntheticShapeTarget
     override val documentation: SmithyDocumentation?
     override val declaredTraits: List<SmithyTrait>
 }
 
 abstract class SmithyEnumMemberMixin(node: ASTNode) : SmithyPsiElement(node), SmithyEnumMember {
-    override val targetShapeName = "Unit"
-    override val declaredTargetNamespace = "smithy.api"
-    override val resolvedTargetNamespace = "smithy.api"
+    override val declaredTarget = SmithySyntheticShapeTarget(this, "string")
+    override val resolvedTarget = declaredTarget
     override val enclosingShape: SmithyEnum get() = getParentOfType(this, SmithyEnum::class.java)!!
     override fun getName(): String = nameIdentifier.text
     override fun setName(newName: String) = setName<SmithyEnumMember>(this, newName)
     override fun getTextOffset() = nameIdentifier.textOffset
-    override fun resolve() = getDefinitions(this).firstOrNull()
     override fun getPresentation() = object : ItemPresentation {
         override fun getPresentableText(): String = name
         override fun getLocationString() = enclosingShape.shapeName
@@ -183,21 +176,19 @@ abstract class SmithyIntEnumMixin(node: ASTNode) : SmithyShapeImpl(node), Smithy
 
 interface SmithyIntEnumMemberExt : SmithyNamedElement, SmithyMemberDefinition {
     override val enclosingShape: SmithyIntEnum
-    override val declaredTargetNamespace: String
-    override val resolvedTargetNamespace: String
+    override val declaredTarget: SmithySyntheticShapeTarget
+    override val resolvedTarget: SmithySyntheticShapeTarget
     override val documentation: SmithyDocumentation?
     override val declaredTraits: List<SmithyTrait>
 }
 
 abstract class SmithyIntEnumMemberMixin(node: ASTNode) : SmithyPsiElement(node), SmithyIntEnumMember {
-    override val targetShapeName = "Unit"
-    override val declaredTargetNamespace = "smithy.api"
-    override val resolvedTargetNamespace = "smithy.api"
+    override val declaredTarget = SmithySyntheticShapeTarget(this, "integer")
+    override val resolvedTarget = declaredTarget
     override val enclosingShape: SmithyIntEnum get() = getParentOfType(this, SmithyIntEnum::class.java)!!
     override fun getName(): String = nameIdentifier.text
     override fun setName(newName: String) = setName<SmithyIntEnumMember>(this, newName)
     override fun getTextOffset() = nameIdentifier.textOffset
-    override fun resolve() = getDefinitions(this).firstOrNull()
     override fun getPresentation() = object : ItemPresentation {
         override fun getPresentableText(): String = name
         override fun getLocationString() = enclosingShape.shapeName
@@ -381,11 +372,8 @@ abstract class SmithyShapeMixin(node: ASTNode) : SmithyPsiElement(node), SmithyS
     }
 }
 
-interface SmithyShapeIdExt : SmithyCharSequence, PsiNamedElement {
-    val shapeName: String
-    val declaredNamespace: String?
+interface SmithyShapeIdExt : SmithyCharSequence, SmithyShapeTarget, PsiNamedElement {
     val enclosingNamespace: String?
-    val resolvedNamespace: String?
 }
 
 abstract class SmithyShapeIdMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyShapeId {
@@ -397,6 +385,7 @@ abstract class SmithyShapeIdMixin(node: ASTNode) : SmithyPrimitiveImpl(node), Sm
     override fun getName() = shapeName
     override fun setName(newName: String) = setName<SmithyShapeId>(this, id, newName)
     override fun getTextOffset() = id.textOffset
+    override fun resolve() = reference.resolve()
 }
 
 private fun parseInnerText(text: String, start: Int = 0, end: Int = text.length - start): String? = buildString {
