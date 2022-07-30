@@ -46,6 +46,7 @@ TOKEN_INCOMPLETE_TEXT_BLOCK=\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[
   "}"                                { return TOKEN_CLOSE_BRACE; }
   "["                                { return TOKEN_OPEN_BRACKET; }
   "]"                                { return TOKEN_CLOSE_BRACKET; }
+  ":="                               { return TOKEN_WALRUS; }
   ":"                                { return TOKEN_COLON; }
   ","                                { return TOKEN_COMMA; }
   "="                                { return TOKEN_EQUALS; }

@@ -36,14 +36,25 @@ class SmithyFormattingModelBuilder : FormattingModelBuilder {
             SmithyTypes.UNION
         )
     }
+
     @Suppress("UnstableApiUsage")
     override fun createModel(formattingContext: FormattingContext): FormattingModel {
         val codeStyleSettings = formattingContext.codeStyleSettings
         val spacingBuilder = SpacingBuilder(codeStyleSettings, SmithyLanguage)
+            //No extra spaces around $
+            .around(SmithyTypes.TOKEN_DOLLAR_SIGN).none()
+            //No extra spaces before :
+            .before(TokenSet.create(SmithyTypes.TOKEN_COLON)).none()
+            //Space before container bodies (to add separation from the shape name or traits for inline I/O)
+            .before(
+                TokenSet.create(
+                    SmithyTypes.CONTAINER_BODY, SmithyTypes.ENUM_BODY, SmithyTypes.INT_ENUM_BODY
+                )
+            ).spaces(1)
             //Space after : and ,
             .after(TokenSet.create(SmithyTypes.TOKEN_COLON, SmithyTypes.TOKEN_COMMA)).spaces(1)
-            //Spaces around =
-            .around(SmithyTypes.TOKEN_EQUALS).spaces(1)
+            //Spaces around = and :=
+            .around(TokenSet.create(SmithyTypes.TOKEN_EQUALS, SmithyTypes.TOKEN_WALRUS)).spaces(1)
             //Blank lines after all top-level declarations (not before so line comments can be placed)
             .after(
                 TokenSet.create(

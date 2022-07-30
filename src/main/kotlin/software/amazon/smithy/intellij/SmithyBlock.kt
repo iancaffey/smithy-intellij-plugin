@@ -31,7 +31,7 @@ class SmithyBlock constructor(
     private val parent: SmithyBlock? = null,
     private val indent: Indent = Indent.getNoneIndent(),
     wrap: Wrap? = Wrap.createWrap(WrapType.NONE, false),
-    alignment: Alignment? = if (parent != null && node.psi is SmithyContainer) parent.alignment else Alignment.createAlignment(),
+    alignment: Alignment? = if (parent != null) parent.alignment else Alignment.createAlignment(),
 ) : AbstractBlock(node, wrap, alignment) {
 
     private val childAlignment = Alignment.createAlignment()

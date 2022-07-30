@@ -1,7 +1,6 @@
 package software.amazon.smithy.intellij.psi
 
 import com.intellij.psi.PsiElement
-import software.amazon.smithy.intellij.SmithyLanguage
 
 /**
  * A synthetic shape which refines `smithy.api#Unit` to a specific type.
@@ -29,7 +28,6 @@ class SmithySyntheticShape(
     override val documentation: SmithyDocumentationDefinition? = null
     override fun getName() = type
     override fun getNameIdentifier() = id
-    override fun getLanguage() = SmithyLanguage
     override fun getParent() = enclosing
 }
 

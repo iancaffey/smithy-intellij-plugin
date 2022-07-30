@@ -29,6 +29,7 @@ import software.amazon.smithy.intellij.SmithyShapeReference
 import software.amazon.smithy.intellij.SmithyShapeResolver.getNamespace
 import software.amazon.smithy.intellij.psi.impl.SmithyContainerShapeImpl
 import software.amazon.smithy.intellij.psi.impl.SmithyKeyedElementImpl
+import software.amazon.smithy.intellij.psi.impl.SmithyOperationMemberImpl
 import software.amazon.smithy.intellij.psi.impl.SmithyPrimitiveImpl
 import software.amazon.smithy.intellij.psi.impl.SmithyShapeImpl
 import software.amazon.smithy.intellij.psi.impl.SmithyValueImpl
@@ -54,6 +55,7 @@ interface SmithyNamedElement : SmithyElement, PsiNameIdentifierOwner {
 
 abstract class SmithySyntheticElement : FakePsiElement(), SmithyElement {
     override fun getLanguage() = SmithyLanguage
+    override fun getTextOffset() = parent?.node?.startOffset ?: 0
 }
 
 interface SmithyStatement : SmithyElement {
@@ -166,6 +168,29 @@ abstract class SmithyImportMixin(node: ASTNode) : SmithyPsiElement(node), Smithy
 interface SmithyIncompleteAppliedTraitExt : SmithyStatement
 abstract class SmithyIncompleteAppliedTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyIncompleteAppliedTrait
 
+interface SmithyInputExt : SmithyContainerShape, SmithyShapeTarget {
+    val operation: SmithyOperation
+}
+
+abstract class SmithyInputMixin(node: ASTNode) : SmithyContainerShapeImpl(node), SmithyInput {
+    private val id = object : SmithySyntheticElement() {
+        override fun getParent() = this@SmithyInputMixin
+        override fun getTextOffset() = body.textOffset
+        override fun getText() =
+            "${operation.name}${(containingFile as? SmithyFile)?.model?.operationInputSuffix ?: "Input"}"
+    }
+    override val operation get() = getParentOfType(this, SmithyOperation::class.java)!!
+    override val declaredNamespace = namespace
+    override val resolvedNamespace = namespace
+    override val typeIdentifier = object : SmithySyntheticElement() {
+        override fun getParent() = this@SmithyInputMixin
+        override fun getText() = "structure"
+    }
+
+    override fun getNameIdentifier() = id
+    override fun resolve() = this
+}
+
 interface SmithyIntEnumExt : SmithyShape {
     override val members: List<SmithyIntEnumMember>
 }
@@ -245,6 +270,7 @@ interface SmithyModelExt : SmithyElement {
     val operationOutputSuffix: String
     val control: List<SmithyControl>
     val metadata: List<SmithyMetadata>
+    val shapes: List<SmithyShape>
 }
 
 abstract class SmithyModelMixin(node: ASTNode) : SmithyPsiElement(node), SmithyModel {
@@ -260,6 +286,18 @@ abstract class SmithyModelMixin(node: ASTNode) : SmithyPsiElement(node), SmithyM
         } ?: "Output"
     override val control: List<SmithyControl> get() = getChildrenOfTypeAsList(this, SmithyControl::class.java)
     override val metadata: List<SmithyMetadata> get() = getChildrenOfTypeAsList(this, SmithyMetadata::class.java)
+    override val shapes: List<SmithyShape>
+        get() = mutableListOf<SmithyShape>().also { shapes ->
+            firstChild?.siblings()?.forEach {
+                if (it is SmithyShape) {
+                    shapes += it
+                    if (it is SmithyOperation) {
+                        it.input?.shape?.let { input -> shapes += input }
+                        it.output?.shape?.let { output -> shapes += output }
+                    }
+                }
+            }
+        }
 }
 
 interface SmithyNamespaceExt : SmithyStatement
@@ -311,8 +349,73 @@ abstract class SmithyObjectMixin(node: ASTNode) : SmithyValueImpl(node), SmithyO
     }
 }
 
+interface SmithyOperationExt : SmithyShape {
+    val input: SmithyOperationInput?
+    val output: SmithyOperationOutput?
+    val errors: SmithyOperationErrors?
+}
+
 abstract class SmithyOperationMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyOperation {
     override val supportedMembers = setOf("input", "output", "errors")
+    override val input get() = body.members.firstNotNullOfOrNull { it as? SmithyOperationInput }
+    override val output get() = body.members.firstNotNullOfOrNull { it as? SmithyOperationOutput }
+    override val errors get() = body.members.firstNotNullOfOrNull { it as? SmithyOperationErrors }
+}
+
+interface SmithyOperationMemberExt : SmithyNamedElement {
+    val enclosingShape: SmithyOperation
+}
+
+abstract class SmithyOperationMemberMixin(node: ASTNode) : SmithyPsiElement(node), SmithyOperationMember {
+    override val enclosingShape: SmithyOperation get() = getParentOfType(this, SmithyOperation::class.java)!!
+    override fun getName(): String = nameIdentifier.text
+    override fun setName(newName: String): PsiElement? = null
+    override fun getTextOffset() = nameIdentifier.textOffset
+    override fun getPresentation() = object : ItemPresentation {
+        override fun getPresentableText(): String = name
+        override fun getLocationString() = enclosingShape.shapeName
+        override fun getIcon(unused: Boolean) = getIcon(0)
+    }
+}
+
+interface SmithyOperationErrorsExt : SmithyOperationMemberExt
+
+abstract class SmithyOperationErrorsMixin(node: ASTNode) : SmithyOperationMemberImpl(node), SmithyOperationErrors {
+    override fun getNameIdentifier(): PsiElement = findChildByType(SmithyTypes.TOKEN_ERRORS)!!
+}
+
+interface SmithyOperationInputExt : SmithyOperationMemberExt
+
+abstract class SmithyOperationInputMixin(node: ASTNode) : SmithyOperationMemberImpl(node), SmithyOperationInput {
+    override fun getNameIdentifier(): PsiElement = findChildByType(SmithyTypes.TOKEN_INPUT)!!
+}
+
+interface SmithyOperationOutputExt : SmithyOperationMemberExt
+abstract class SmithyOperationOutputMixin(node: ASTNode) : SmithyOperationMemberImpl(node), SmithyOperationOutput {
+    override fun getNameIdentifier(): PsiElement = findChildByType(SmithyTypes.TOKEN_OUTPUT)!!
+}
+
+interface SmithyOutputExt : SmithyContainerShape, SmithyShapeTarget {
+    val operation: SmithyOperation
+}
+
+abstract class SmithyOutputMixin(node: ASTNode) : SmithyContainerShapeImpl(node), SmithyOutput {
+    private val id = object : SmithySyntheticElement() {
+        override fun getParent() = this@SmithyOutputMixin
+        override fun getTextOffset() = body.textOffset
+        override fun getText() =
+            "${operation.name}${(containingFile as? SmithyFile)?.model?.operationOutputSuffix ?: "Output"}"
+    }
+    override val operation get() = getParentOfType(this, SmithyOperation::class.java)!!
+    override val declaredNamespace = namespace
+    override val resolvedNamespace = namespace
+    override val typeIdentifier = object : SmithySyntheticElement() {
+        override fun getParent() = this@SmithyOutputMixin
+        override fun getText() = "structure"
+    }
+
+    override fun getNameIdentifier() = id
+    override fun resolve() = this
 }
 
 abstract class SmithyResourceMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyResource {
@@ -345,7 +448,6 @@ interface SmithyShapeExt : SmithyNamedElement, SmithyShapeDefinition, SmithyStat
     val model: SmithyModel
     val requiredMembers: Set<String> get() = emptySet()
     val supportedMembers: Set<String>? get() = requiredMembers.takeIf { it.isNotEmpty() }
-    override fun getNameIdentifier(): SmithyShapeName
 }
 
 abstract class SmithyShapeMixin(node: ASTNode) : SmithyPsiElement(node), SmithyShape {
@@ -356,14 +458,14 @@ abstract class SmithyShapeMixin(node: ASTNode) : SmithyPsiElement(node), SmithyS
     override val namespace get() = model.namespace!!
     override val shapeName: String get() = nameIdentifier.text
     override val shapeId get() = "$namespace#$shapeName"
-    override val model get() = parent as SmithyModel
+    override val model get() = (containingFile as? SmithyFile)?.model!!
     override val members get(): List<@JvmWildcard SmithyMemberDefinition> = emptyList<SmithyMemberDefinition>()
     override val documentation get() = getChildOfType(this, SmithyDocumentation::class.java)
     override val declaredTraits: List<SmithyTrait> get() = getChildrenOfTypeAsList(this, SmithyTrait::class.java)
     override fun getMember(name: String): SmithyMemberDefinition? = members.find { it.name == name }
     override fun getName() = shapeName
     override fun setName(newName: String) = setName<SmithyShape>(this, newName)
-    override fun getNameIdentifier() = getChildOfType(this, SmithyShapeName::class.java)!!
+    override fun getNameIdentifier(): PsiElement = getChildOfType(this, SmithyShapeName::class.java)!!
     override fun getTextOffset() = nameIdentifier.textOffset
     override fun getPresentation() = object : ItemPresentation {
         override fun getPresentableText(): String = shapeName

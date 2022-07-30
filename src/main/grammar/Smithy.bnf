@@ -18,6 +18,7 @@
         TOKEN_CLOSE_BRACE="}"
         TOKEN_OPEN_BRACKET="["
         TOKEN_CLOSE_BRACKET="]"
+        TOKEN_WALRUS=":="
         TOKEN_COLON=":"
         TOKEN_COMMA=","
         TOKEN_EQUALS="="
@@ -72,18 +73,19 @@
         TOKEN_INCOMPLETE_TEXT_BLOCK="regexp:\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))+"
     ]
     implements("^(?!.*element).*")="software.amazon.smithy.intellij.psi.SmithyElement"
-    implements("array|object|container_body|enum_body|int_enum_body|trait_body")="software.amazon.smithy.intellij.psi.SmithyContainer"
+    implements("array|object|container_body|enum_body|int_enum_body|operation_body|trait_body")="software.amazon.smithy.intellij.psi.SmithyContainer"
     extends("array|object|primitive")=value
     extends("null|boolean|number|string|text_block|shape_id")=primitive
     extends("symbol|null|boolean|simple_type_name")=id
     extends("container_shape|simple_shape|enum|int_enum|service|operation|resource")=shape
-    extends("list|set|map|structure|union")=container_shape
+    extends("operation_input|operation_output|operation_errors")=operation_member
+    extends("list|set|map|output|structure|union|input|output")=container_shape
     extends("control|entry|metadata")=keyed_element
 }
 //https://awslabs.github.io/smithy/1.0/spec/core/idl.html
 root ::= [model]
 model ::= control* metadata* [namespace import* (applied_trait | incomplete_applied_trait | shape)*] {
-    methods=[control="" metadata="" namespace="" imports="import" applied_traits="applied_trait" incomplete_applied_trait="" shapes="shape"]
+    methods=[control="" metadata="" namespace="" shape="" imports="import" applied_traits="applied_trait" incomplete_applied_trait=""]
     implements="software.amazon.smithy.intellij.psi.SmithyModelExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyModelMixin"
 }
@@ -104,7 +106,7 @@ import ::= TOKEN_USE shape_id {
     mixin="software.amazon.smithy.intellij.psi.SmithyImportMixin"
 }
 
-//Shapes
+//Shapes (excl. inline I/O)
 shape ::= simple_shape | enum | int_enum | list | set | map | structure | union | service | operation | resource {
     implements="software.amazon.smithy.intellij.psi.SmithyShapeExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyShapeMixin"
@@ -162,9 +164,42 @@ service ::= [documentation] trait* TOKEN_SERVICE shape_name object {
     methods=[trait="" shape_name="" body="object"]
     mixin="software.amazon.smithy.intellij.psi.SmithyServiceMixin"
 }
-operation ::= [documentation] trait* TOKEN_OPERATION shape_name object {
-    methods=[trait="" shape_name="" body="object"]
+operation ::= [documentation] trait* TOKEN_OPERATION shape_name operation_body {
+    methods=[trait="" shape_name="" body="operation_body"]
+    implements="software.amazon.smithy.intellij.psi.SmithyOperationExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyOperationMixin"
+}
+operation_body ::= TOKEN_OPEN_BRACE (operation_member [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
+     methods=[members="operation_member"]
+}
+operation_member ::= operation_input | operation_output | operation_errors {
+    implements="software.amazon.smithy.intellij.psi.SmithyOperationMemberExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyOperationMemberMixin"
+}
+operation_input ::= TOKEN_INPUT ((TOKEN_COLON shape_id) | (TOKEN_WALRUS input)) {
+    methods=[shape="input"]
+    implements="software.amazon.smithy.intellij.psi.SmithyOperationInputExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyOperationInputMixin"
+}
+input ::= [documentation] trait* container_body {
+    methods=[trait="" body="container_body"]
+    implements="software.amazon.smithy.intellij.psi.SmithyInputExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyInputMixin"
+}
+operation_output ::= TOKEN_OUTPUT ((TOKEN_COLON shape_id) | (TOKEN_WALRUS output)) {
+    methods=[shape="output"]
+    implements="software.amazon.smithy.intellij.psi.SmithyOperationOutputExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyOperationOutputMixin"
+}
+output ::= [documentation] trait* container_body {
+    methods=[trait="" body="container_body"]
+    implements="software.amazon.smithy.intellij.psi.SmithyOutputExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyOutputMixin"
+}
+operation_errors ::= TOKEN_ERRORS TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COMMA])* TOKEN_CLOSE_BRACKET {
+    methods=[shapes="shape_id"]
+    implements="software.amazon.smithy.intellij.psi.SmithyOperationErrorsExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyOperationErrorsMixin"
 }
 resource ::= [documentation] trait* TOKEN_RESOURCE shape_name object {
     methods=[trait="" shape_name="" body="object"]
