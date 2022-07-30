@@ -64,6 +64,8 @@
                                    implementationClass="software.amazon.smithy.intellij.SmithyKeyParameterInfoHandler"/>
         <codeInsight.parameterInfo language="Smithy"
                                    implementationClass="software.amazon.smithy.intellij.SmithyValueParameterInfoHandler"/>
+        <codeInsight.parameterNameHints language="Smithy"
+                                        implementationClass="software.amazon.smithy.intellij.InlineShapeInlayHintsProvider"/>
         <colorSettingsPage implementation="software.amazon.smithy.intellij.SmithyColorSettingsPage"/>
         <completion.contributor language="Smithy"
                                 implementationClass="software.amazon.smithy.intellij.SmithyCompletionContributor"/>
