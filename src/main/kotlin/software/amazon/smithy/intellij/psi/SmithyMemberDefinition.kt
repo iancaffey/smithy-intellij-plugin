@@ -17,5 +17,7 @@ interface SmithyMemberDefinition : SmithyDefinition {
     val enclosingShape: SmithyShapeDefinition
     val declaredTarget: SmithyShapeTarget?
     val resolvedTarget: SmithyShapeTarget? get() = declaredTarget
+    val defaultValue: SmithyValueDefinition? get() = findTrait("smithy.api", "default")?.value
+    val enumValue: SmithyValueDefinition? get() = findTrait("smithy.api", "enumValue")?.value
     fun resolve() = resolvedTarget?.resolve()
 }

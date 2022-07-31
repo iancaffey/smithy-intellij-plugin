@@ -123,8 +123,8 @@ enum_body ::= TOKEN_OPEN_BRACE (enum_member [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
     methods=[members="enum_member"]
 }
 //Note: to have a better parsing experience, the grammar only requires a node value and SmithyAnnotator adds an error annotation if it's not a string
-enum_member ::= [documentation] trait* member_name [TOKEN_EQUALS value] {
-    methods=[declared_traits="trait" name_identifier="member_name"]
+enum_member ::= [documentation] trait* member_name [member_initializer] {
+    methods=[declared_traits="trait" name_identifier="member_name" initializer="member_initializer"]
     implements="software.amazon.smithy.intellij.psi.SmithyEnumMemberExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyEnumMemberMixin"
 }
@@ -137,8 +137,8 @@ int_enum_body ::= TOKEN_OPEN_BRACE (int_enum_member [TOKEN_COMMA])* TOKEN_CLOSE_
     methods=[members="int_enum_member"]
 }
 //Note: to have a better parsing experience, the grammar only requires a node value and SmithyAnnotator adds an error annotation if it's not an integer
-int_enum_member ::= [documentation] trait* member_name [TOKEN_EQUALS value] {
-    methods=[declared_traits="trait" name_identifier="member_name"]
+int_enum_member ::= [documentation] trait* member_name [member_initializer] {
+    methods=[declared_traits="trait" name_identifier="member_name" initializer="member_initializer"]
     implements="software.amazon.smithy.intellij.psi.SmithyIntEnumMemberExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyIntEnumMemberMixin"
 }
@@ -208,10 +208,14 @@ resource ::= [documentation] trait* TOKEN_RESOURCE shape_name object {
 container_body ::= TOKEN_OPEN_BRACE ((container_member | incomplete_container_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
     methods=[members="container_member" incomplete_container_member=""]
 }
-container_member ::= [documentation] trait* member_name TOKEN_COLON shape_id {
-    methods=[declared_traits="trait" name_identifier="member_name" declared_target="shape_id"]
+container_member ::= [documentation] trait* member_name TOKEN_COLON shape_id [member_initializer] {
+    methods=[declared_traits="trait" name_identifier="member_name" declared_target="shape_id" initializer="member_initializer"]
     implements="software.amazon.smithy.intellij.psi.SmithyContainerMemberExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyContainerMemberMixin"
+}
+member_initializer ::= TOKEN_EQUALS value {
+    implements="software.amazon.smithy.intellij.psi.SmithyMemberInitializerExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyMemberInitializerMixin"
 }
 
 //Traits

@@ -346,7 +346,7 @@ data class SmithyAst(
         }
 
         data class Number(@JsonValue val value: java.math.BigDecimal) : Value {
-            override fun toString() = value.toString()
+            override fun toString(): kotlin.String = value.toPlainString()
         }
 
         data class Object(@JsonValue val fields: kotlin.collections.Map<kotlin.String, Value>) : Value {

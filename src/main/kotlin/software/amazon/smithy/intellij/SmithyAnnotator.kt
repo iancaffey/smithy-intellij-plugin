@@ -18,6 +18,7 @@ import software.amazon.smithy.intellij.actions.SmithyImportShapeQuickFix
 import software.amazon.smithy.intellij.actions.SmithyOptimizeShapeIdQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveCommasQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveImportQuickFix
+import software.amazon.smithy.intellij.actions.SmithyRemoveMemberInitializerQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveMemberQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveUnusedImportsQuickFix
 import software.amazon.smithy.intellij.psi.SmithyBoolean
@@ -32,6 +33,7 @@ import software.amazon.smithy.intellij.psi.SmithyIntEnumMember
 import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyMap
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
+import software.amazon.smithy.intellij.psi.SmithyMemberInitializer
 import software.amazon.smithy.intellij.psi.SmithyMemberName
 import software.amazon.smithy.intellij.psi.SmithyModel
 import software.amazon.smithy.intellij.psi.SmithyNull
@@ -183,6 +185,20 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
             }
         }
     },
+    INVALID_DEFAULT_VALUE {
+        val validEnclosingShapes = setOf("enum", "intEnum", "structure")
+        override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+            if (element is SmithyMemberInitializer) {
+                val enclosingShapeType = element.enclosingMember.enclosingShape.type
+                if (enclosingShapeType !in validEnclosingShapes) {
+                    holder.newAnnotation(
+                        HighlightSeverity.ERROR,
+                        "'${element.enclosingMember.name}' cannot have a default value"
+                    ).withFix(SmithyRemoveMemberInitializerQuickFix(element)).create()
+                }
+            }
+        }
+    },
     INVALID_ENUM_MEMBER {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element is SmithyValue) {
@@ -319,7 +335,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
     IMPORT_CONFLICT {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element is SmithyShape) {
-                val conflictingImport = getParentOfType(element, SmithyModel::class.java)?.imports?.find {
+                val conflictingImport = element.model.imports.find {
                     element.shapeName == it.shapeId.shapeName
                 }
                 if (conflictingImport != null) {
@@ -409,10 +425,6 @@ private fun AnnotationHolder.highlight(key: TextAttributesKey, range: TextRange)
 
 private fun AnnotationHolder.highlight(severity: HighlightSeverity, message: String) =
     newAnnotation(severity, message).create()
-
-private fun AnnotationHolder.highlight(
-    severity: HighlightSeverity, message: String, range: TextRange
-) = newAnnotation(severity, message).range(range).create()
 
 private fun AnnotationHolder.highlight(
     severity: HighlightSeverity, message: String, key: TextAttributesKey, range: TextRange

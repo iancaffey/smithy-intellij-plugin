@@ -3,9 +3,6 @@ package software.amazon.smithy.intellij.psi
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.navigation.ItemPresentation
-import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil
-import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.appendHighlightedByLexerAndEncodedAsHtmlCodeSnippet
-import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.getHighlightedByLexerAndEncodedAsHtmlCodeSnippet
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiDocumentManager
@@ -20,7 +17,6 @@ import com.intellij.psi.util.PsiTreeUtil.getChildOfType
 import com.intellij.psi.util.PsiTreeUtil.getChildrenOfTypeAsList
 import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import com.intellij.psi.util.siblings
-import software.amazon.smithy.intellij.SmithyColorSettings
 import software.amazon.smithy.intellij.SmithyFile
 import software.amazon.smithy.intellij.SmithyKeyReference
 import software.amazon.smithy.intellij.SmithyLanguage
@@ -82,11 +78,18 @@ abstract class SmithyBooleanMixin(node: ASTNode) : SmithyPrimitiveImpl(node), Sm
 interface SmithyContainerMemberExt : SmithyNamedElement, SmithyMemberDefinition {
     override val enclosingShape: SmithyShape
     override val documentation: SmithyDocumentation?
+    override val declaredTarget: SmithyShapeId
     override val declaredTraits: List<SmithyTrait>
 }
 
 abstract class SmithyContainerMemberMixin(node: ASTNode) : SmithyPsiElement(node), SmithyContainerMember {
+    private var _syntheticTraits: List<SmithyTraitDefinition>? = null
     override val enclosingShape: SmithyContainerShape get() = getParentOfType(this, SmithyContainerShape::class.java)!!
+    override val syntheticTraits: List<SmithyTraitDefinition>
+        get() = _syntheticTraits ?: (initializer?.value?.let {
+            listOf(SmithySyntheticTrait(this, "smithy.api", "default", it))
+        } ?: emptyList()).also { _syntheticTraits = it }
+
     override fun getName(): String = nameIdentifier.text
     override fun setName(newName: String) = setName<SmithyContainerMember>(this, newName)
     override fun getTextOffset() = nameIdentifier.textOffset
@@ -94,6 +97,10 @@ abstract class SmithyContainerMemberMixin(node: ASTNode) : SmithyPsiElement(node
         override fun getPresentableText(): String = resolvedTarget?.let { "$name: ${it.shapeName}" } ?: name
         override fun getLocationString() = enclosingShape.shapeName
         override fun getIcon(unused: Boolean) = getIcon(0)
+    }
+
+    override fun subtreeChanged() {
+        _syntheticTraits = null
     }
 }
 
@@ -149,9 +156,30 @@ interface SmithyEnumMemberExt : SmithyNamedElement, SmithyMemberDefinition {
 }
 
 abstract class SmithyEnumMemberMixin(node: ASTNode) : SmithyPsiElement(node), SmithyEnumMember {
+    private var _syntheticTraits: List<SmithyTraitDefinition>? = null
     override val declaredTarget = SmithySyntheticShapeTarget(this, "string")
     override val resolvedTarget = declaredTarget
     override val enclosingShape: SmithyEnum get() = getParentOfType(this, SmithyEnum::class.java)!!
+    override val syntheticTraits: List<SmithyTraitDefinition>
+        get() {
+            val value = initializer?.value
+            return if (value != null) {
+                _syntheticTraits ?: listOf(
+                    SmithySyntheticTrait(this, "smithy.api", "enumValue", value)
+                ).also { _syntheticTraits = it }
+            } else if (
+                !hasTraitIn(appliedTraits, "smithy.api", "enumValue")
+                && !hasTraitIn(declaredTraits, "smithy.api", "enumValue")
+            ) {
+                val inferred = SmithySyntheticValue.String(name).also { it.scope(this) }
+                _syntheticTraits ?: listOf(
+                    SmithySyntheticTrait(this, "smithy.api", "enumValue", inferred)
+                ).also { _syntheticTraits = it }
+            } else {
+                emptyList()
+            }
+        }
+
     override fun getName(): String = nameIdentifier.text
     override fun setName(newName: String) = setName<SmithyEnumMember>(this, newName)
     override fun getTextOffset() = nameIdentifier.textOffset
@@ -159,6 +187,10 @@ abstract class SmithyEnumMemberMixin(node: ASTNode) : SmithyPsiElement(node), Sm
         override fun getPresentableText(): String = name
         override fun getLocationString() = enclosingShape.shapeName
         override fun getIcon(unused: Boolean) = getIcon(0)
+    }
+
+    override fun subtreeChanged() {
+        _syntheticTraits = null
     }
 }
 
@@ -182,6 +214,7 @@ abstract class SmithyInputMixin(node: ASTNode) : SmithyContainerShapeImpl(node),
     override val operation get() = getParentOfType(this, SmithyOperation::class.java)!!
     override val declaredNamespace = namespace
     override val resolvedNamespace = namespace
+    override val syntheticTraits = listOf(SmithySyntheticTrait(this, "smithy.api", "input"))
     override val typeIdentifier = object : SmithySyntheticElement() {
         override fun getParent() = this@SmithyInputMixin
         override fun getText() = "structure"
@@ -208,9 +241,15 @@ interface SmithyIntEnumMemberExt : SmithyNamedElement, SmithyMemberDefinition {
 }
 
 abstract class SmithyIntEnumMemberMixin(node: ASTNode) : SmithyPsiElement(node), SmithyIntEnumMember {
+    private var _syntheticTraits: List<SmithyTraitDefinition>? = null
     override val declaredTarget = SmithySyntheticShapeTarget(this, "integer")
     override val resolvedTarget = declaredTarget
     override val enclosingShape: SmithyIntEnum get() = getParentOfType(this, SmithyIntEnum::class.java)!!
+    override val syntheticTraits: List<SmithyTraitDefinition>
+        get() = _syntheticTraits ?: (initializer?.value?.let { value ->
+            listOf(SmithySyntheticTrait(this, "smithy.api", "enumValue", value))
+        } ?: emptyList()).also { _syntheticTraits = it }
+
     override fun getName(): String = nameIdentifier.text
     override fun setName(newName: String) = setName<SmithyIntEnumMember>(this, newName)
     override fun getTextOffset() = nameIdentifier.textOffset
@@ -218,6 +257,10 @@ abstract class SmithyIntEnumMemberMixin(node: ASTNode) : SmithyPsiElement(node),
         override fun getPresentableText(): String = name
         override fun getLocationString() = enclosingShape.shapeName
         override fun getIcon(unused: Boolean) = getIcon(0)
+    }
+
+    override fun subtreeChanged() {
+        _syntheticTraits = null
     }
 }
 
@@ -258,6 +301,14 @@ interface SmithyMemberIdExt : SmithyElement {
 abstract class SmithyMemberIdMixin(node: ASTNode) : SmithyPsiElement(node), SmithyMemberId {
     override val memberName: String get() = member.text
     override val reference by lazy { SmithyMemberReference(this) }
+}
+
+interface SmithyMemberInitializerExt : SmithyElement {
+    val enclosingMember: SmithyMemberDefinition
+}
+
+abstract class SmithyMemberInitializerMixin(node: ASTNode) : SmithyPsiElement(node), SmithyMemberInitializer {
+    override val enclosingMember: SmithyMemberDefinition get() = parent as SmithyMemberDefinition
 }
 
 interface SmithyMetadataExt : SmithyStatement
@@ -409,6 +460,7 @@ abstract class SmithyOutputMixin(node: ASTNode) : SmithyContainerShapeImpl(node)
     override val operation get() = getParentOfType(this, SmithyOperation::class.java)!!
     override val declaredNamespace = namespace
     override val resolvedNamespace = namespace
+    override val syntheticTraits = listOf(SmithySyntheticTrait(this, "smithy.api", "output"))
     override val typeIdentifier = object : SmithySyntheticElement() {
         override fun getParent() = this@SmithyOutputMixin
         override fun getText() = "structure"
@@ -579,20 +631,15 @@ abstract class SmithyTextBlockMixin(node: ASTNode) : SmithyPrimitiveImpl(node), 
     }
 }
 
-private class EmptyObject(private val element: PsiElement) : SmithySyntheticElement(), SmithyValueDefinition {
-    override val type = SmithyValueType.OBJECT
-    override fun getParent() = element
-}
-
 interface SmithyTraitExt : SmithyTraitDefinition
 
 abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyTrait {
     private var parsed = false
-    private var _value: SmithyValueDefinition = EmptyObject(this)
+    private var _value: SmithyValueDefinition = SmithySyntheticValue.Object().also { it.scope(this) }
     override val value: SmithyValueDefinition
         get() =
             if (parsed) _value else when (val body = body) {
-                null -> EmptyObject(this)
+                null -> SmithySyntheticValue.Object().also { it.scope(this) }
                 else -> body.value ?: object : SmithySyntheticElement(), SmithyValueDefinition {
                     override val type = SmithyValueType.OBJECT
                     override val fields = body.entries.associate { it.name to it.value }
@@ -605,11 +652,6 @@ abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyT
     override val shapeName get() = shape.shapeName
     override val declaredNamespace get() = shape.declaredNamespace
     override val resolvedNamespace get() = shape.resolvedNamespace
-
-    override fun subtreeChanged() {
-        parsed = false
-    }
-
     override fun getName() = shapeName
     override fun setName(newName: String) = also { shape.setName(newName) }
     override fun getTextOffset() = shape.textOffset
@@ -624,31 +666,8 @@ abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyT
         override fun getIcon(unused: Boolean) = getIcon(0)
     }
 
-    override fun toDocString() = buildString {
-        //Note: since this can only do lexer-based highlighting, this will be approximately the same style as
-        //the editor display (but could have some keyword highlighting issues in the body)
-        HtmlSyntaxInfoUtil.appendStyledSpan(
-            this, SmithyColorSettings.TRAIT_NAME, "@$shapeName", 1f
-        )
-        body?.let { body ->
-            //Note: since keys are dynamically highlighted using an annotator, this will manually apply the same
-            //behavior to improve readability of trait values
-            if (body.entries.isNotEmpty()) {
-                append(body.entries.joinToString(", ", "(", ")") {
-                    val key = HtmlSyntaxInfoUtil.getStyledSpan(
-                        SmithyColorSettings.KEY, it.key.text, 1f
-                    )
-                    val value = getHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
-                        project, SmithyLanguage, it.value.text, 1f
-                    )
-                    "$key: $value"
-                })
-            } else {
-                appendHighlightedByLexerAndEncodedAsHtmlCodeSnippet(
-                    this, project, SmithyLanguage, body.text, 1f
-                )
-            }
-        }
+    override fun subtreeChanged() {
+        parsed = false
     }
 }
 

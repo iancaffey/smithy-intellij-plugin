@@ -27,10 +27,17 @@ import java.util.function.Consumer
  * @since 1.0
  */
 class SmithyDocumentationProvider : AbstractDocumentationProvider() {
+    companion object {
+        //Note: these traits have special handling in generateDoc(), so they're filtered out when displaying traits
+        private val quickNavigateIgnoredTraitNames = setOf(
+            "documentation", "externalDocumentation", "default", "enumValue"
+        )
+    }
+
     override fun getQuickNavigateInfo(element: PsiElement, originalElement: PsiElement?): String? = when (element) {
         is SmithyMemberDefinition -> buildString {
-            sequenceOf(element.appliedTraits, element.declaredTraits).flatten().forEach {
-                if ((it.shapeName != "documentation" && it.shapeName != "externalDocumentation") || it.resolvedNamespace != "smithy.api") {
+            element.traits.forEach {
+                if (it.shapeName !in quickNavigateIgnoredTraitNames || it.resolvedNamespace != "smithy.api") {
                     append(getQuickNavigateInfo(it, it)).append("<br/>")
                 }
             }
@@ -39,16 +46,18 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                     appendStyledSpan(this, SmithyColorSettings.KEYWORD, "$enclosingShapeType member", 1f)
                     append(" ")
                     appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
+                    element.enumValue?.let { append(" = ").append(it.toDocString()) }
                 }
                 else -> {
                     appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
                     element.resolvedTarget?.let { target -> append(": ${target.shapeName}") }
+                    element.defaultValue?.let { append(" = ").append(it.toDocString()) }
                 }
             }
         }
         is SmithyShapeDefinition -> buildString {
-            sequenceOf(element.appliedTraits, element.declaredTraits).flatten().forEach {
-                if ((it.shapeName != "documentation" && it.shapeName != "externalDocumentation") || it.resolvedNamespace != "smithy.api") {
+            element.traits.forEach {
+                if (it.shapeName !in quickNavigateIgnoredTraitNames || it.resolvedNamespace != "smithy.api") {
                     append(getQuickNavigateInfo(it, it)).append("<br/>")
                 }
             }
@@ -75,6 +84,8 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             element.resolve()?.let { target ->
                 additionalInfo["Type"] = getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
             }
+            element.defaultValue?.let { additionalInfo["Default value"] = it.toDocString() }
+            element.enumValue?.let { additionalInfo["Value"] = it.toDocString() }
             element.findTrait("smithy.api", "externalDocumentation")?.let {
                 additionalInfo["See also"] = it.value.fields.mapNotNull { (title, value) ->
                     value.asString()?.let { href -> "<a href='$href'>$title</a>" }
