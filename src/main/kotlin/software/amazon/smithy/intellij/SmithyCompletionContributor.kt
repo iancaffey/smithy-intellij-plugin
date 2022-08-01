@@ -17,8 +17,12 @@ import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyIncompleteEntry
+import software.amazon.smithy.intellij.psi.SmithyIncompleteMember
 import software.amazon.smithy.intellij.psi.SmithyMemberId
 import software.amazon.smithy.intellij.psi.SmithyObject
+import software.amazon.smithy.intellij.psi.SmithyOperationBody
+import software.amazon.smithy.intellij.psi.SmithyResourceBody
+import software.amazon.smithy.intellij.psi.SmithyServiceBody
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 import software.amazon.smithy.intellij.psi.SmithyTrait
@@ -70,6 +74,31 @@ class SmithyCompletionContributor : CompletionContributor() {
                         } else {
                             addShapes(it, results)
                         }
+                    }
+                    getParentOfType(element, SmithyIncompleteMember::class.java)?.let {
+                        when (it.parent) {
+                            is SmithyOperationBody -> setOf("errors", "input", "output")
+                            is SmithyResourceBody -> setOf(
+                                "collectionOperations",
+                                "create",
+                                "delete",
+                                "identifiers",
+                                "list",
+                                "operations",
+                                "put",
+                                "read",
+                                "resources",
+                                "update"
+                            )
+                            is SmithyServiceBody -> setOf(
+                                "version",
+                                "operations",
+                                "resources",
+                                "errors",
+                                "rename"
+                            )
+                            else -> emptySet()
+                        }.forEach { name -> results.addElement(LookupElementBuilder.create(name)) }
                     }
                 }
             })
