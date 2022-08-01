@@ -42,8 +42,10 @@ import software.amazon.smithy.intellij.psi.SmithyMemberName
 import software.amazon.smithy.intellij.psi.SmithyMixins
 import software.amazon.smithy.intellij.psi.SmithyModel
 import software.amazon.smithy.intellij.psi.SmithyNull
+import software.amazon.smithy.intellij.psi.SmithyOperationMember
 import software.amazon.smithy.intellij.psi.SmithyResourceMember
 import software.amazon.smithy.intellij.psi.SmithyResourceReference
+import software.amazon.smithy.intellij.psi.SmithyServiceMember
 import software.amazon.smithy.intellij.psi.SmithyShape
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 import software.amazon.smithy.intellij.psi.SmithyStatement
@@ -104,6 +106,11 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
         }
     },
     MEMBER {
+        val operationMembers = setOf(
+            SmithyTypes.TOKEN_ERRORS,
+            SmithyTypes.TOKEN_INPUT,
+            SmithyTypes.TOKEN_OUTPUT,
+        )
         val resourceMembers = setOf(
             SmithyTypes.TOKEN_COLLECTION_OPERATIONS,
             SmithyTypes.TOKEN_CREATE,
@@ -116,9 +123,20 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
             SmithyTypes.TOKEN_RESOURCES,
             SmithyTypes.TOKEN_UPDATE
         )
+        val serviceMembers = setOf(
+            SmithyTypes.TOKEN_VERSION,
+            SmithyTypes.TOKEN_OPERATIONS,
+            SmithyTypes.TOKEN_RESOURCES,
+            SmithyTypes.TOKEN_ERRORS,
+            SmithyTypes.TOKEN_RENAME,
+        )
 
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-            if (element is SmithyMemberName || (element.elementType in resourceMembers && element.parent is SmithyResourceMember)) {
+            if (element is SmithyMemberName
+                || (element.elementType in operationMembers && element.parent is SmithyOperationMember)
+                || (element.elementType in resourceMembers && element.parent is SmithyResourceMember)
+                || (element.elementType in serviceMembers && element.parent is SmithyServiceMember)
+            ) {
                 holder.highlight(SmithyColorSettings.SHAPE_MEMBER)
             }
         }
