@@ -367,13 +367,13 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
             if (element is SmithyShapeId && element.parent !is SmithyImport) {
                 element.namespaceId?.let { namespaceId ->
                     val conflicts = getParentOfType(element, SmithyModel::class.java)?.shapes?.any {
-                        it.name == element.shapeName
+                        it.name == element.shapeName && it.namespace != namespaceId.id
                     } == true
                     if (!conflicts) {
                         val fix = SmithyOptimizeShapeIdQuickFix(element.project, element)
                         holder.newAnnotation(
                             INFORMATION,
-                            if (fix.hasImport) "Remove unnecessary qualifier" else "Add import for: ${element.shapeName}"
+                            if (fix.requiresImport) "Add import for: ${element.shapeName}" else "Remove unnecessary qualifier"
                         ).range(namespaceId.textRange)
                             .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL)
                             .withFix(fix)
