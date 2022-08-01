@@ -417,7 +417,6 @@ interface SmithyOperationExt : SmithyShape {
 }
 
 abstract class SmithyOperationMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyOperation {
-    override val supportedMembers = setOf("input", "output", "errors")
     override val input get() = body.members.firstNotNullOfOrNull { it as? SmithyOperationInput }
     override val output get() = body.members.firstNotNullOfOrNull { it as? SmithyOperationOutput }
     override val errors get() = body.members.firstNotNullOfOrNull { it as? SmithyOperationErrors }
@@ -495,18 +494,6 @@ interface SmithyResourceExt : SmithyShape {
 }
 
 abstract class SmithyResourceMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyResource {
-    override val supportedMembers = setOf(
-        "identifiers",
-        "create",
-        "put",
-        "read",
-        "update",
-        "delete",
-        "list",
-        "operations",
-        "collectionOperations",
-        "resources"
-    )
     override val identifiers: List<SmithyResourceIdentifier>
         get() = body.members.firstNotNullOfOrNull {
             it as? SmithyResourceIdentifiers
@@ -573,9 +560,7 @@ abstract class SmithyResourceMemberMixin(node: ASTNode) : SmithyPsiElement(node)
     override val enclosingResource: SmithyResource get() = parent.parent as SmithyResource
 }
 
-abstract class SmithyServiceMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyService {
-    override val supportedMembers = setOf("version", "operations", "resources", "errors", "rename")
-}
+abstract class SmithyServiceMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyService
 
 abstract class SmithySetMixin(node: ASTNode) : SmithyContainerShapeImpl(node), SmithySet {
     override val requiredMembers = setOf("member")

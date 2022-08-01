@@ -238,7 +238,7 @@ resource_operations ::= TOKEN_OPERATIONS TOKEN_COLON TOKEN_OPEN_BRACKET (shape_i
 resource_collection_operations ::= TOKEN_COLLECTION_OPERATIONS TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COLON])* TOKEN_CLOSE_BRACKET {
     methods=[shapes="shape_id"]
 }
-resource_resources ::= TOKEN_COLLECTION_OPERATIONS TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COLON])* TOKEN_CLOSE_BRACKET {
+resource_resources ::= TOKEN_RESOURCES TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COLON])* TOKEN_CLOSE_BRACKET {
     methods=[shapes="shape_id"]
 }
 container_body ::= TOKEN_OPEN_BRACE ((container_member | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
