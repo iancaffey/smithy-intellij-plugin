@@ -14,6 +14,7 @@ object SmithyIcons {
     val MEMBER = icon("member")
     val SHAPE = icon("shape")
     val TRAIT = icon("trait")
+    val RESOURCE_IDENTIFIER = icon("resourceIdentifier")
 
     private fun icon(name: String) = IconLoader.getIcon("META-INF/${name}Icon.svg", SmithyIcons.javaClass)
 

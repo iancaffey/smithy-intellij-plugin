@@ -3,6 +3,7 @@ package software.amazon.smithy.intellij
 import com.intellij.ide.IconProvider
 import com.intellij.psi.PsiElement
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
+import software.amazon.smithy.intellij.psi.SmithyResourceIdentifier
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyTraitDefinition
 
@@ -17,6 +18,7 @@ class SmithyIconProvider : IconProvider() {
         is SmithyShapeDefinition -> SmithyIcons.SHAPE
         is SmithyMemberDefinition -> SmithyIcons.MEMBER
         is SmithyTraitDefinition -> SmithyIcons.TRAIT
+        is SmithyResourceIdentifier -> SmithyIcons.RESOURCE_IDENTIFIER
         else -> null
     }
 }

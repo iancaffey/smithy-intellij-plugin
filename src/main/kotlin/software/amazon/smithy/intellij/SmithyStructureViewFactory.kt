@@ -16,6 +16,7 @@ import com.intellij.psi.NavigatablePsiElement
 import com.intellij.psi.PsiFile
 import software.amazon.smithy.intellij.psi.SmithyDefinition
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
+import software.amazon.smithy.intellij.psi.SmithyResource
 import software.amazon.smithy.intellij.psi.SmithyShape
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 
@@ -67,7 +68,8 @@ class SmithyStructureViewElement(val element: NavigatablePsiElement) : Structure
         is SmithyShapeDefinition -> listOf(
             element.appliedTraits.map { SmithyStructureViewElement(it) },
             element.declaredTraits.map { SmithyStructureViewElement(it) },
-            element.members.map { SmithyStructureViewElement(it) }
+            element.members.map { SmithyStructureViewElement(it) },
+            if (element is SmithyResource) element.identifiers.map { SmithyStructureViewElement(it) } else emptyList()
         ).flatten().toTypedArray()
         is SmithyDefinition -> listOf(
             element.appliedTraits.map { SmithyStructureViewElement(it) },

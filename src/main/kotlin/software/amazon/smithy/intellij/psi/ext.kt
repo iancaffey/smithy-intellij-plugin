@@ -4,6 +4,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.navigation.ItemPresentation
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.psi.NavigatablePsiElement
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
@@ -480,6 +481,19 @@ abstract class SmithyOutputMixin(node: ASTNode) : SmithyContainerShapeImpl(node)
     override fun resolve() = this
 }
 
+interface SmithyResourceExt : SmithyShape {
+    val identifiers: List<SmithyResourceIdentifier>
+    val create: SmithyShapeId?
+    val put: SmithyShapeId?
+    val read: SmithyShapeId?
+    val update: SmithyShapeId?
+    val delete: SmithyShapeId?
+    val list: SmithyShapeId?
+    val operations: List<SmithyShapeId>
+    val collectionOperations: List<SmithyShapeId>
+    val resources: List<SmithyShapeId>
+}
+
 abstract class SmithyResourceMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyResource {
     override val supportedMembers = setOf(
         "identifiers",
@@ -493,6 +507,70 @@ abstract class SmithyResourceMixin(node: ASTNode) : SmithyShapeImpl(node), Smith
         "collectionOperations",
         "resources"
     )
+    override val identifiers: List<SmithyResourceIdentifier>
+        get() = body.members.firstNotNullOfOrNull {
+            it as? SmithyResourceIdentifiers
+        }?.identifiers ?: emptyList()
+    override val create: SmithyShapeId?
+        get() = body.members.firstNotNullOfOrNull {
+            it as? SmithyResourceCreateOperation
+        }?.shapeId
+    override val put: SmithyShapeId?
+        get() = body.members.firstNotNullOfOrNull {
+            it as? SmithyResourcePutOperation
+        }?.shapeId
+    override val read: SmithyShapeId?
+        get() = body.members.firstNotNullOfOrNull {
+            it as? SmithyResourceReadOperation
+        }?.shapeId
+    override val update: SmithyShapeId?
+        get() = body.members.firstNotNullOfOrNull {
+            it as? SmithyResourceUpdateOperation
+        }?.shapeId
+    override val delete: SmithyShapeId?
+        get() = body.members.firstNotNullOfOrNull {
+            it as? SmithyResourceDeleteOperation
+        }?.shapeId
+    override val list: SmithyShapeId?
+        get() = body.members.firstNotNullOfOrNull {
+            it as? SmithyResourceListOperation
+        }?.shapeId
+    override val operations: List<SmithyShapeId>
+        get() = body.members.firstNotNullOfOrNull {
+            it as? SmithyResourceOperations
+        }?.shapes ?: emptyList()
+    override val collectionOperations: List<SmithyShapeId>
+        get() = body.members.firstNotNullOfOrNull {
+            it as? SmithyResourceCollectionOperations
+        }?.shapes ?: emptyList()
+    override val resources: List<SmithyShapeId>
+        get() = body.members.firstNotNullOfOrNull {
+            it as? SmithyResourceResources
+        }?.shapes ?: emptyList()
+}
+
+interface SmithyResourceIdentifierExt : SmithyNamedElement, NavigatablePsiElement {
+    val enclosingResource: SmithyResource
+}
+
+abstract class SmithyResourceIdentifierMixin(node: ASTNode) : SmithyPsiElement(node), SmithyResourceIdentifier {
+    override val enclosingResource: SmithyResource get() = (parent as SmithyResourceIdentifiers).enclosingResource
+    override fun getName(): String = nameIdentifier.text
+    override fun setName(newName: String) = setName<SmithyResourceIdentifier>(this, newName)
+    override fun getTextOffset() = nameIdentifier.textOffset
+    override fun getPresentation() = object : ItemPresentation {
+        override fun getPresentableText(): String = "$name: ${shapeId.shapeName}"
+        override fun getLocationString() = enclosingResource.shapeName
+        override fun getIcon(unused: Boolean) = getIcon(0)
+    }
+}
+
+interface SmithyResourceMemberExt : SmithyElement {
+    val enclosingResource: SmithyResource
+}
+
+abstract class SmithyResourceMemberMixin(node: ASTNode) : SmithyPsiElement(node), SmithyResourceMember {
+    override val enclosingResource: SmithyResource get() = parent.parent as SmithyResource
 }
 
 abstract class SmithyServiceMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyService {

@@ -31,8 +31,8 @@ import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyEnumMember
 import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyIncompleteAppliedTrait
-import software.amazon.smithy.intellij.psi.SmithyIncompleteContainerMember
 import software.amazon.smithy.intellij.psi.SmithyIncompleteEntry
+import software.amazon.smithy.intellij.psi.SmithyIncompleteMember
 import software.amazon.smithy.intellij.psi.SmithyIntEnumMember
 import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyMap
@@ -42,6 +42,7 @@ import software.amazon.smithy.intellij.psi.SmithyMemberName
 import software.amazon.smithy.intellij.psi.SmithyMixins
 import software.amazon.smithy.intellij.psi.SmithyModel
 import software.amazon.smithy.intellij.psi.SmithyNull
+import software.amazon.smithy.intellij.psi.SmithyResourceMember
 import software.amazon.smithy.intellij.psi.SmithyResourceReference
 import software.amazon.smithy.intellij.psi.SmithyShape
 import software.amazon.smithy.intellij.psi.SmithyShapeId
@@ -103,8 +104,21 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
         }
     },
     MEMBER {
+        val resourceMembers = setOf(
+            SmithyTypes.TOKEN_COLLECTION_OPERATIONS,
+            SmithyTypes.TOKEN_CREATE,
+            SmithyTypes.TOKEN_DELETE,
+            SmithyTypes.TOKEN_IDENTIFIERS,
+            SmithyTypes.TOKEN_LIST,
+            SmithyTypes.TOKEN_OPERATIONS,
+            SmithyTypes.TOKEN_PUT,
+            SmithyTypes.TOKEN_READ,
+            SmithyTypes.TOKEN_RESOURCES,
+            SmithyTypes.TOKEN_UPDATE
+        )
+
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-            if (element is SmithyMemberName) {
+            if (element is SmithyMemberName || (element.elementType in resourceMembers && element.parent is SmithyResourceMember)) {
                 holder.highlight(SmithyColorSettings.SHAPE_MEMBER)
             }
         }
@@ -267,7 +281,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
     },
     INCOMPLETE_MEMBER {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-            if (element is SmithyIncompleteEntry || element is SmithyIncompleteContainerMember) {
+            if (element is SmithyIncompleteEntry || element is SmithyIncompleteMember) {
                 holder.highlight(ERROR, "Missing shape id")
             }
         }
