@@ -16,6 +16,7 @@ import com.intellij.psi.util.PsiTreeUtil.findChildrenOfType
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
+import software.amazon.smithy.intellij.index.SmithyAstShapeIndex
 import software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex
 import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyDocumentation
@@ -171,7 +172,10 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             SmithyDefinedShapeIdIndex.getFiles(namespace, shapeName, context.resolveScope).firstOrNull()?.let {
                 psiManager.findFile(it)
             } ?: return null
-        if (enclosingFile !is SmithyFile) return enclosingFile
+        if (enclosingFile !is SmithyFile) {
+            return SmithyAstShapeIndex.getShapes(namespace, shapeName, context.resolveScope).firstOrNull()
+                ?: enclosingFile
+        }
         val shape = (enclosingFile as? SmithyFile)?.model?.shapes?.find { it.shapeName == shapeName }
         if (shape == null || memberName == null) return shape
         return shape.members.find { it.name == memberName } ?: shape
