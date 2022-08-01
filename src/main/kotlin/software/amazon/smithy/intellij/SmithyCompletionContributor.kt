@@ -13,6 +13,7 @@ import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import com.intellij.util.ProcessingContext
 import com.intellij.util.applyIf
 import software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex
+import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyIncompleteEntry
@@ -41,16 +42,9 @@ class SmithyCompletionContributor : CompletionContributor() {
                 ) {
                     val element = parameters.originalPosition ?: return
                     if (getParentOfType(element, PsiErrorElement::class.java) != null) return
-                    getParentOfType(element, SmithyShapeId::class.java)?.let {
-                        val startingTraitMember = it.parent.let { parent ->
-                            parent is SmithyTraitBody && parent.parent.let { trait ->
-                                trait is SmithyTrait && trait.resolve()?.type in unwrappedShapeTypes
-                            }
-                        }
-                        if (startingTraitMember) {
-                            addMembers(it, it.text, results)
-                        } else {
-                            addShapes(it, results)
+                    getParentOfType(element, SmithyControl::class.java)?.let {
+                        setOf("version", "operationInputSuffix", "operationOutputSuffix").forEach {
+                            results.addElement(LookupElementBuilder.create(it))
                         }
                     }
                     getParentOfType(element, SmithyEntry::class.java)?.let { addMembers(it, it.key.text, results) }
@@ -63,6 +57,18 @@ class SmithyCompletionContributor : CompletionContributor() {
                             member.resolvedTarget?.let { target ->
                                 results.addElement(memberElement(member.name, target.shapeName, parent))
                             }
+                        }
+                    }
+                    getParentOfType(element, SmithyShapeId::class.java)?.let {
+                        val startingTraitMember = it.parent.let { parent ->
+                            parent is SmithyTraitBody && parent.parent.let { trait ->
+                                trait is SmithyTrait && trait.resolve()?.type in unwrappedShapeTypes
+                            }
+                        }
+                        if (startingTraitMember) {
+                            addMembers(it, it.text, results)
+                        } else {
+                            addShapes(it, results)
                         }
                     }
                 }

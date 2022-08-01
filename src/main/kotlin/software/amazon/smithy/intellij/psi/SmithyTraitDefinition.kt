@@ -1,10 +1,12 @@
 package software.amazon.smithy.intellij.psi
 
 import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.appendStyledSpan
+import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.getStyledSpan
 import com.intellij.psi.NavigatablePsiElement
 import com.intellij.psi.PsiNamedElement
 import software.amazon.smithy.intellij.SmithyColorSettings
 import software.amazon.smithy.intellij.SmithyShapeResolver
+import software.amazon.smithy.intellij.generateLink
 
 /**
  * A [trait](https://awslabs.github.io/smithy/1.0/spec/core/model.html#traits) definition (either in an AST or IDL) in [Smithy](https://awslabs.github.io/smithy).
@@ -15,14 +17,18 @@ import software.amazon.smithy.intellij.SmithyShapeResolver
  * @see SmithyAstTrait
  */
 interface SmithyTraitDefinition : SmithyElement, NavigatablePsiElement, PsiNamedElement {
+    val href: String
+        get() = resolvedNamespace?.let { namespace ->
+            generateLink("${namespace}#${shapeName}", "@$shapeName", SmithyColorSettings.TRAIT_NAME)
+        } ?: getStyledSpan(SmithyColorSettings.TRAIT_NAME, "@$shapeName", 1f)
+
     val shapeName: String
     val declaredNamespace: String?
     val resolvedNamespace: String?
     val value: SmithyValueDefinition
     fun resolve() = SmithyShapeResolver.getDefinitions(this).firstOrNull()
     fun toDocString(): String = buildString {
-        append("<span>")
-        appendStyledSpan(this, SmithyColorSettings.TRAIT_NAME, "@$shapeName", 1f)
+        append("<span>").append(href)
         value.let { value ->
             if (value.type == SmithyValueType.OBJECT) {
                 value.fields.takeIf { fields -> fields.isNotEmpty() }?.let { fields ->

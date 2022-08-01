@@ -1,6 +1,7 @@
 package software.amazon.smithy.intellij.psi
 
 import software.amazon.smithy.intellij.SmithyAppliedTraitResolver.getAppliedTraits
+import software.amazon.smithy.intellij.generateLink
 
 /**
  * A [shape](https://awslabs.github.io/smithy/1.0/spec/core/model.html#shapes) definition (either in an AST or IDL) in [Smithy](https://awslabs.github.io/smithy).
@@ -13,6 +14,7 @@ import software.amazon.smithy.intellij.SmithyAppliedTraitResolver.getAppliedTrai
  */
 interface SmithyShapeDefinition : SmithyDefinition {
     override val appliedTraits get() = getAppliedTraits(this)
+    override val href: String get() = generateLink("${namespace}#${shapeName}", shapeName)
     val type: String
     val shapeId: String
     val shapeName: String

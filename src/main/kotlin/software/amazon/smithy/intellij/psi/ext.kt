@@ -201,6 +201,7 @@ interface SmithyIncompleteAppliedTraitExt : SmithyStatement
 abstract class SmithyIncompleteAppliedTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyIncompleteAppliedTrait
 
 interface SmithyInputExt : SmithyContainerShape, SmithyShapeTarget {
+    override val href: String get() = super<SmithyContainerShape>.href
     val operation: SmithyOperation
 }
 
@@ -447,6 +448,7 @@ abstract class SmithyOperationOutputMixin(node: ASTNode) : SmithyOperationMember
 }
 
 interface SmithyOutputExt : SmithyContainerShape, SmithyShapeTarget {
+    override val href: String get() = super<SmithyContainerShape>.href
     val operation: SmithyOperation
 }
 
