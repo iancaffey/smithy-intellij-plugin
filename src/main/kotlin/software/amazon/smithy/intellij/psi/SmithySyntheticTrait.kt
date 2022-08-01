@@ -18,4 +18,7 @@ data class SmithySyntheticTrait(
 
     override val resolvedNamespace = declaredNamespace
     override fun getParent() = target
+    override fun getPresentableText() = shapeName
+    override fun getLocationString() = target.name
+    override fun getIcon(unused: Boolean) = getIcon(0)
 }

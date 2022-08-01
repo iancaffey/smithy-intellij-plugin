@@ -1,6 +1,7 @@
 package software.amazon.smithy.intellij.psi
 
 import com.intellij.psi.PsiElement
+import software.amazon.smithy.intellij.SmithyIcons
 
 /**
  * A synthetic shape which refines `smithy.api#Unit` to a specific type.
@@ -30,6 +31,9 @@ class SmithySyntheticShape(
     override fun getName() = type
     override fun getNameIdentifier() = id
     override fun getParent() = enclosing
+    override fun getLocationString() = namespace
+    override fun getIcon(unused: Boolean) = SmithyIcons.SHAPE
+    override fun toString() = shapeId
 }
 
 data class SmithySyntheticShapeTarget(
