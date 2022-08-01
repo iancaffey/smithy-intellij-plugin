@@ -315,6 +315,14 @@ abstract class SmithyMemberInitializerMixin(node: ASTNode) : SmithyPsiElement(no
 interface SmithyMetadataExt : SmithyStatement
 abstract class SmithyMetadataMixin(node: ASTNode) : SmithyKeyedElementImpl(node), SmithyMetadata
 
+interface SmithyMixinsExt : SmithyElement {
+    val enclosingShape: SmithyShape
+}
+
+abstract class SmithyMixinsMixin(node: ASTNode) : SmithyPsiElement(node), SmithyMixins {
+    override val enclosingShape: SmithyShape get() = parent as SmithyShape
+}
+
 interface SmithyModelExt : SmithyElement {
     val namespace: String?
     val version: String?

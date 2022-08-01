@@ -22,6 +22,7 @@ import software.amazon.smithy.intellij.actions.SmithyRemoveCommasQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveImportQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveMemberInitializerQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveMemberQuickFix
+import software.amazon.smithy.intellij.actions.SmithyRemoveMixinQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveResourceReferenceQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveUnusedImportsQuickFix
 import software.amazon.smithy.intellij.psi.SmithyBoolean
@@ -224,6 +225,25 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                     holder.newAnnotation(ERROR, "Structures can only target resource shapes")
                         .withFix(SmithyRemoveResourceReferenceQuickFix(element))
                         .create()
+                }
+            }
+        }
+    },
+    INVALID_MIXIN {
+        override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+            if (element is SmithyShapeId) {
+                val mixins = element.parent as? SmithyMixins ?: return
+                element.resolve()?.let {
+                    val error = when {
+                        !it.hasTrait("smithy.api", "mixin") -> "${element.shapeName} cannot be used as a mixin"
+                        it.type != mixins.enclosingShape.type -> "${element.shapeName} cannot be applied to '${mixins.enclosingShape.type}' shapes"
+                        else -> null
+                    }
+                    if (error != null) {
+                        holder.newAnnotation(ERROR, error)
+                            .withFix(SmithyRemoveMixinQuickFix(element))
+                            .create()
+                    }
                 }
             }
         }

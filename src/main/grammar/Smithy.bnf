@@ -222,6 +222,8 @@ member_initializer ::= TOKEN_EQUALS value {
 resource_reference ::= TOKEN_FOR shape_id
 mixins ::= TOKEN_WITH TOKEN_OPEN_BRACKET (shape_id [TOKEN_COMMA])* TOKEN_CLOSE_BRACKET {
     methods=[shapes="shape_id"]
+    implements="software.amazon.smithy.intellij.psi.SmithyMixinsExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyMixinsMixin"
 }
 
 //Traits
