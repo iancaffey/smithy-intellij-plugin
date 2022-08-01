@@ -53,8 +53,16 @@ class SmithyFormattingModelBuilder : FormattingModelBuilder {
             ).spaces(1)
             //Space after : and ,
             .after(TokenSet.create(SmithyTypes.TOKEN_COLON, SmithyTypes.TOKEN_COMMA)).spaces(1)
-            //Spaces around = and :=
-            .around(TokenSet.create(SmithyTypes.TOKEN_EQUALS, SmithyTypes.TOKEN_WALRUS)).spaces(1)
+            //Spaces around =, :=, for, mixins list, and with
+            .around(
+                TokenSet.create(
+                    SmithyTypes.TOKEN_EQUALS,
+                    SmithyTypes.TOKEN_FOR,
+                    SmithyTypes.MIXINS,
+                    SmithyTypes.TOKEN_WALRUS,
+                    SmithyTypes.TOKEN_WITH
+                )
+            ).spaces(1)
             //Blank lines after all top-level declarations (not before so line comments can be placed)
             .after(
                 TokenSet.create(
