@@ -75,13 +75,14 @@
         TOKEN_INCOMPLETE_TEXT_BLOCK="regexp:\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))+"
     ]
     implements("^(?!.*element).*")="software.amazon.smithy.intellij.psi.SmithyElement"
-    implements("array|object|container_body|enum_body|int_enum_body|mixins|operation_body|resource_body|resource_identifiers|resource_operations|resource_collection_operations|resource_resources|trait_body")="software.amazon.smithy.intellij.psi.SmithyContainer"
+    implements("array|object|container_body|enum_body|int_enum_body|mixins|operation_body|resource_body|resource_identifiers|resource_operations|resource_collection_operations|resource_resources|service_body|service_operations|service_resources|service_errors|service_renames|trait_body")="software.amazon.smithy.intellij.psi.SmithyContainer"
     extends("array|object|primitive")=value
     extends("null|boolean|number|string|text_block|shape_id")=primitive
     extends("symbol|null|boolean|simple_type_name")=id
     extends("container_shape|simple_shape|enum|int_enum|service|operation|resource")=shape
     extends("operation_input|operation_output|operation_errors")=operation_member
     extends("resource_identifiers|resource_create_operation|resource_put_operation|resource_read_operation|resource_update_operation|resource_delete_operation|resource_list_operation|resource_operations|resource_collection_operations|resource_resources")=resource_member
+    extends("service_version|service_operations|service_resources|service_errors|service_renames")=service_member
     extends("list|set|map|output|structure|union|input|output")=container_shape
     extends("control|entry|metadata")=keyed_element
 }
@@ -163,9 +164,29 @@ structure ::= [documentation] trait* TOKEN_STRUCTURE shape_name [resource_refere
 union ::= [documentation] trait* TOKEN_UNION shape_name [mixins] container_body {
     methods=[trait="" shape_name="" mixins="" body="container_body"]
 }
-service ::= [documentation] trait* TOKEN_SERVICE shape_name [mixins] object {
-    methods=[trait="" shape_name="" mixins="" body="object"]
+service ::= [documentation] trait* TOKEN_SERVICE shape_name [mixins] service_body {
+    methods=[trait="" shape_name="" mixins="" body="service_body"]
     mixin="software.amazon.smithy.intellij.psi.SmithyServiceMixin"
+}
+service_body ::= TOKEN_OPEN_BRACE ((service_member | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
+    methods=[members="service_member" incomplete_member=""]
+}
+service_member ::= service_version | service_operations | service_resources | service_errors | service_renames
+service_version ::= TOKEN_VERSION TOKEN_COLON string
+service_operations ::= TOKEN_OPERATIONS TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COLON])* TOKEN_CLOSE_BRACKET {
+    methods=[shapes="shape_id"]
+}
+service_resources ::= TOKEN_RESOURCES TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COLON])* TOKEN_CLOSE_BRACKET {
+    methods=[shapes="shape_id"]
+}
+service_errors ::= TOKEN_ERRORS TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COLON])* TOKEN_CLOSE_BRACKET {
+    methods=[shapes="shape_id"]
+}
+service_renames ::= TOKEN_RENAME TOKEN_COLON TOKEN_OPEN_BRACE (service_rename [TOKEN_COLON])* TOKEN_CLOSE_BRACE {
+    methods=[entries="service_rename"]
+}
+service_rename ::= key TOKEN_COLON string {
+    methods=[string="value"]
 }
 operation ::= [documentation] trait* TOKEN_OPERATION shape_name [mixins] operation_body {
     methods=[trait="" shape_name="" mixins="" body="operation_body"]
