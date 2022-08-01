@@ -3,6 +3,9 @@ package software.amazon.smithy.intellij.psi
 import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.appendStyledSpan
 import software.amazon.smithy.intellij.SmithyColorSettings
 import software.amazon.smithy.intellij.SmithyJson
+import software.amazon.smithy.intellij.SmithyShapeResolver.getNamespace
+import software.amazon.smithy.intellij.generateLink
+import software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex.Companion.exists
 import java.math.BigDecimal
 
 /**
@@ -71,12 +74,38 @@ interface SmithyValueDefinition : SmithyElement {
                 }
                 append("}")
             }
-            SmithyValueType.STRING -> appendStyledSpan(
-                this,
-                SmithyColorSettings.STRING,
-                SmithyJson.writeValueAsString(asString()),
-                1f
-            )
+            SmithyValueType.STRING -> {
+                val value = asString()
+                if (value != null && "#" in value) {
+                    val (namespace, relativeId) = value.split("#", limit = 2)
+                    if ("$" in relativeId) {
+                        val (shapeName) = relativeId.split("$", limit = 2)
+                        if (exists(namespace, shapeName, resolveScope)) {
+                            append(
+                                generateLink(
+                                    value,
+                                    if (getNamespace(shapeName, containingFile) != namespace) value else relativeId
+                                )
+                            )
+                            return@buildString
+                        }
+                    } else if (exists(namespace, relativeId, resolveScope)) {
+                        append(
+                            generateLink(
+                                value,
+                                if (getNamespace(relativeId, containingFile) != namespace) value else relativeId
+                            )
+                        )
+                        return@buildString
+                    }
+                }
+                appendStyledSpan(
+                    this,
+                    SmithyColorSettings.STRING,
+                    SmithyJson.writeValueAsString(value),
+                    1f
+                )
+            }
         }
     }
 }

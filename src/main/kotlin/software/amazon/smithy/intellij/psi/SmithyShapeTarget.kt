@@ -16,11 +16,12 @@ import software.amazon.smithy.intellij.generateLink
 interface SmithyShapeTarget : SmithyElement {
     val href: String
         get() = buildString {
+            val label = if (declaredNamespace != null) "$declaredNamespace#$shapeName" else shapeName
             val namespace = resolvedNamespace
-            if (namespace != null)
-                append(generateLink("${namespace}#${shapeName}", shapeName))
-            else
-                append(getStyledSpan(HighlighterColors.TEXT, shapeName, 1f))
+            append(
+                if (namespace != null) generateLink("${namespace}#${shapeName}", label)
+                else getStyledSpan(HighlighterColors.TEXT, label, 1f)
+            )
         }
     val shapeName: String
     val declaredNamespace: String?
