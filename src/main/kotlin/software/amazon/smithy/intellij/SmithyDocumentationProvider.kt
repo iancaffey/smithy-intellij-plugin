@@ -1,22 +1,42 @@
 package software.amazon.smithy.intellij
 
+import com.intellij.codeInsight.documentation.DocumentationManagerUtil.createHyperlink
 import com.intellij.lang.documentation.AbstractDocumentationProvider
 import com.intellij.lang.documentation.DocumentationProvider
+import com.intellij.openapi.editor.HighlighterColors
+import com.intellij.openapi.editor.colors.TextAttributesKey
+import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.appendStyledSpan
 import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.getStyledSpan
 import com.intellij.psi.PsiDocCommentBase
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiManager
 import com.intellij.psi.util.PsiTreeUtil.findChildrenOfType
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
+import software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex
+import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyDocumentation
 import software.amazon.smithy.intellij.psi.SmithyDocumentationDefinition
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyTraitDefinition
 import java.util.function.Consumer
+
+private val linkAttributes = TextAttributes().apply {
+    foregroundColor = HighlighterColors.TEXT.defaultAttributes.foregroundColor
+}
+
+fun generateLink(href: String, label: String, key: TextAttributesKey? = null) = buildString {
+    createHyperlink(
+        this,
+        href,
+        if (key != null) getStyledSpan(key, label, 1f) else getStyledSpan(linkAttributes, label, 1f),
+        true
+    )
+}
 
 /**
  * A [DocumentationProvider] for [Smithy](https://awslabs.github.io/smithy).
@@ -50,7 +70,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 }
                 else -> {
                     appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
-                    element.resolvedTarget?.let { target -> append(": ${target.shapeName}") }
+                    element.resolvedTarget?.let { target -> append(": ${target.href}") }
                     element.defaultValue?.let { append(" = ").append(it.toDocString()) }
                 }
             }
@@ -62,9 +82,25 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 }
             }
             appendStyledSpan(this, SmithyColorSettings.KEYWORD, element.type, 1f)
-            append(" ").append(element.name)
+            append(" ").append(element.href)
+            element.mixins.takeIf { it.isNotEmpty() }?.let { mixins ->
+                appendLine()
+                appendStyledSpan(this, SmithyColorSettings.KEYWORD, "with", 1f)
+                append(" [")
+                mixins.onEachIndexed { index, mixin ->
+                    if (index != 0) append(", ")
+                    append(mixin.href)
+                }
+                append("]")
+            }
         }
         is SmithyTraitDefinition -> element.toDocString()
+        is SmithyControl -> when (element.name) {
+            "version" -> "Defines the version of the Smithy IDL to use for a model file."
+            "operationInputSuffix" -> "Defines the suffix to use for inline operation input shapes."
+            "operationOutputSuffix" -> "Defines the suffix to use for inline operation output shapes."
+            else -> null
+        }?.let { renderDocumentation(it) }
         else -> null
     }
 
@@ -79,7 +115,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             docs?.let { append("<div class='content'>").append(docs).append("</div>") }
             val additionalInfo = mutableMapOf(
                 "Namespace" to element.enclosingShape.namespace,
-                "Parent" to element.enclosingShape.name
+                "Parent" to element.enclosingShape.href
             )
             element.resolve()?.let { target ->
                 additionalInfo["Type"] = getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
@@ -109,7 +145,36 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             }
             append(renderAdditionalInfo(additionalInfo))
         }
-        else -> null
+        else -> getQuickNavigateInfo(element, originalElement)
+    }
+
+    override fun getDocumentationElementForLink(
+        psiManager: PsiManager, link: String, context: PsiElement
+    ): PsiElement? {
+        if ("#" !in link) return null
+        val namespace: String
+        val shapeName: String
+        val memberName: String?
+        if ("$" in link) {
+            val parts = link.split("#", limit = 2)
+            namespace = parts[0]
+            val memberParts = parts[1].split("$", limit = 2)
+            shapeName = memberParts[0]
+            memberName = memberParts[1]
+        } else {
+            val parts = link.split("#", limit = 2)
+            namespace = parts[0]
+            shapeName = parts[1]
+            memberName = null
+        }
+        val enclosingFile =
+            SmithyDefinedShapeIdIndex.getFiles(namespace, shapeName, context.resolveScope).firstOrNull()?.let {
+                psiManager.findFile(it)
+            } ?: return null
+        if (enclosingFile !is SmithyFile) return enclosingFile
+        val shape = (enclosingFile as? SmithyFile)?.model?.shapes?.find { it.shapeName == shapeName }
+        if (shape == null || memberName == null) return shape
+        return shape.members.find { it.name == memberName } ?: shape
     }
 
     override fun generateRenderedDoc(comment: PsiDocCommentBase) =

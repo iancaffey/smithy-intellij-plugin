@@ -55,6 +55,8 @@
         TOKEN_UPDATE="update"
         TOKEN_DELETE="delete"
         TOKEN_COLLECTION_OPERATIONS="collectionOperations"
+        TOKEN_FOR="for"
+        TOKEN_WITH="with"
         TOKEN_NULL="null"
         TOKEN_BOOLEAN="regexp:true|false"
         TOKEN_SIMPLE_TYPE_NAME="regexp:blob|boolean|document|string|byte|short|integer|long|float|double|bigInteger|bigDecimal|timestamp"
@@ -73,7 +75,7 @@
         TOKEN_INCOMPLETE_TEXT_BLOCK="regexp:\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))+"
     ]
     implements("^(?!.*element).*")="software.amazon.smithy.intellij.psi.SmithyElement"
-    implements("array|object|container_body|enum_body|int_enum_body|operation_body|trait_body")="software.amazon.smithy.intellij.psi.SmithyContainer"
+    implements("array|object|container_body|enum_body|int_enum_body|mixins|operation_body|trait_body")="software.amazon.smithy.intellij.psi.SmithyContainer"
     extends("array|object|primitive")=value
     extends("null|boolean|number|string|text_block|shape_id")=primitive
     extends("symbol|null|boolean|simple_type_name")=id
@@ -111,11 +113,11 @@ shape ::= simple_shape | enum | int_enum | list | set | map | structure | union 
     implements="software.amazon.smithy.intellij.psi.SmithyShapeExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyShapeMixin"
 }
-simple_shape ::= [documentation] trait* simple_type_name shape_name {
-    methods=[trait="" simple_type_name="" shape_name=""]
+simple_shape ::= [documentation] trait* simple_type_name shape_name [mixins] {
+    methods=[trait="" simple_type_name="" shape_name="" mixins=""]
 }
-enum ::= [documentation] trait* TOKEN_ENUM shape_name enum_body {
-    methods=[trait="" shape_name="" body="enum_body"]
+enum ::= [documentation] trait* TOKEN_ENUM shape_name [mixins] enum_body {
+    methods=[trait="" shape_name="" mixins="" body="enum_body"]
     implements="software.amazon.smithy.intellij.psi.SmithyEnumExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyEnumMixin"
 }
@@ -128,8 +130,8 @@ enum_member ::= [documentation] trait* member_name [member_initializer] {
     implements="software.amazon.smithy.intellij.psi.SmithyEnumMemberExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyEnumMemberMixin"
 }
-int_enum ::= [documentation] trait* TOKEN_INT_ENUM shape_name int_enum_body {
-    methods=[trait="" shape_name="" body="int_enum_body"]
+int_enum ::= [documentation] trait* TOKEN_INT_ENUM shape_name [mixins] int_enum_body {
+    methods=[trait="" shape_name="" mixins="" body="int_enum_body"]
     implements="software.amazon.smithy.intellij.psi.SmithyIntEnumExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyIntEnumMixin"
 }
@@ -142,30 +144,30 @@ int_enum_member ::= [documentation] trait* member_name [member_initializer] {
     implements="software.amazon.smithy.intellij.psi.SmithyIntEnumMemberExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyIntEnumMemberMixin"
 }
-list ::= [documentation] trait* TOKEN_LIST shape_name container_body {
-    methods=[trait="" shape_name="" body="container_body"]
+list ::= [documentation] trait* TOKEN_LIST shape_name [mixins] container_body {
+    methods=[trait="" shape_name="" mixins="" body="container_body"]
     mixin="software.amazon.smithy.intellij.psi.SmithyListMixin"
 }
-set ::= [documentation] trait* TOKEN_SET shape_name container_body {
-    methods=[trait="" shape_name="" body="container_body"]
+set ::= [documentation] trait* TOKEN_SET shape_name [mixins] container_body {
+    methods=[trait="" shape_name="" mixins="" body="container_body"]
     mixin="software.amazon.smithy.intellij.psi.SmithySetMixin"
 }
-map ::= [documentation] trait* TOKEN_MAP shape_name container_body {
-    methods=[trait="" shape_name="" body="container_body"]
+map ::= [documentation] trait* TOKEN_MAP shape_name [mixins] container_body {
+    methods=[trait="" shape_name="" mixins="" body="container_body"]
     mixin="software.amazon.smithy.intellij.psi.SmithyMapMixin"
 }
-structure ::= [documentation] trait* TOKEN_STRUCTURE shape_name container_body {
-    methods=[trait="" shape_name="" body="container_body"]
+structure ::= [documentation] trait* TOKEN_STRUCTURE shape_name [resource_reference] [mixins] container_body {
+    methods=[trait="" shape_name="" mixins="" body="container_body"]
 }
-union ::= [documentation] trait* TOKEN_UNION shape_name container_body {
-    methods=[trait="" shape_name="" body="container_body"]
+union ::= [documentation] trait* TOKEN_UNION shape_name [mixins] container_body {
+    methods=[trait="" shape_name="" mixins="" body="container_body"]
 }
-service ::= [documentation] trait* TOKEN_SERVICE shape_name object {
-    methods=[trait="" shape_name="" body="object"]
+service ::= [documentation] trait* TOKEN_SERVICE shape_name [mixins] object {
+    methods=[trait="" shape_name="" mixins="" body="object"]
     mixin="software.amazon.smithy.intellij.psi.SmithyServiceMixin"
 }
-operation ::= [documentation] trait* TOKEN_OPERATION shape_name operation_body {
-    methods=[trait="" shape_name="" body="operation_body"]
+operation ::= [documentation] trait* TOKEN_OPERATION shape_name [mixins] operation_body {
+    methods=[trait="" shape_name="" mixins="" body="operation_body"]
     implements="software.amazon.smithy.intellij.psi.SmithyOperationExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyOperationMixin"
 }
@@ -181,8 +183,8 @@ operation_input ::= TOKEN_INPUT ((TOKEN_COLON shape_id) | (TOKEN_WALRUS input)) 
     implements="software.amazon.smithy.intellij.psi.SmithyOperationInputExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyOperationInputMixin"
 }
-input ::= [documentation] trait* container_body {
-    methods=[trait="" body="container_body"]
+input ::= [documentation] trait* [resource_reference] [mixins] container_body {
+    methods=[trait="" mixins="" body="container_body"]
     implements="software.amazon.smithy.intellij.psi.SmithyInputExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyInputMixin"
 }
@@ -191,8 +193,8 @@ operation_output ::= TOKEN_OUTPUT ((TOKEN_COLON shape_id) | (TOKEN_WALRUS output
     implements="software.amazon.smithy.intellij.psi.SmithyOperationOutputExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyOperationOutputMixin"
 }
-output ::= [documentation] trait* container_body {
-    methods=[trait="" body="container_body"]
+output ::= [documentation] trait* [resource_reference] [mixins] container_body {
+    methods=[trait="" mixins="" body="container_body"]
     implements="software.amazon.smithy.intellij.psi.SmithyOutputExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyOutputMixin"
 }
@@ -201,8 +203,8 @@ operation_errors ::= TOKEN_ERRORS TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKE
     implements="software.amazon.smithy.intellij.psi.SmithyOperationErrorsExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyOperationErrorsMixin"
 }
-resource ::= [documentation] trait* TOKEN_RESOURCE shape_name object {
-    methods=[trait="" shape_name="" body="object"]
+resource ::= [documentation] trait* TOKEN_RESOURCE shape_name [mixins] object {
+    methods=[trait="" shape_name="" mixins="" body="object"]
     mixin="software.amazon.smithy.intellij.psi.SmithyResourceMixin"
 }
 container_body ::= TOKEN_OPEN_BRACE ((container_member | incomplete_container_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
@@ -216,6 +218,10 @@ container_member ::= [documentation] trait* member_name TOKEN_COLON shape_id [me
 member_initializer ::= TOKEN_EQUALS value {
     implements="software.amazon.smithy.intellij.psi.SmithyMemberInitializerExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyMemberInitializerMixin"
+}
+resource_reference ::= TOKEN_FOR shape_id
+mixins ::= TOKEN_WITH TOKEN_OPEN_BRACKET (shape_id [TOKEN_COMMA])* TOKEN_CLOSE_BRACKET {
+    methods=[shapes="shape_id"]
 }
 
 //Traits
@@ -278,7 +284,7 @@ id ::= symbol | null | boolean | simple_type_name
        | TOKEN_APPLY | TOKEN_USE | TOKEN_LIST | TOKEN_SET | TOKEN_MAP | TOKEN_METADATA | TOKEN_NAMESPACE | TOKEN_STRUCTURE
        | TOKEN_UNION | TOKEN_SERVICE | TOKEN_OPERATION | TOKEN_RESOURCE | TOKEN_VERSION | TOKEN_OPERATIONS | TOKEN_RESOURCES
        | TOKEN_RENAME | TOKEN_INPUT | TOKEN_OUTPUT | TOKEN_ERRORS | TOKEN_IDENTIFIERS | TOKEN_CREATE | TOKEN_PUT | TOKEN_READ
-       | TOKEN_UPDATE | TOKEN_DELETE | TOKEN_COLLECTION_OPERATIONS | TOKEN_ENUM | TOKEN_INT_ENUM {
+       | TOKEN_UPDATE | TOKEN_DELETE | TOKEN_COLLECTION_OPERATIONS | TOKEN_ENUM | TOKEN_INT_ENUM | TOKEN_FOR | TOKEN_WITH {
     methods=[null="" boolean=""]
 }
 

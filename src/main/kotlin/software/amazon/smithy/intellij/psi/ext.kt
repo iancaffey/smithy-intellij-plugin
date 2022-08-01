@@ -497,6 +497,7 @@ interface SmithyShapeExt : SmithyNamedElement, SmithyShapeDefinition, SmithyStat
     override val type get() = super.type
     override val documentation: SmithyDocumentation?
     override val declaredTraits: List<SmithyTrait>
+    override val mixins: List<SmithyShapeId>
     val model: SmithyModel
     val requiredMembers: Set<String> get() = emptySet()
     val supportedMembers: Set<String>? get() = requiredMembers.takeIf { it.isNotEmpty() }
@@ -511,6 +512,8 @@ abstract class SmithyShapeMixin(node: ASTNode) : SmithyPsiElement(node), SmithyS
     override val shapeName: String get() = nameIdentifier.text
     override val shapeId get() = "$namespace#$shapeName"
     override val model get() = (containingFile as? SmithyFile)?.model!!
+    override val mixins: List<SmithyShapeId>
+        get() = getChildOfType(this, SmithyMixins::class.java)?.shapes ?: emptyList()
     override val members get(): List<@JvmWildcard SmithyMemberDefinition> = emptyList<SmithyMemberDefinition>()
     override val documentation get() = getChildOfType(this, SmithyDocumentation::class.java)
     override val declaredTraits: List<SmithyTrait> get() = getChildrenOfTypeAsList(this, SmithyTrait::class.java)

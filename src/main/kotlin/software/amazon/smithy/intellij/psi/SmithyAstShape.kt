@@ -30,6 +30,9 @@ data class SmithyAstShape(
             SmithyAstMember(this, memberName, reference)
         }
     } ?: emptyList()
+    override val mixins: List<SmithyShapeTarget> = shape.mixins?.map {
+        SmithyAstTarget(this, it.target)
+    } ?: emptyList()
     override val documentation = shape.traits?.get("smithy.api#documentation")?.let {
         (it as? SmithyAst.Value.String)?.value?.let { docs -> SmithyAstDocumentation(this, docs) }
     }

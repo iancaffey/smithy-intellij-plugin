@@ -8,12 +8,14 @@ import software.amazon.smithy.intellij.SmithyShapeResolver.getDefinitions
  * @author Ian Caffey
  * @since 1.0
  */
-class SmithyAstTarget(val member: SmithyAstMember, val shapeId: String) : SmithySyntheticElement(), SmithyShapeTarget {
+data class SmithyAstTarget(
+    val enclosing: SmithyDefinition, val shapeId: String
+) : SmithySyntheticElement(), SmithyShapeTarget {
     private val parts = shapeId.split('#', limit = 2)
     override val shapeName = parts[1]
     override val declaredNamespace = parts[0]
     override val resolvedNamespace = parts[0]
     override fun getName() = shapeName
-    override fun getParent() = member
+    override fun getParent() = enclosing
     override fun resolve() = getDefinitions(this, declaredNamespace, shapeName).firstOrNull()
 }

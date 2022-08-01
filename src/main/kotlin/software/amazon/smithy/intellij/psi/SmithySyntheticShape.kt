@@ -24,6 +24,7 @@ class SmithySyntheticShape(
     override val shapeName = "Unit"
     override val shapeId = "smithy.api#Unit"
     override val members = emptyList<SmithyMemberDefinition>()
+    override val mixins = emptyList<SmithyShapeTarget>()
     override val declaredTraits = emptyList<SmithyTraitDefinition>()
     override val documentation: SmithyDocumentationDefinition? = null
     override fun getName() = type

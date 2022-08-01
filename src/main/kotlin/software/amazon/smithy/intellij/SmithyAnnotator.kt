@@ -35,8 +35,10 @@ import software.amazon.smithy.intellij.psi.SmithyMap
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
 import software.amazon.smithy.intellij.psi.SmithyMemberInitializer
 import software.amazon.smithy.intellij.psi.SmithyMemberName
+import software.amazon.smithy.intellij.psi.SmithyMixins
 import software.amazon.smithy.intellij.psi.SmithyModel
 import software.amazon.smithy.intellij.psi.SmithyNull
+import software.amazon.smithy.intellij.psi.SmithyResourceReference
 import software.amazon.smithy.intellij.psi.SmithyShape
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 import software.amazon.smithy.intellij.psi.SmithyStatement
@@ -72,10 +74,12 @@ class SmithyAnnotator : Annotator {
 private enum class Annotation(val sinceVersion: String? = null, val untilVersion: String? = null) : Annotator {
     KEYWORD {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-            if (element is SmithyBoolean || element is SmithyNull) {
-                holder.highlight(SmithyColorSettings.KEYWORD)
-            }
-            getParentOfType(element, SmithyStatement::class.java)?.takeIf { element == it.typeIdentifier }?.let {
+            if (element is SmithyBoolean
+                || element is SmithyNull
+                || (element.elementType == SmithyTypes.TOKEN_FOR && element.parent is SmithyResourceReference)
+                || (element.elementType == SmithyTypes.TOKEN_WITH && element.parent is SmithyMixins)
+                || getParentOfType(element, SmithyStatement::class.java)?.let { element == it.typeIdentifier } == true
+            ) {
                 holder.highlight(SmithyColorSettings.KEYWORD)
             }
         }

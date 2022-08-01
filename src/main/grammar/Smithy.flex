@@ -82,6 +82,8 @@ TOKEN_INCOMPLETE_TEXT_BLOCK=\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[
   "update"                           { return TOKEN_UPDATE; }
   "delete"                           { return TOKEN_DELETE; }
   "collectionOperations"             { return TOKEN_COLLECTION_OPERATIONS; }
+  "for"                              { return TOKEN_FOR; }
+  "with"                             { return TOKEN_WITH; }
   "null"                             { return TOKEN_NULL; }
 
   {TOKEN_BOOLEAN}                    { return TOKEN_BOOLEAN; }
