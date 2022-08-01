@@ -4,6 +4,8 @@ import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.lang.annotation.HighlightSeverity.ERROR
+import com.intellij.lang.annotation.HighlightSeverity.INFORMATION
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiComment
@@ -20,6 +22,7 @@ import software.amazon.smithy.intellij.actions.SmithyRemoveCommasQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveImportQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveMemberInitializerQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveMemberQuickFix
+import software.amazon.smithy.intellij.actions.SmithyRemoveResourceReferenceQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveUnusedImportsQuickFix
 import software.amazon.smithy.intellij.psi.SmithyBoolean
 import software.amazon.smithy.intellij.psi.SmithyControl
@@ -138,7 +141,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                 valid.forEach { holder.highlight(SmithyColorSettings.VALID_ESCAPE_SEQUENCE, range.cutOut(it)) }
                 invalid.forEach {
                     holder.highlight(
-                        HighlightSeverity.ERROR,
+                        ERROR,
                         "Invalid escape sequence: '${it.substring(element.text)}'",
                         SmithyColorSettings.INVALID_ESCAPE_SEQUENCE,
                         range.cutOut(it)
@@ -152,7 +155,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
             if (element.elementType in SmithyFormattingModelBuilder.TOKENS_REQUIRING_TRAILING_NEW_LINE && element.nextLeaf() != null) {
                 val trailingWhiteSpace = element.nextLeafs.takeWhile { it is PsiComment || it is PsiWhiteSpace }
                 if (trailingWhiteSpace.none { it.textContains('\n') }) {
-                    holder.highlight(HighlightSeverity.ERROR, "Expecting trailing line break '\\n'")
+                    holder.highlight(ERROR, "Expecting trailing line break '\\n'")
                 }
             }
         }
@@ -174,7 +177,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                 }
                 val nextSibling = element.siblings(withSelf = false).indexOfFirst { it.elementType == type }
                 if (nextSibling != -1 && (nextComma == -1 || nextSibling < nextComma)) {
-                    holder.highlight(HighlightSeverity.ERROR, "Expecting trailing comma ','")
+                    holder.highlight(ERROR, "Expecting trailing comma ','")
                 }
             }
         }
@@ -182,7 +185,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
     UNNECESSARY_COMMAS(sinceVersion = "2.0") {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element.elementType == SmithyTypes.TOKEN_COMMA) {
-                holder.newAnnotation(HighlightSeverity.INFORMATION, "Remove unnecessary commas")
+                holder.newAnnotation(INFORMATION, "Remove unnecessary commas")
                     .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL)
                     .withFix(SmithyRemoveCommasQuickFix)
                     .create()
@@ -195,10 +198,9 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
             if (element is SmithyMemberInitializer) {
                 val enclosingShapeType = element.enclosingMember.enclosingShape.type
                 if (enclosingShapeType !in validEnclosingShapes) {
-                    holder.newAnnotation(
-                        HighlightSeverity.ERROR,
-                        "'${element.enclosingMember.name}' cannot have a default value"
-                    ).withFix(SmithyRemoveMemberInitializerQuickFix(element)).create()
+                    holder.newAnnotation(ERROR, "'${element.enclosingMember.name}' cannot have a default value")
+                        .withFix(SmithyRemoveMemberInitializerQuickFix(element))
+                        .create()
                 }
             }
         }
@@ -207,10 +209,21 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element is SmithyValue) {
                 if (element.parent is SmithyEnumMember && element.asString() == null) {
-                    holder.highlight(HighlightSeverity.ERROR, "Expected a string value")
+                    holder.highlight(ERROR, "Expected a string value")
                 }
                 if (element.parent is SmithyIntEnumMember && element.asNumber() == null) {
-                    holder.highlight(HighlightSeverity.ERROR, "Expected an integer value")
+                    holder.highlight(ERROR, "Expected an integer value")
+                }
+            }
+        }
+    },
+    INVALID_RESOURCE_REFERENCE {
+        override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+            if (element is SmithyResourceReference) {
+                element.shapeId.resolve()?.takeIf { it.type != "resource" }.let {
+                    holder.newAnnotation(ERROR, "Structures can only target resource shapes")
+                        .withFix(SmithyRemoveResourceReferenceQuickFix(element))
+                        .create()
                 }
             }
         }
@@ -218,24 +231,24 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
     INCOMPLETE_STRING {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element.elementType == SmithyTypes.TOKEN_INCOMPLETE_STRING) {
-                holder.highlight(HighlightSeverity.ERROR, "Expecting closing quote '\"'")
+                holder.highlight(ERROR, "Expecting closing quote '\"'")
             }
             if (element.elementType == SmithyTypes.TOKEN_INCOMPLETE_TEXT_BLOCK) {
-                holder.highlight(HighlightSeverity.ERROR, "Expecting closing quotes '\"\"\"'")
+                holder.highlight(ERROR, "Expecting closing quotes '\"\"\"'")
             }
         }
     },
     INCOMPLETE_TRAIT {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element is SmithyIncompleteAppliedTrait) {
-                holder.highlight(HighlightSeverity.ERROR, "Missing trait")
+                holder.highlight(ERROR, "Missing trait")
             }
         }
     },
     INCOMPLETE_MEMBER {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element is SmithyIncompleteEntry || element is SmithyIncompleteContainerMember) {
-                holder.highlight(HighlightSeverity.ERROR, "Missing shape id")
+                holder.highlight(ERROR, "Missing shape id")
             }
         }
     },
@@ -252,7 +265,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                     ) { "'$it'" }
                 }
                 if (message != null) {
-                    holder.highlight(HighlightSeverity.ERROR, message)
+                    holder.highlight(ERROR, message)
                 }
             }
         }
@@ -275,7 +288,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                                 ", ", "${enclosingShape.type} expects ", ", or '${it.last()}'"
                             ) { member -> "'$member'" }
                         }
-                        holder.highlight(HighlightSeverity.ERROR, message)
+                        holder.highlight(ERROR, message)
                     }
                 }
             }
@@ -286,7 +299,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
             if (element is SmithyMemberDefinition && element.parent.children.any {
                     it is SmithyMemberDefinition && it != element && it.name == element.name
                 }) {
-                holder.newAnnotation(HighlightSeverity.ERROR, "'${element.name}' is already defined")
+                holder.newAnnotation(ERROR, "'${element.name}' is already defined")
                     .withFix(SmithyRemoveMemberQuickFix(element))
                     .create()
             }
@@ -297,7 +310,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
             if (element is SmithyMemberDefinition && element.name == "key" && element.enclosingShape is SmithyMap) {
                 val target = element.resolve()
                 if (target != null && target.type != "string") {
-                    holder.highlight(HighlightSeverity.ERROR, "'key' must target a string shape")
+                    holder.highlight(ERROR, "'key' must target a string shape")
                 }
             }
         }
@@ -307,10 +320,10 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
             if (element is SmithyTrait) {
                 val target = element.resolve()
                 if (target != null && !target.hasTrait("smithy.api", "trait")) {
-                    holder.newAnnotation(
-                        HighlightSeverity.ERROR,
-                        "${element.shape.shapeName} cannot be used as a trait"
-                    ).range(element.shape).highlightType(ProblemHighlightType.ERROR).create()
+                    holder.newAnnotation(ERROR, "${element.shape.shapeName} cannot be used as a trait")
+                        .range(element.shape)
+                        .highlightType(ProblemHighlightType.ERROR)
+                        .create()
                 }
             }
         }
@@ -325,7 +338,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                     if (!conflicts) {
                         val fix = SmithyOptimizeShapeIdQuickFix(element.project, element)
                         holder.newAnnotation(
-                            HighlightSeverity.INFORMATION,
+                            INFORMATION,
                             if (fix.hasImport) "Remove unnecessary qualifier" else "Add import for: ${element.shapeName}"
                         ).range(namespaceId.textRange)
                             .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL)
@@ -344,7 +357,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                 }
                 if (conflictingImport != null) {
                     holder.newAnnotation(
-                        HighlightSeverity.ERROR,
+                        ERROR,
                         "'${element.shapeName}' conflicts with the imported shape '${conflictingImport.shapeId.text}'"
                     )
                         .range(element.nameIdentifier.textRange)
@@ -357,7 +370,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
     UNUSED_IMPORT {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element is SmithyImport && element in SmithyImportOptimizer.unusedImports(element.containingFile)) {
-                holder.newAnnotation(HighlightSeverity.INFORMATION, "Unused import")
+                holder.newAnnotation(INFORMATION, "Unused import")
                     .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL)
                     .withFix(SmithyRemoveUnusedImportsQuickFix)
                     .create()
@@ -369,14 +382,14 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
             when (val reference = element.reference) {
                 is SmithyKeyReference -> {
                     if (!reference.isSoft && reference.resolve() == null) {
-                        holder.newAnnotation(HighlightSeverity.ERROR, "Unresolved member: ${reference.key.text}")
+                        holder.newAnnotation(ERROR, "Unresolved member: ${reference.key.text}")
                             .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
                             .create()
                     }
                 }
                 is SmithyMemberReference -> {
                     if (!reference.isSoft && reference.resolve() == null) {
-                        holder.newAnnotation(HighlightSeverity.ERROR, "Unresolved member: ${reference.id.text}")
+                        holder.newAnnotation(ERROR, "Unresolved member: ${reference.id.text}")
                             .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
                             .create()
                     }
@@ -385,7 +398,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                     val target = reference.resolve()
                     if (target == null) {
                         if (!reference.isSoft) {
-                            holder.newAnnotation(HighlightSeverity.ERROR, "Unresolved shape: ${element.text}")
+                            holder.newAnnotation(ERROR, "Unresolved shape: ${element.text}")
                                 .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
                                 .also {
                                     if (element is SmithyShapeId) {
@@ -398,7 +411,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                         val enclosingNamespace = (element.containingFile as? SmithyFile)?.model?.namespace
                         if (target.namespace != enclosingNamespace && target.hasTrait("smithy.api", "private")) {
                             holder.newAnnotation(
-                                HighlightSeverity.ERROR,
+                                ERROR,
                                 "${element.shapeName} cannot be referenced outside ${target.namespace}"
                             ).highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL).create()
                         }
@@ -422,10 +435,10 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
 }
 
 private fun AnnotationHolder.highlight(key: TextAttributesKey) =
-    newSilentAnnotation(HighlightSeverity.INFORMATION).textAttributes(key).create()
+    newSilentAnnotation(INFORMATION).textAttributes(key).create()
 
 private fun AnnotationHolder.highlight(key: TextAttributesKey, range: TextRange) =
-    newSilentAnnotation(HighlightSeverity.INFORMATION).range(range).textAttributes(key).create()
+    newSilentAnnotation(INFORMATION).range(range).textAttributes(key).create()
 
 private fun AnnotationHolder.highlight(severity: HighlightSeverity, message: String) =
     newAnnotation(severity, message).create()
