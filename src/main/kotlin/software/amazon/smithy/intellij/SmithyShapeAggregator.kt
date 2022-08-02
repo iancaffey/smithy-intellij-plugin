@@ -40,18 +40,17 @@ object SmithyShapeAggregator {
 
     private fun findMembers(shape: SmithyShapeDefinition): List<SmithyMemberDefinition> {
         val declaredMembers = shape.declaredMembers
+        if (hasCycle(shape)) return declaredMembers
         val members = mutableMapOf<String, SmithyMemberDefinition>()
-        if (!hasCycle(shape)) {
-            shape.mixins.forEach { target ->
-                //Note: all mixins _should_ have this trait, but invalid mixins will be ignored here
-                val mixin = target.resolve()?.takeIf { it.hasTrait("smithy.api", "mixin") } ?: return@forEach
-                findMembers(mixin).forEach { inheritedMember ->
-                    //Note: declared members are kept as-is (even if they have mixins), as the original definition supports
-                    //locating inherited traits (so we only need to introduce new members from mixins here)
-                    members[inheritedMember.name] = declaredMembers.find {
-                        it.name == inheritedMember.name
-                    } ?: SmithySyntheticMember(shape, inheritedMember)
-                }
+        shape.mixins.forEach { target ->
+            //Note: all mixins _should_ have this trait, but invalid mixins will be ignored here
+            val mixin = target.resolve()?.takeIf { it.hasTrait("smithy.api", "mixin") } ?: return@forEach
+            findMembers(mixin).forEach { inheritedMember ->
+                //Note: declared members are kept as-is (even if they have mixins), as the original definition supports
+                //locating inherited traits (so we only need to introduce new members from mixins here)
+                members[inheritedMember.name] = declaredMembers.find {
+                    it.name == inheritedMember.name
+                } ?: SmithySyntheticMember(shape, inheritedMember)
             }
         }
         declaredMembers.forEach { if (it.name !in members) members[it.name] = it }
@@ -59,25 +58,24 @@ object SmithyShapeAggregator {
     }
 
     private fun findTraits(shape: SmithyShapeDefinition): List<SmithyTraitDefinition> {
-        val explicitTraits = listOf(shape.appliedTraits, shape.declaredTraits, shape.syntheticTraits).flatten()
+        val explicitTraits = listOf(shape.syntheticTraits, shape.declaredTraits, shape.appliedTraits).flatten()
+        if (hasCycle(shape)) return merge(shape, explicitTraits)
         val inheritedTraits = mutableMapOf<String, SmithyTraitDefinition>()
-        if (!hasCycle(shape)) {
-            shape.mixins.forEach { target ->
-                val mixin = target.resolve() ?: return@forEach
-                //Note: all mixins _should_ have this trait, but invalid mixins will be ignored here
-                val mixinTrait = mixin.findTrait("smithy.api", "mixin") ?: return@forEach
-                val ignoredTraits = mutableSetOf("smithy.api#mixin")
-                mixinTrait.value.fields["localTraits"]?.values?.forEach {
-                    it.asString()?.let { shapeId -> ignoredTraits += shapeId }
-                }
-                findTraits(mixin).forEach {
-                    val namespace = it.resolvedNamespace
-                    if (namespace != null
-                        && "$namespace#${it.shapeName}" !in ignoredTraits
-                        && explicitTraits.none { explicit -> explicit.shapeName == it.shapeName && explicit.resolvedNamespace == namespace }
-                    ) {
-                        inheritedTraits["${namespace}#${it.shapeName}"] = it
-                    }
+        shape.mixins.forEach { target ->
+            val mixin = target.resolve() ?: return@forEach
+            //Note: all mixins _should_ have this trait, but invalid mixins will be ignored here
+            val mixinTrait = mixin.findTrait("smithy.api", "mixin") ?: return@forEach
+            val ignoredTraits = mutableSetOf("smithy.api#mixin")
+            mixinTrait.value.fields["localTraits"]?.values?.forEach {
+                it.asString()?.let { shapeId -> ignoredTraits += shapeId }
+            }
+            findTraits(mixin).forEach {
+                val namespace = it.resolvedNamespace
+                if (namespace != null
+                    && "$namespace#${it.shapeName}" !in ignoredTraits
+                    && explicitTraits.none { explicit -> explicit.shapeName == it.shapeName && explicit.resolvedNamespace == namespace }
+                ) {
+                    inheritedTraits["${namespace}#${it.shapeName}"] = it
                 }
             }
         }
@@ -88,14 +86,14 @@ object SmithyShapeAggregator {
         if (visited.contains(shape.shapeId)) return true else visited += shape.shapeId
         return shape.mixins.any {
             val target = it.resolve()
-            return@any target != null && hasCycle(target, visited)
+            target != null && hasCycle(target, visited)
         }
     }
 
     private fun collectTraits(member: SmithyMemberDefinition): List<SmithyTraitDefinition> {
         //Synthetic members are not re-declared, so they only inherit the original member traits
         //Declared members inherit from the last mixin member (since re-declared members supersede the previous member)
-        val explicitTraits = listOf(member.appliedTraits, member.declaredTraits, member.syntheticTraits).flatten()
+        val explicitTraits = listOf(member.syntheticTraits, member.declaredTraits, member.appliedTraits).flatten()
         val inheritedTraits = when (member) {
             is SmithySyntheticMember -> collectTraits(member.original)
             else -> member.enclosingShape.mixins.mapNotNull {
@@ -136,13 +134,10 @@ object SmithyShapeAggregator {
                 if (value == null) break
                 value = value.merge(definition.value)
             }
-            return@mapNotNull if (value != null) SmithySyntheticTrait(
-                parent,
-                first.declaredNamespace,
-                first.resolvedNamespace,
-                first.shapeName,
-                value
-            ) else null
+            //Note: if the trait value has a merge conflict, the entire trait gets dropped here
+            value?.let {
+                SmithySyntheticTrait(parent, first.declaredNamespace, first.resolvedNamespace, first.shapeName, it)
+            }
         }
     }
 }
