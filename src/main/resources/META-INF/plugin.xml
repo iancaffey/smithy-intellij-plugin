@@ -60,6 +60,8 @@
         <annotator language="Smithy" implementationClass="software.amazon.smithy.intellij.SmithyAnnotator"/>
         <codeInsight.lineMarkerProvider language="Smithy"
                                         implementationClass="software.amazon.smithy.intellij.SmithyAppliedTraitLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="Smithy"
+                                        implementationClass="software.amazon.smithy.intellij.SmithyInheritedMemberLineMarkerProvider"/>
         <codeInsight.parameterInfo language="Smithy"
                                    implementationClass="software.amazon.smithy.intellij.SmithyKeyParameterInfoHandler"/>
         <codeInsight.parameterInfo language="Smithy"

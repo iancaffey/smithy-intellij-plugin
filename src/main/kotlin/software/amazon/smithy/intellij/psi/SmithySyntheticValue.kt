@@ -10,6 +10,18 @@ import java.math.BigDecimal
  * @since 1.0
  */
 sealed class SmithySyntheticValue : SmithySyntheticElement(), SmithyValueDefinition {
+    companion object {
+        fun from(value: SmithyValueDefinition): SmithySyntheticValue =
+            if (value is SmithySyntheticValue) value else when (value.type) {
+                SmithyValueType.ARRAY -> Array(value.values.map { from(it) })
+                SmithyValueType.BOOLEAN -> Boolean(value.asBoolean())
+                SmithyValueType.NULL -> Null()
+                SmithyValueType.NUMBER -> Number(value.asNumber())
+                SmithyValueType.OBJECT -> Object(value.fields.mapValues { (_, value) -> from(value) })
+                SmithyValueType.STRING -> String(value.asString())
+            }
+    }
+
     abstract fun scope(parent: PsiElement)
 
     data class Array(override val values: List<SmithySyntheticValue>) : SmithySyntheticValue() {
@@ -23,7 +35,7 @@ sealed class SmithySyntheticValue : SmithySyntheticElement(), SmithyValueDefinit
         }
     }
 
-    data class Boolean(val value: kotlin.Boolean) : SmithySyntheticValue() {
+    data class Boolean(val value: kotlin.Boolean?) : SmithySyntheticValue() {
         private lateinit var enclosing: PsiElement
         override val type = SmithyValueType.BOOLEAN
         override fun getParent() = enclosing
@@ -34,12 +46,12 @@ sealed class SmithySyntheticValue : SmithySyntheticElement(), SmithyValueDefinit
         }
     }
 
-    data class Number(val value: BigDecimal) : SmithySyntheticValue() {
+    data class Number(val value: BigDecimal?) : SmithySyntheticValue() {
         private lateinit var enclosing: PsiElement
         override val type = SmithyValueType.NUMBER
         override fun getParent() = enclosing
         override fun asNumber() = value
-        override fun toString(): kotlin.String = value.toPlainString()
+        override fun toString(): kotlin.String = value?.toPlainString() ?: "NaN"
         override fun scope(parent: PsiElement) {
             enclosing = parent
         }
@@ -68,12 +80,12 @@ sealed class SmithySyntheticValue : SmithySyntheticElement(), SmithyValueDefinit
         }
     }
 
-    data class String(val value: kotlin.String) : SmithySyntheticValue() {
+    data class String(val value: kotlin.String?) : SmithySyntheticValue() {
         private lateinit var enclosing: PsiElement
         override val type = SmithyValueType.STRING
         override fun getParent() = enclosing
         override fun asString() = value
-        override fun toString() = value
+        override fun toString() = value ?: "<invalid string>"
         override fun scope(parent: PsiElement) {
             enclosing = parent
         }

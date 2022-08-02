@@ -193,7 +193,7 @@ operation ::= [documentation] trait* TOKEN_OPERATION shape_name [mixins] operati
     implements="software.amazon.smithy.intellij.psi.SmithyOperationExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyOperationMixin"
 }
-operation_body ::= TOKEN_OPEN_BRACE (operation_member [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
+operation_body ::= TOKEN_OPEN_BRACE ((operation_member | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
      methods=[members="operation_member"]
 }
 operation_member ::= operation_input | operation_output | operation_errors {

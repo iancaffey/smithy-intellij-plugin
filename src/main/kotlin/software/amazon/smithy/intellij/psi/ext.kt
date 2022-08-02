@@ -4,6 +4,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.navigation.ItemPresentation
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.NavigatablePsiElement
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiDocumentManager
@@ -53,6 +54,7 @@ interface SmithyNamedElement : SmithyElement, PsiNameIdentifierOwner {
 abstract class SmithySyntheticElement : FakePsiElement(), SmithyElement {
     override fun getLanguage() = SmithyLanguage
     override fun getTextOffset() = parent?.node?.startOffset ?: 0
+    override fun getTextRange() = TextRange.from(textOffset, textLength)
 }
 
 interface SmithyStatement : SmithyElement {
@@ -106,11 +108,11 @@ abstract class SmithyContainerMemberMixin(node: ASTNode) : SmithyPsiElement(node
 }
 
 interface SmithyContainerShapeExt : SmithyShape {
-    override val members: List<SmithyContainerMember>
+    override val declaredMembers: List<SmithyContainerMember>
 }
 
 abstract class SmithyContainerShapeMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyContainerShape {
-    override val members: List<SmithyContainerMember> get() = body.members
+    override val declaredMembers: List<SmithyContainerMember> get() = body.members
 }
 
 interface SmithyControlExt : SmithyStatement
@@ -141,11 +143,11 @@ abstract class SmithyEntryMixin(node: ASTNode) : SmithyKeyedElementImpl(node), S
 }
 
 interface SmithyEnumExt : SmithyShape {
-    override val members: List<SmithyEnumMember>
+    override val declaredMembers: List<SmithyEnumMember>
 }
 
 abstract class SmithyEnumMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyEnum {
-    override val members: List<SmithyEnumMember> get() = body.members
+    override val declaredMembers: List<SmithyEnumMember> get() = body.members
 }
 
 interface SmithyEnumMemberExt : SmithyNamedElement, SmithyMemberDefinition {
@@ -167,14 +169,6 @@ abstract class SmithyEnumMemberMixin(node: ASTNode) : SmithyPsiElement(node), Sm
             return if (value != null) {
                 _syntheticTraits ?: listOf(
                     SmithySyntheticTrait(this, "smithy.api", "enumValue", value)
-                ).also { _syntheticTraits = it }
-            } else if (
-                !hasTraitIn(appliedTraits, "smithy.api", "enumValue")
-                && !hasTraitIn(declaredTraits, "smithy.api", "enumValue")
-            ) {
-                val inferred = SmithySyntheticValue.String(name).also { it.scope(this) }
-                _syntheticTraits ?: listOf(
-                    SmithySyntheticTrait(this, "smithy.api", "enumValue", inferred)
                 ).also { _syntheticTraits = it }
             } else {
                 emptyList()
@@ -227,11 +221,11 @@ abstract class SmithyInputMixin(node: ASTNode) : SmithyContainerShapeImpl(node),
 }
 
 interface SmithyIntEnumExt : SmithyShape {
-    override val members: List<SmithyIntEnumMember>
+    override val declaredMembers: List<SmithyIntEnumMember>
 }
 
 abstract class SmithyIntEnumMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyIntEnum {
-    override val members: List<SmithyIntEnumMember> get() = body.members
+    override val declaredMembers: List<SmithyIntEnumMember> get() = body.members
 }
 
 interface SmithyIntEnumMemberExt : SmithyNamedElement, SmithyMemberDefinition {
@@ -587,7 +581,7 @@ abstract class SmithyShapeMixin(node: ASTNode) : SmithyPsiElement(node), SmithyS
     override val model get() = (containingFile as? SmithyFile)?.model!!
     override val mixins: List<SmithyShapeId>
         get() = getChildOfType(this, SmithyMixins::class.java)?.shapes ?: emptyList()
-    override val members get(): List<@JvmWildcard SmithyMemberDefinition> = emptyList<SmithyMemberDefinition>()
+    override val declaredMembers get(): List<@JvmWildcard SmithyMemberDefinition> = emptyList<SmithyMemberDefinition>()
     override val documentation get() = getChildOfType(this, SmithyDocumentation::class.java)
     override val declaredTraits: List<SmithyTrait> get() = getChildrenOfTypeAsList(this, SmithyTrait::class.java)
     override fun getMember(name: String): SmithyMemberDefinition? = members.find { it.name == name }

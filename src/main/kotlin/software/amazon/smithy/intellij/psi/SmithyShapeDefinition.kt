@@ -1,6 +1,8 @@
 package software.amazon.smithy.intellij.psi
 
 import software.amazon.smithy.intellij.SmithyAppliedTraitResolver.getAppliedTraits
+import software.amazon.smithy.intellij.SmithyShapeAggregator.getMembers
+import software.amazon.smithy.intellij.SmithyShapeAggregator.getTraits
 import software.amazon.smithy.intellij.generateLink
 
 /**
@@ -13,18 +15,15 @@ import software.amazon.smithy.intellij.generateLink
  * @see SmithySyntheticShape
  */
 interface SmithyShapeDefinition : SmithyDefinition {
-    override val appliedTraits get() = getAppliedTraits(this)
     override val href: String get() = generateLink("${namespace}#${shapeName}", shapeName)
+    override val appliedTraits get() = getAppliedTraits(this)
+    override val traits: List<SmithyTraitDefinition> get() = getTraits(this)
     val type: String
     val shapeId: String
     val shapeName: String
     val namespace: String
-    val members: List<@JvmWildcard SmithyMemberDefinition>
+    val members: List<SmithyMemberDefinition> get() = getMembers(this)
+    val declaredMembers: List<@JvmWildcard SmithyMemberDefinition>
     val mixins: List<@JvmWildcard SmithyShapeTarget>
-    val enumValues
-        get() = findTrait("smithy.api", "enum")?.value?.values?.mapNotNull {
-            it.fields["value"]?.asString()
-        } ?: emptyList()
-
     fun getMember(name: String): SmithyMemberDefinition? = members.find { it.name == name }
 }

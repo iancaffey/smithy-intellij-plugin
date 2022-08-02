@@ -5,7 +5,7 @@ import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.getStyledSpan
 import com.intellij.psi.NavigatablePsiElement
 import com.intellij.psi.PsiNamedElement
 import software.amazon.smithy.intellij.SmithyColorSettings
-import software.amazon.smithy.intellij.SmithyShapeResolver
+import software.amazon.smithy.intellij.SmithyShapeResolver.getDefinitions
 import software.amazon.smithy.intellij.generateLink
 
 /**
@@ -26,7 +26,7 @@ interface SmithyTraitDefinition : SmithyElement, NavigatablePsiElement, PsiNamed
     val declaredNamespace: String?
     val resolvedNamespace: String?
     val value: SmithyValueDefinition
-    fun resolve() = SmithyShapeResolver.getDefinitions(this).firstOrNull()
+    fun resolve() = getDefinitions(this).firstOrNull()
     fun toDocString(): String = buildString {
         append("<span>").append(href)
         value.let { value ->

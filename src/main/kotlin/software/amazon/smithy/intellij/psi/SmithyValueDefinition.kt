@@ -46,6 +46,15 @@ interface SmithyValueDefinition : SmithyElement {
         SmithyValueType.STRING -> asString() == other.asString()
     }
 
+    fun merge(other: SmithyValueDefinition): SmithyValueDefinition? = when {
+        type != other.type -> null
+        equivalentTo(other) -> this
+        type == SmithyValueType.ARRAY -> SmithySyntheticValue.Array(listOf(values, other.values).flatten().map {
+            SmithySyntheticValue.from(it)
+        })
+        else -> null
+    }
+
     fun toDocString(): String = buildString {
         when (type) {
             SmithyValueType.ARRAY -> {
