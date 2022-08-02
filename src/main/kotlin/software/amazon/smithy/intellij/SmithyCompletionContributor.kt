@@ -23,7 +23,6 @@ import software.amazon.smithy.intellij.psi.SmithyObject
 import software.amazon.smithy.intellij.psi.SmithyOperationBody
 import software.amazon.smithy.intellij.psi.SmithyResourceBody
 import software.amazon.smithy.intellij.psi.SmithyServiceBody
-import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 import software.amazon.smithy.intellij.psi.SmithyTrait
 import software.amazon.smithy.intellij.psi.SmithyTraitBody
@@ -59,7 +58,7 @@ class SmithyCompletionContributor : CompletionContributor() {
                         val parent = it.shapeId.reference.resolve()
                         parent?.members?.forEach { member ->
                             member.resolvedTarget?.let { target ->
-                                results.addElement(memberElement(member.name, target.shapeName, parent))
+                                results.addElement(memberElement(member.name, target.shapeName, it))
                             }
                         }
                     }
@@ -153,9 +152,9 @@ private fun shapeElement(namespace: String, shapeName: String, addImports: Boole
 private fun memberElement(
     memberName: String,
     shapeName: String,
-    enclosingShape: SmithyShapeDefinition? = null
+    memberId: SmithyMemberId? = null
 ): LookupElementBuilder {
-    return LookupElementBuilder.create(if (enclosingShape != null) "${enclosingShape.shapeId}$$memberName" else memberName)
+    return LookupElementBuilder.create(if (memberId != null) "${memberId.shapeId.text}$$memberName" else memberName)
         .withPresentableText(memberName)
         .withTypeText(shapeName)
         .withIcon(SmithyIcons.MEMBER)
