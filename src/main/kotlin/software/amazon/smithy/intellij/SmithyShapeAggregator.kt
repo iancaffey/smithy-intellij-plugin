@@ -22,12 +22,74 @@ import software.amazon.smithy.intellij.psi.SmithyValueDefinition
 object SmithyShapeAggregator {
     private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
 
+    fun hasCycle(shape: SmithyShapeDefinition): Boolean = getCachedValue(shape) {
+        CachedValueProvider.Result.create(hasCycle(shape, mutableSetOf()), dependencies)
+    }
+
     fun getMembers(shape: SmithyShapeDefinition): List<SmithyMemberDefinition> = getCachedValue(shape) {
-        CachedValueProvider.Result.create(getMembers(shape, mutableSetOf()), dependencies)
+        CachedValueProvider.Result.create(findMembers(shape), dependencies)
     }
 
     fun getTraits(member: SmithyMemberDefinition): List<SmithyTraitDefinition> = getCachedValue(member) {
         CachedValueProvider.Result.create(collectTraits(member), dependencies)
+    }
+
+    fun getTraits(shape: SmithyShapeDefinition): List<SmithyTraitDefinition> = getCachedValue(shape) {
+        CachedValueProvider.Result.create(findTraits(shape), dependencies)
+    }
+
+    private fun findMembers(shape: SmithyShapeDefinition): List<SmithyMemberDefinition> {
+        val declaredMembers = shape.declaredMembers
+        val members = mutableMapOf<String, SmithyMemberDefinition>()
+        if (!hasCycle(shape)) {
+            shape.mixins.forEach { target ->
+                //Note: all mixins _should_ have this trait, but invalid mixins will be ignored here
+                val mixin = target.resolve()?.takeIf { it.hasTrait("smithy.api", "mixin") } ?: return@forEach
+                findMembers(mixin).forEach { inheritedMember ->
+                    //Note: declared members are kept as-is (even if they have mixins), as the original definition supports
+                    //locating inherited traits (so we only need to introduce new members from mixins here)
+                    members[inheritedMember.name] = declaredMembers.find {
+                        it.name == inheritedMember.name
+                    } ?: SmithySyntheticMember(shape, inheritedMember)
+                }
+            }
+        }
+        declaredMembers.forEach { if (it.name !in members) members[it.name] = it }
+        return members.values.toList()
+    }
+
+    private fun findTraits(shape: SmithyShapeDefinition): List<SmithyTraitDefinition> {
+        val explicitTraits = listOf(shape.appliedTraits, shape.declaredTraits, shape.syntheticTraits).flatten()
+        val inheritedTraits = mutableMapOf<String, SmithyTraitDefinition>()
+        if (!hasCycle(shape)) {
+            shape.mixins.forEach { target ->
+                val mixin = target.resolve() ?: return@forEach
+                //Note: all mixins _should_ have this trait, but invalid mixins will be ignored here
+                val mixinTrait = mixin.findTrait("smithy.api", "mixin") ?: return@forEach
+                val ignoredTraits = mutableSetOf("smithy.api#mixin")
+                mixinTrait.value.fields["localTraits"]?.values?.forEach {
+                    it.asString()?.let { shapeId -> ignoredTraits += shapeId }
+                }
+                findTraits(mixin).forEach {
+                    val namespace = it.resolvedNamespace
+                    if (namespace != null
+                        && "$namespace#${it.shapeName}" !in ignoredTraits
+                        && explicitTraits.none { explicit -> explicit.shapeName == it.shapeName && explicit.resolvedNamespace == namespace }
+                    ) {
+                        inheritedTraits["${namespace}#${it.shapeName}"] = it
+                    }
+                }
+            }
+        }
+        return merge(shape, listOf(explicitTraits, inheritedTraits.values).flatten())
+    }
+
+    private fun hasCycle(shape: SmithyShapeDefinition, visited: MutableSet<String>): Boolean {
+        if (visited.contains(shape.shapeId)) return true else visited += shape.shapeId
+        return shape.mixins.any {
+            val target = it.resolve()
+            return@any target != null && hasCycle(target, visited)
+        }
     }
 
     private fun collectTraits(member: SmithyMemberDefinition): List<SmithyTraitDefinition> {
@@ -60,53 +122,6 @@ object SmithyShapeAggregator {
             )
         }
         return merge(member, resolvedTraits)
-    }
-
-    fun getTraits(shape: SmithyShapeDefinition): List<SmithyTraitDefinition> = getCachedValue(shape) {
-        CachedValueProvider.Result.create(getTraits(shape, mutableSetOf()), dependencies)
-    }
-
-    private fun getMembers(shape: SmithyShapeDefinition, visited: MutableSet<String>): List<SmithyMemberDefinition> {
-        val declaredMembers = shape.declaredMembers
-        val members = mutableMapOf<String, SmithyMemberDefinition>()
-        shape.mixins.forEach { target ->
-            //Note: all mixins _should_ have this trait, but invalid mixins will be ignored here
-            val mixin = target.resolve()?.takeIf { it.hasTrait("smithy.api", "mixin") } ?: return@forEach
-            getMembers(mixin, visited).forEach { inheritedMember ->
-                //Note: declared members are kept as-is (even if they have mixins), as the original definition supports
-                //locating inherited traits (so we only need to introduce new members from mixins here)
-                members[inheritedMember.name] = declaredMembers.find {
-                    it.name == inheritedMember.name
-                } ?: SmithySyntheticMember(shape, inheritedMember)
-            }
-        }
-        declaredMembers.forEach { if (it.name !in members) members[it.name] = it }
-        return members.values.toList()
-    }
-
-    private fun getTraits(shape: SmithyShapeDefinition, visited: MutableSet<String>): List<SmithyTraitDefinition> {
-        if (!visited.contains(shape.shapeId)) visited += shape.shapeId else return emptyList()
-        val explicitTraits = listOf(shape.appliedTraits, shape.declaredTraits, shape.syntheticTraits).flatten()
-        val inheritedTraits = mutableMapOf<String, SmithyTraitDefinition>()
-        shape.mixins.forEach { target ->
-            val mixin = target.resolve() ?: return@forEach
-            //Note: all mixins _should_ have this trait, but invalid mixins will be ignored here
-            val mixinTrait = mixin.findTrait("smithy.api", "mixin") ?: return@forEach
-            val ignoredTraits = mutableSetOf("smithy.api#mixin")
-            mixinTrait.value.fields["localTraits"]?.values?.forEach {
-                it.asString()?.let { shapeId -> ignoredTraits += shapeId }
-            }
-            getTraits(mixin, visited).forEach {
-                val namespace = it.resolvedNamespace
-                if (namespace != null
-                    && "$namespace#${it.shapeName}" !in ignoredTraits
-                    && explicitTraits.none { explicit -> explicit.shapeName == it.shapeName && explicit.resolvedNamespace == namespace }
-                ) {
-                    inheritedTraits["${namespace}#${it.shapeName}"] = it
-                }
-            }
-        }
-        return merge(shape, listOf(explicitTraits, inheritedTraits.values).flatten())
     }
 
     private fun merge(parent: SmithyDefinition, traits: List<SmithyTraitDefinition>): List<SmithyTraitDefinition> {

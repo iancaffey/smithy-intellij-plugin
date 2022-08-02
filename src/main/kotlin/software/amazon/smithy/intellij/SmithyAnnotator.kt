@@ -253,11 +253,19 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
     INVALID_RESOURCE_REFERENCE {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element is SmithyResourceReference) {
-                element.shapeId.resolve()?.takeIf { it.type != "resource" }.let {
+                val targetType = element.shapeId.resolve()?.type
+                if (targetType != null && targetType != "resource") {
                     holder.newAnnotation(ERROR, "Structures can only target resource shapes")
                         .withFix(SmithyRemoveResourceReferenceQuickFix(element))
                         .create()
                 }
+            }
+        }
+    },
+    CIRCULAR_MIXIN_REFERENCE {
+        override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+            if (element is SmithyMixins && SmithyShapeAggregator.hasCycle(element.enclosingShape)) {
+                holder.highlight(ERROR, "Mixins cannot introduce circular references")
             }
         }
     },
