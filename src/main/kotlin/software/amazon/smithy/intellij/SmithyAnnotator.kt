@@ -290,6 +290,16 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
             }
         }
     },
+    INVALID_MIXIN_USAGE {
+        override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+            if (element is SmithyShapeId
+                && element.parent.let { it !is SmithyImport && it !is SmithyMixins }
+                && element.resolve()?.findTrait("smithy.api", "mixin") != null
+            ) {
+                holder.highlight(ERROR, "Mixins cannot be referenced other than as mixins to other shapes")
+            }
+        }
+    },
     INCOMPLETE_STRING {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element.elementType == SmithyTypes.TOKEN_INCOMPLETE_STRING) {
