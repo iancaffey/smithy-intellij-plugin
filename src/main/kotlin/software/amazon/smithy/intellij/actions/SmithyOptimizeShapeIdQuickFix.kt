@@ -27,7 +27,7 @@ class SmithyOptimizeShapeIdQuickFix(val project: Project, val shapeId: SmithySha
     val requiresImport = !hasImport && shapeId.declaredNamespace != shapeId.enclosingNamespace
 
     override fun getText() =
-        if (requiresImport) "Add import for \"${shapeId}\"" else "Remove unnecessary qualifier for \"${shapeId.shapeName}\""
+        if (requiresImport) "Add import for '${shapeId}'" else "Remove unnecessary qualifier for '${shapeId.shapeName}'"
 
     override fun getFamilyName() = if (requiresImport) "Add import" else "Remove unnecessary qualifier"
     override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?) =
