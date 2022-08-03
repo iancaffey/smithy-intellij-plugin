@@ -116,10 +116,10 @@ data class SmithyKeyReference(val key: SmithyKey) : SmithyReference(key, soft = 
  */
 data class SmithyMemberReference(val id: SmithyMemberId) : SmithyReference(id, soft = false) {
     override fun isSoft() = id.shapeId.reference.isSoft
-    override fun getAbsoluteRange(): TextRange = id.textRange
+    override fun getAbsoluteRange(): TextRange = id.member.textRange
     override fun resolve() = id.shapeId.reference.resolve()?.getMember(id.memberName)
     override fun handleElementRename(newElementName: String): SmithyMemberId {
-        val textRange = id.textRange
+        val textRange = id.member.textRange
         val document = FileDocumentManager.getInstance().getDocument(id.containingFile.virtualFile)
         document!!.replaceString(textRange.startOffset, textRange.endOffset, newElementName)
         PsiDocumentManager.getInstance(id.project).commitDocument(document)
