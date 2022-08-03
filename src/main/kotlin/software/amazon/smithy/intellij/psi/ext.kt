@@ -27,7 +27,7 @@ import software.amazon.smithy.intellij.SmithyShapeReference
 import software.amazon.smithy.intellij.SmithyShapeResolver.getNamespace
 import software.amazon.smithy.intellij.psi.impl.SmithyContainerShapeImpl
 import software.amazon.smithy.intellij.psi.impl.SmithyKeyedElementImpl
-import software.amazon.smithy.intellij.psi.impl.SmithyOperationMemberImpl
+import software.amazon.smithy.intellij.psi.impl.SmithyOperationPropertyImpl
 import software.amazon.smithy.intellij.psi.impl.SmithyPrimitiveImpl
 import software.amazon.smithy.intellij.psi.impl.SmithyShapeImpl
 import software.amazon.smithy.intellij.psi.impl.SmithyValueImpl
@@ -442,16 +442,16 @@ interface SmithyOperationExt : SmithyShape {
 }
 
 abstract class SmithyOperationMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyOperation {
-    override val input get() = body.members.firstNotNullOfOrNull { it as? SmithyOperationInput }
-    override val output get() = body.members.firstNotNullOfOrNull { it as? SmithyOperationOutput }
-    override val errors get() = body.members.firstNotNullOfOrNull { it as? SmithyOperationErrors }
+    override val input get() = body.properties.firstNotNullOfOrNull { it as? SmithyOperationInput }
+    override val output get() = body.properties.firstNotNullOfOrNull { it as? SmithyOperationOutput }
+    override val errors get() = body.properties.firstNotNullOfOrNull { it as? SmithyOperationErrors }
 }
 
-interface SmithyOperationMemberExt : SmithyNamedElement {
+interface SmithyOperationPropertyExt : SmithyNamedElement {
     val enclosingShape: SmithyOperation
 }
 
-abstract class SmithyOperationMemberMixin(node: ASTNode) : SmithyPsiElement(node), SmithyOperationMember {
+abstract class SmithyOperationPropertyMixin(node: ASTNode) : SmithyPsiElement(node), SmithyOperationProperty {
     override val enclosingShape: SmithyOperation get() = getParentOfType(this, SmithyOperation::class.java)!!
     override fun getName(): String = nameIdentifier.text
     override fun setName(newName: String): PsiElement? = null
@@ -463,20 +463,20 @@ abstract class SmithyOperationMemberMixin(node: ASTNode) : SmithyPsiElement(node
     }
 }
 
-interface SmithyOperationErrorsExt : SmithyOperationMemberExt
+interface SmithyOperationErrorsExt : SmithyOperationPropertyExt
 
-abstract class SmithyOperationErrorsMixin(node: ASTNode) : SmithyOperationMemberImpl(node), SmithyOperationErrors {
+abstract class SmithyOperationErrorsMixin(node: ASTNode) : SmithyOperationPropertyImpl(node), SmithyOperationErrors {
     override fun getNameIdentifier(): PsiElement = findChildByType(SmithyTypes.TOKEN_ERRORS)!!
 }
 
-interface SmithyOperationInputExt : SmithyOperationMemberExt
+interface SmithyOperationInputExt : SmithyOperationPropertyExt
 
-abstract class SmithyOperationInputMixin(node: ASTNode) : SmithyOperationMemberImpl(node), SmithyOperationInput {
+abstract class SmithyOperationInputMixin(node: ASTNode) : SmithyOperationPropertyImpl(node), SmithyOperationInput {
     override fun getNameIdentifier(): PsiElement = findChildByType(SmithyTypes.TOKEN_INPUT)!!
 }
 
-interface SmithyOperationOutputExt : SmithyOperationMemberExt
-abstract class SmithyOperationOutputMixin(node: ASTNode) : SmithyOperationMemberImpl(node), SmithyOperationOutput {
+interface SmithyOperationOutputExt : SmithyOperationPropertyExt
+abstract class SmithyOperationOutputMixin(node: ASTNode) : SmithyOperationPropertyImpl(node), SmithyOperationOutput {
     override fun getNameIdentifier(): PsiElement = findChildByType(SmithyTypes.TOKEN_OUTPUT)!!
 }
 
@@ -522,43 +522,43 @@ interface SmithyResourceExt : SmithyShape {
 
 abstract class SmithyResourceMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyResource {
     override val identifiers: List<SmithyResourceIdentifier>
-        get() = body.members.firstNotNullOfOrNull {
+        get() = body.properties.firstNotNullOfOrNull {
             it as? SmithyResourceIdentifiers
         }?.identifiers ?: emptyList()
     override val create: SmithyShapeId?
-        get() = body.members.firstNotNullOfOrNull {
+        get() = body.properties.firstNotNullOfOrNull {
             it as? SmithyResourceCreateOperation
         }?.shapeId
     override val put: SmithyShapeId?
-        get() = body.members.firstNotNullOfOrNull {
+        get() = body.properties.firstNotNullOfOrNull {
             it as? SmithyResourcePutOperation
         }?.shapeId
     override val read: SmithyShapeId?
-        get() = body.members.firstNotNullOfOrNull {
+        get() = body.properties.firstNotNullOfOrNull {
             it as? SmithyResourceReadOperation
         }?.shapeId
     override val update: SmithyShapeId?
-        get() = body.members.firstNotNullOfOrNull {
+        get() = body.properties.firstNotNullOfOrNull {
             it as? SmithyResourceUpdateOperation
         }?.shapeId
     override val delete: SmithyShapeId?
-        get() = body.members.firstNotNullOfOrNull {
+        get() = body.properties.firstNotNullOfOrNull {
             it as? SmithyResourceDeleteOperation
         }?.shapeId
     override val list: SmithyShapeId?
-        get() = body.members.firstNotNullOfOrNull {
+        get() = body.properties.firstNotNullOfOrNull {
             it as? SmithyResourceListOperation
         }?.shapeId
     override val operations: List<SmithyShapeId>
-        get() = body.members.firstNotNullOfOrNull {
+        get() = body.properties.firstNotNullOfOrNull {
             it as? SmithyResourceOperations
         }?.shapes ?: emptyList()
     override val collectionOperations: List<SmithyShapeId>
-        get() = body.members.firstNotNullOfOrNull {
+        get() = body.properties.firstNotNullOfOrNull {
             it as? SmithyResourceCollectionOperations
         }?.shapes ?: emptyList()
     override val resources: List<SmithyShapeId>
-        get() = body.members.firstNotNullOfOrNull {
+        get() = body.properties.firstNotNullOfOrNull {
             it as? SmithyResourceResources
         }?.shapes ?: emptyList()
 }
@@ -580,11 +580,11 @@ abstract class SmithyResourceIdentifierMixin(node: ASTNode) : SmithyPsiElement(n
     }
 }
 
-interface SmithyResourceMemberExt : SmithyElement {
+interface SmithyResourcePropertyExt : SmithyElement {
     val enclosingResource: SmithyResource
 }
 
-abstract class SmithyResourceMemberMixin(node: ASTNode) : SmithyPsiElement(node), SmithyResourceMember {
+abstract class SmithyResourcePropertyMixin(node: ASTNode) : SmithyPsiElement(node), SmithyResourceProperty {
     override val enclosingResource: SmithyResource get() = parent.parent as SmithyResource
 }
 

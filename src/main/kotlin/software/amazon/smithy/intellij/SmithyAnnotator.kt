@@ -43,10 +43,10 @@ import software.amazon.smithy.intellij.psi.SmithyMemberName
 import software.amazon.smithy.intellij.psi.SmithyMixins
 import software.amazon.smithy.intellij.psi.SmithyModel
 import software.amazon.smithy.intellij.psi.SmithyNull
-import software.amazon.smithy.intellij.psi.SmithyOperationMember
-import software.amazon.smithy.intellij.psi.SmithyResourceMember
+import software.amazon.smithy.intellij.psi.SmithyOperationProperty
+import software.amazon.smithy.intellij.psi.SmithyResourceProperty
 import software.amazon.smithy.intellij.psi.SmithyResourceReference
-import software.amazon.smithy.intellij.psi.SmithyServiceMember
+import software.amazon.smithy.intellij.psi.SmithyServiceProperty
 import software.amazon.smithy.intellij.psi.SmithyShape
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 import software.amazon.smithy.intellij.psi.SmithyStatement
@@ -107,12 +107,12 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
         }
     },
     MEMBER {
-        val operationMembers = setOf(
+        val operationProperties = setOf(
             SmithyTypes.TOKEN_ERRORS,
             SmithyTypes.TOKEN_INPUT,
             SmithyTypes.TOKEN_OUTPUT,
         )
-        val resourceMembers = setOf(
+        val resourceProperties = setOf(
             SmithyTypes.TOKEN_COLLECTION_OPERATIONS,
             SmithyTypes.TOKEN_CREATE,
             SmithyTypes.TOKEN_DELETE,
@@ -124,7 +124,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
             SmithyTypes.TOKEN_RESOURCES,
             SmithyTypes.TOKEN_UPDATE
         )
-        val serviceMembers = setOf(
+        val serviceProperties = setOf(
             SmithyTypes.TOKEN_VERSION,
             SmithyTypes.TOKEN_OPERATIONS,
             SmithyTypes.TOKEN_RESOURCES,
@@ -135,9 +135,9 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element is SmithyMemberName
                 || (element.elementType == SmithyTypes.TOKEN_DOLLAR_SIGN && element.parent is SmithyElidedMember)
-                || (element.elementType in operationMembers && element.parent is SmithyOperationMember)
-                || (element.elementType in resourceMembers && element.parent is SmithyResourceMember)
-                || (element.elementType in serviceMembers && element.parent is SmithyServiceMember)
+                || (element.elementType in operationProperties && element.parent is SmithyOperationProperty)
+                || (element.elementType in resourceProperties && element.parent is SmithyResourceProperty)
+                || (element.elementType in serviceProperties && element.parent is SmithyServiceProperty)
             ) {
                 holder.highlight(SmithyColorSettings.SHAPE_MEMBER)
             }
