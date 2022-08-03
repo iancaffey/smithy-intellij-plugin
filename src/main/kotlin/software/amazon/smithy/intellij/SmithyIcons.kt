@@ -22,6 +22,7 @@ object SmithyIcons {
         val APPLIED_TRAIT = icon("appliedTrait")
         val APPLIED_TRAITS = icon("appliedTraits")
         val INHERITED_MEMBER = icon("inheritedMember")
+        val INHERITED_RESOURCE_IDENTIFIER = icon("inheritedResourceIdentifier")
 
         private fun icon(name: String) = SmithyIcons.icon("${name}Gutter")
 

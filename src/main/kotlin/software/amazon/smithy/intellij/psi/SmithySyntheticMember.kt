@@ -23,4 +23,7 @@ data class SmithySyntheticMember(
     override fun getName() = original.name
     override fun getNameIdentifier() = id
     override fun getParent() = enclosingShape
+    override fun getPresentableText(): String = resolvedTarget?.let { "$name: ${it.shapeName}" } ?: name
+    override fun getLocationString() = enclosingShape.shapeName
+    override fun getIcon(unused: Boolean) = getIcon(0)
 }
