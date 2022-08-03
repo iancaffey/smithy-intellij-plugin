@@ -22,6 +22,8 @@ import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyDocumentation
 import software.amazon.smithy.intellij.psi.SmithyDocumentationDefinition
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
+import software.amazon.smithy.intellij.psi.SmithyOperationInput
+import software.amazon.smithy.intellij.psi.SmithyOperationOutput
 import software.amazon.smithy.intellij.psi.SmithyResourceIdentifierDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyTraitDefinition
@@ -76,6 +78,14 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                     element.defaultValue?.let { append(" = ").append(it.toDocString()) }
                 }
             }
+        }
+        is SmithyOperationInput -> buildString {
+            appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
+            (element.shape?.href ?: element.shapeId?.href)?.let { append(": $it") }
+        }
+        is SmithyOperationOutput -> buildString {
+            appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
+            (element.shape?.href ?: element.shapeId?.href)?.let { append(": $it") }
         }
         is SmithyResourceIdentifierDefinition -> buildString {
             appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
@@ -132,6 +142,32 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 additionalInfo["See also"] = it.value.fields.mapNotNull { (title, value) ->
                     value.asString()?.let { href -> "<a href='$href'>$title</a>" }
                 }.joinToString("<span>, </span>", "<div>", "</div>")
+            }
+            append(renderAdditionalInfo(additionalInfo))
+        }
+        is SmithyOperationInput -> buildString {
+            append("<div class='definition'><pre>")
+            append(getQuickNavigateInfo(element, originalElement))
+            append("</pre></div>")
+            val additionalInfo = mutableMapOf(
+                "Namespace" to element.enclosingShape.namespace,
+                "Parent" to element.enclosingShape.href
+            )
+            (element.shape ?: element.shapeId?.resolve())?.let { target ->
+                additionalInfo["Type"] = getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
+            }
+            append(renderAdditionalInfo(additionalInfo))
+        }
+        is SmithyOperationOutput -> buildString {
+            append("<div class='definition'><pre>")
+            append(getQuickNavigateInfo(element, originalElement))
+            append("</pre></div>")
+            val additionalInfo = mutableMapOf(
+                "Namespace" to element.enclosingShape.namespace,
+                "Parent" to element.enclosingShape.href
+            )
+            (element.shape ?: element.shapeId?.resolve())?.let { target ->
+                additionalInfo["Type"] = getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
             }
             append(renderAdditionalInfo(additionalInfo))
         }
