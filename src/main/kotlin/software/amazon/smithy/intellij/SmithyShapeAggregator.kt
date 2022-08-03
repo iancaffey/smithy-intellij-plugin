@@ -13,6 +13,7 @@ import software.amazon.smithy.intellij.psi.SmithySyntheticTrait
 import software.amazon.smithy.intellij.psi.SmithySyntheticValue
 import software.amazon.smithy.intellij.psi.SmithyTraitDefinition
 import software.amazon.smithy.intellij.psi.SmithyValueDefinition
+import java.util.*
 
 /**
  * A utility class providing API to merge all definitions along with any inherited members and traits for a [SmithyShapeDefinition].
@@ -25,7 +26,7 @@ object SmithyShapeAggregator {
     private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
 
     fun hasCycle(shape: SmithyShapeDefinition): Boolean = getCachedValue(shape) {
-        CachedValueProvider.Result.create(hasCycle(shape, mutableSetOf()), dependencies)
+        CachedValueProvider.Result.create(findCycle(shape), dependencies)
     }
 
     fun getDeclaration(member: SmithyElidedMember): SmithyElidedMemberTarget? = getCachedValue(member) {
@@ -103,13 +104,26 @@ object SmithyShapeAggregator {
         return merge(shape, listOf(explicitTraits, inheritedTraits.values).flatten())
     }
 
-    private fun hasCycle(shape: SmithyShapeDefinition, visited: MutableSet<String>): Boolean {
-        if (visited.contains(shape.shapeId)) return true else visited += shape.shapeId
-        val resource = shape.resource?.resolve()
-        return (resource != null && hasCycle(resource, visited)) || shape.mixins.any {
-            val target = it.resolve()
-            target != null && hasCycle(target, visited)
+    private fun findCycle(shape: SmithyShapeDefinition): Boolean {
+        val visited = mutableSetOf<String>()
+        val remaining: Deque<SmithyShapeDefinition> = LinkedList()
+        remaining += shape
+        while (remaining.isNotEmpty()) {
+            val next = remaining.pop()
+            if (next.shapeId in visited) continue
+            visited += next.shapeId
+            next.resource?.resolve()?.let {
+                if (shape.shapeId == it.shapeId) return true
+                remaining.push(it)
+            }
+            next.mixins.forEach { mixin ->
+                mixin.resolve()?.let {
+                    if (shape.shapeId == it.shapeId) return true
+                    remaining.push(it)
+                }
+            }
         }
+        return false
     }
 
     private fun collectTraits(member: SmithyMemberDefinition): List<SmithyTraitDefinition> {
