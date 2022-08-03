@@ -1,4 +1,4 @@
-package software.amazon.smithy.intellij
+package software.amazon.smithy.intellij.insights
 
 import com.intellij.lang.parameterInfo.CreateParameterInfoContext
 import com.intellij.lang.parameterInfo.ParameterInfoHandler
@@ -6,6 +6,7 @@ import com.intellij.lang.parameterInfo.ParameterInfoUIContext
 import com.intellij.lang.parameterInfo.UpdateParameterInfoContext
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil.getParentOfType
+import software.amazon.smithy.intellij.SmithyDocumentationProvider
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyValue
 

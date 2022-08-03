@@ -1,4 +1,4 @@
-package software.amazon.smithy.intellij
+package software.amazon.smithy.intellij.insights
 
 import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo
@@ -6,6 +6,7 @@ import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil.getDeepestFirst
+import software.amazon.smithy.intellij.SmithyIcons
 import software.amazon.smithy.intellij.psi.SmithyAppliedTrait
 import software.amazon.smithy.intellij.psi.SmithyDefinition
 

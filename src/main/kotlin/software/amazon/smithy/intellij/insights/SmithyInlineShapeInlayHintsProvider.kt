@@ -1,8 +1,9 @@
-package software.amazon.smithy.intellij
+package software.amazon.smithy.intellij.insights
 
 import com.intellij.codeInsight.hints.InlayInfo
 import com.intellij.codeInsight.hints.InlayParameterHintsProvider
 import com.intellij.psi.PsiElement
+import software.amazon.smithy.intellij.SmithyLanguage
 import software.amazon.smithy.intellij.psi.SmithyInput
 import software.amazon.smithy.intellij.psi.SmithyOutput
 
@@ -13,7 +14,7 @@ import software.amazon.smithy.intellij.psi.SmithyOutput
  * @since 1.0
  */
 @Suppress("UnstableApiUsage")
-class InlineShapeInlayHintsProvider : InlayParameterHintsProvider {
+class SmithyInlineShapeInlayHintsProvider : InlayParameterHintsProvider {
     override fun getDefaultBlackList() = emptySet<String>()
     override fun getBlackListDependencyLanguage() = SmithyLanguage
     override fun getInlayPresentation(inlayText: String) = inlayText
