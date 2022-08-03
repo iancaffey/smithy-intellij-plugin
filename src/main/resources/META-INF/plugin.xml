@@ -85,6 +85,7 @@
         <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex"/>
         <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyShapeNameResolutionHintIndex"/>
         <gotoClassContributor implementation="software.amazon.smithy.intellij.SmithyGotoShapeContributor"/>
+        <gotoSymbolContributor implementation="software.amazon.smithy.intellij.SmithyGotoIdentifierContributor"/>
         <gotoSymbolContributor implementation="software.amazon.smithy.intellij.SmithyGotoMemberContributor"/>
         <iconProvider implementation="software.amazon.smithy.intellij.SmithyIconProvider"/>
         <liveTemplateContext implementation="software.amazon.smithy.intellij.SmithyContextType"/>
