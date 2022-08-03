@@ -15,15 +15,18 @@ import software.amazon.smithy.intellij.generateLink
  * @see SmithySyntheticShape
  */
 interface SmithyShapeDefinition : SmithyDefinition {
-    override val href: String get() = generateLink("${namespace}#${shapeName}", shapeName)
+    val href: String get() = generateLink("${namespace}#${shapeName}", shapeName)
     override val appliedTraits get() = getAppliedTraits(this)
     override val traits: List<SmithyTraitDefinition> get() = getTraits(this)
     val type: String
     val shapeId: String
     val shapeName: String
     val namespace: String
+    val resource: SmithyShapeTarget? get() = null
+    val identifiers: List<@JvmWildcard SmithyResourceIdentifierDefinition> get() = emptyList()
     val members: List<SmithyMemberDefinition> get() = getMembers(this)
     val declaredMembers: List<@JvmWildcard SmithyMemberDefinition>
     val mixins: List<@JvmWildcard SmithyShapeTarget>
+    fun getIdentifier(name: String): SmithyResourceIdentifierDefinition? = identifiers.find { it.name == name }
     fun getMember(name: String): SmithyMemberDefinition? = members.find { it.name == name }
 }

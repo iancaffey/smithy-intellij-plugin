@@ -4,6 +4,8 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager.getCachedValue
 import com.intellij.psi.util.PsiModificationTracker
 import software.amazon.smithy.intellij.psi.SmithyDefinition
+import software.amazon.smithy.intellij.psi.SmithyElidedMember
+import software.amazon.smithy.intellij.psi.SmithyElidedMemberTarget
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithySyntheticMember
@@ -26,6 +28,10 @@ object SmithyShapeAggregator {
         CachedValueProvider.Result.create(hasCycle(shape, mutableSetOf()), dependencies)
     }
 
+    fun getDeclaration(member: SmithyElidedMember): SmithyElidedMemberTarget? = getCachedValue(member) {
+        CachedValueProvider.Result.create(findDeclaration(member), dependencies)
+    }
+
     fun getMembers(shape: SmithyShapeDefinition): List<SmithyMemberDefinition> = getCachedValue(shape) {
         CachedValueProvider.Result.create(findMembers(shape), dependencies)
     }
@@ -36,6 +42,21 @@ object SmithyShapeAggregator {
 
     fun getTraits(shape: SmithyShapeDefinition): List<SmithyTraitDefinition> = getCachedValue(shape) {
         CachedValueProvider.Result.create(findTraits(shape), dependencies)
+    }
+
+    private fun findDeclaration(member: SmithyElidedMember): SmithyElidedMemberTarget? {
+        val shape = member.enclosingShape
+        if (hasCycle(shape)) return null
+        shape.resource?.resolve()?.getIdentifier(member.name)?.let { return it }
+        var declaration: SmithyMemberDefinition? = null
+        shape.mixins.forEach { target ->
+            //Note: all mixins _should_ have this trait, but invalid mixins will be ignored here
+            val mixin = target.resolve()?.takeIf { it.hasTrait("smithy.api", "mixin") } ?: return@forEach
+            findMembers(mixin).forEach { inheritedMember ->
+                if (inheritedMember.name == member.name) declaration = inheritedMember
+            }
+        }
+        return declaration
     }
 
     private fun findMembers(shape: SmithyShapeDefinition): List<SmithyMemberDefinition> {
@@ -84,7 +105,8 @@ object SmithyShapeAggregator {
 
     private fun hasCycle(shape: SmithyShapeDefinition, visited: MutableSet<String>): Boolean {
         if (visited.contains(shape.shapeId)) return true else visited += shape.shapeId
-        return shape.mixins.any {
+        val resource = shape.resource?.resolve()
+        return (resource != null && hasCycle(resource, visited)) || shape.mixins.any {
             val target = it.resolve()
             target != null && hasCycle(target, visited)
         }

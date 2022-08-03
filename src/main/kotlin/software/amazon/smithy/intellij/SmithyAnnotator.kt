@@ -27,6 +27,7 @@ import software.amazon.smithy.intellij.actions.SmithyRemoveResourceReferenceQuic
 import software.amazon.smithy.intellij.actions.SmithyRemoveUnusedImportsQuickFix
 import software.amazon.smithy.intellij.psi.SmithyBoolean
 import software.amazon.smithy.intellij.psi.SmithyControl
+import software.amazon.smithy.intellij.psi.SmithyElidedMember
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyEnumMember
 import software.amazon.smithy.intellij.psi.SmithyImport
@@ -133,6 +134,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
 
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element is SmithyMemberName
+                || (element.elementType == SmithyTypes.TOKEN_DOLLAR_SIGN && element.parent is SmithyElidedMember)
                 || (element.elementType in operationMembers && element.parent is SmithyOperationMember)
                 || (element.elementType in resourceMembers && element.parent is SmithyResourceMember)
                 || (element.elementType in serviceMembers && element.parent is SmithyServiceMember)
@@ -439,6 +441,12 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
     },
     REFERENCE_INSPECTION {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+            if (element is SmithyElidedMember && element.declaration == null) {
+                holder.newAnnotation(ERROR, "Unresolved member: ${element.name}")
+                    .range(element.nameIdentifier.textRange)
+                    .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
+                    .create()
+            }
             when (val reference = element.reference) {
                 is SmithyKeyReference -> {
                     if (!reference.isSoft && reference.resolve() == null) {

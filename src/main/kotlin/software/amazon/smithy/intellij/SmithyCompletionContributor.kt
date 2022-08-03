@@ -14,6 +14,7 @@ import com.intellij.util.ProcessingContext
 import com.intellij.util.applyIf
 import software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex
 import software.amazon.smithy.intellij.psi.SmithyControl
+import software.amazon.smithy.intellij.psi.SmithyElidedMember
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyIncompleteEntry
@@ -23,6 +24,7 @@ import software.amazon.smithy.intellij.psi.SmithyObject
 import software.amazon.smithy.intellij.psi.SmithyOperationBody
 import software.amazon.smithy.intellij.psi.SmithyResourceBody
 import software.amazon.smithy.intellij.psi.SmithyServiceBody
+import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 import software.amazon.smithy.intellij.psi.SmithyTrait
 import software.amazon.smithy.intellij.psi.SmithyTraitBody
@@ -49,6 +51,9 @@ class SmithyCompletionContributor : CompletionContributor() {
                         setOf("version", "operationInputSuffix", "operationOutputSuffix").forEach {
                             results.addElement(LookupElementBuilder.create(it))
                         }
+                    }
+                    getParentOfType(element, SmithyElidedMember::class.java)?.let {
+                        addElidedTargetMembers(it.enclosingShape, it.name, results)
                     }
                     getParentOfType(element, SmithyEntry::class.java)?.let { addMembers(it, it.key.text, results) }
                     getParentOfType(element, SmithyIncompleteEntry::class.java)?.let {
@@ -112,6 +117,22 @@ private fun addShapes(element: PsiElement, results: CompletionResultSet) {
     }
 }
 
+private fun addElidedTargetMembers(shape: SmithyShapeDefinition, prefix: String, results: CompletionResultSet) {
+    val memberResults = results.withPrefixMatcher(prefix)
+    if (SmithyShapeAggregator.hasCycle(shape)) return
+    shape.resource?.resolve()?.identifiers?.forEach {
+        memberResults.addElement(identifierElement(it.name, it.enclosingShape.name))
+    }
+    val mixinMembers = mutableMapOf<String, String>()
+    shape.mixins.forEach { target ->
+        val mixin = target.resolve() ?: return@forEach
+        mixin.members.forEach { mixinMembers[it.name] = mixin.name }
+    }
+    mixinMembers.forEach { (memberName, shapeName) ->
+        memberResults.addElement(memberElement(memberName, shapeName))
+    }
+}
+
 private fun addMembers(element: PsiElement, prefix: String, results: CompletionResultSet) {
     val memberResults = results.withPrefixMatcher(prefix)
     val enclosingShape = when (val parent = element.parent) {
@@ -147,6 +168,16 @@ private fun shapeElement(namespace: String, shapeName: String, addImports: Boole
                 }
             }
         }
+}
+
+private fun identifierElement(
+    memberName: String,
+    shapeName: String
+): LookupElementBuilder {
+    return LookupElementBuilder.create(memberName)
+        .withPresentableText(memberName)
+        .withTypeText(shapeName)
+        .withIcon(SmithyIcons.RESOURCE_IDENTIFIER)
 }
 
 private fun memberElement(

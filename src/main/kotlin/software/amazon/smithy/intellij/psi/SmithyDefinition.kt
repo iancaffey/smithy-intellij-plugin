@@ -11,7 +11,6 @@ import com.intellij.psi.NavigatablePsiElement
  * @see SmithyShapeDefinition
  */
 sealed interface SmithyDefinition : SmithyNamedElement, NavigatablePsiElement {
-    val href: String
     val appliedTraits: List<@JvmWildcard SmithyTraitDefinition>
     val declaredTraits: List<@JvmWildcard SmithyTraitDefinition>
     val syntheticTraits: List<@JvmWildcard SmithyTraitDefinition> get() = emptyList()

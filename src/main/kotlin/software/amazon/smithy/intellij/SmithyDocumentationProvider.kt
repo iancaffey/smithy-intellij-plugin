@@ -22,6 +22,7 @@ import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyDocumentation
 import software.amazon.smithy.intellij.psi.SmithyDocumentationDefinition
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
+import software.amazon.smithy.intellij.psi.SmithyResourceIdentifierDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyTraitDefinition
 import java.util.function.Consumer
@@ -76,6 +77,10 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 }
             }
         }
+        is SmithyResourceIdentifierDefinition -> buildString {
+            appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
+            append(": ${element.resolvedTarget.href}")
+        }
         is SmithyShapeDefinition -> buildString {
             element.traits.forEach {
                 if (it.shapeName !in quickNavigateIgnoredTraitNames || it.resolvedNamespace != "smithy.api") {
@@ -127,6 +132,19 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 additionalInfo["See also"] = it.value.fields.mapNotNull { (title, value) ->
                     value.asString()?.let { href -> "<a href='$href'>$title</a>" }
                 }.joinToString("<span>, </span>", "<div>", "</div>")
+            }
+            append(renderAdditionalInfo(additionalInfo))
+        }
+        is SmithyResourceIdentifierDefinition -> buildString {
+            append("<div class='definition'><pre>")
+            append(getQuickNavigateInfo(element, originalElement))
+            append("</pre></div>")
+            val additionalInfo = mutableMapOf(
+                "Namespace" to element.enclosingShape.namespace,
+                "Resource" to element.enclosingShape.href
+            )
+            element.resolve()?.let { target ->
+                additionalInfo["Type"] = getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
             }
             append(renderAdditionalInfo(additionalInfo))
         }

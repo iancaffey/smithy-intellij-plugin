@@ -52,7 +52,7 @@ sealed class SmithyReference(element: PsiElement, soft: Boolean) : PsiReferenceB
  * @author Ian Caffey
  * @since 1.0
  */
-class SmithyKeyReference(val key: SmithyKey) : SmithyReference(key, false) {
+data class SmithyKeyReference(val key: SmithyKey) : SmithyReference(key, soft = false) {
     companion object {
         private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
         private fun resolver(ref: Ref) = CachedValueProvider {
@@ -114,7 +114,7 @@ class SmithyKeyReference(val key: SmithyKey) : SmithyReference(key, false) {
  * @author Ian Caffey
  * @since 1.0
  */
-class SmithyMemberReference(val id: SmithyMemberId) : SmithyReference(id, false) {
+data class SmithyMemberReference(val id: SmithyMemberId) : SmithyReference(id, soft = false) {
     override fun isSoft() = id.shapeId.reference.isSoft
     override fun getAbsoluteRange(): TextRange = id.textRange
     override fun resolve() = id.shapeId.reference.resolve()?.getMember(id.memberName)
@@ -141,7 +141,7 @@ sealed class SmithyShapeReference(element: PsiElement, soft: Boolean) : SmithyRe
     abstract override fun resolve(): SmithyShapeDefinition?
 }
 
-private data class ById(val shapeId: SmithyShapeId) : SmithyShapeReference(shapeId, false) {
+private data class ById(val shapeId: SmithyShapeId) : SmithyShapeReference(shapeId, soft = false) {
     companion object {
         private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
         private fun resolver(shapeId: SmithyShapeId) = CachedValueProvider {
@@ -154,7 +154,7 @@ private data class ById(val shapeId: SmithyShapeId) : SmithyShapeReference(shape
     override fun resolve(): SmithyShapeDefinition? = getCachedValue(shapeId, resolver(shapeId))
 }
 
-private data class ByValue(val value: SmithyValue) : SmithyShapeReference(value, false) {
+private data class ByValue(val value: SmithyValue) : SmithyShapeReference(value, soft = false) {
     companion object {
         private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
         private fun resolver(ref: Ref) = CachedValueProvider {

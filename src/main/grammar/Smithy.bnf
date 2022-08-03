@@ -120,11 +120,12 @@ simple_shape ::= [documentation] trait* simple_type_name shape_name [mixins] {
 }
 enum ::= [documentation] trait* TOKEN_ENUM shape_name [mixins] enum_body {
     methods=[trait="" shape_name="" mixins="" body="enum_body"]
-    implements="software.amazon.smithy.intellij.psi.SmithyEnumExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyEnumMixin"
 }
-enum_body ::= TOKEN_OPEN_BRACE ((enum_member | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
-    methods=[members="enum_member" incomplete_member=""]
+enum_body ::= TOKEN_OPEN_BRACE ((enum_member | elided_member | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
+    methods=[enum_member="" elided_member="" incomplete_member=""]
+    implements="software.amazon.smithy.intellij.psi.SmithyMemberBodyExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyMemberBodyMixin"
 }
 //Note: to have a better parsing experience, the grammar only requires a node value and SmithyAnnotator adds an error annotation if it's not a string
 enum_member ::= [documentation] trait* member_name [member_initializer] {
@@ -134,11 +135,12 @@ enum_member ::= [documentation] trait* member_name [member_initializer] {
 }
 int_enum ::= [documentation] trait* TOKEN_INT_ENUM shape_name [mixins] int_enum_body {
     methods=[trait="" shape_name="" mixins="" body="int_enum_body"]
-    implements="software.amazon.smithy.intellij.psi.SmithyIntEnumExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyIntEnumMixin"
 }
-int_enum_body ::= TOKEN_OPEN_BRACE ((int_enum_member | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
-    methods=[members="int_enum_member" incomplete_member=""]
+int_enum_body ::= TOKEN_OPEN_BRACE ((int_enum_member | elided_member | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
+    methods=[enum_member="" elided_member="" incomplete_member=""]
+    implements="software.amazon.smithy.intellij.psi.SmithyMemberBodyExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyMemberBodyMixin"
 }
 //Note: to have a better parsing experience, the grammar only requires a node value and SmithyAnnotator adds an error annotation if it's not an integer
 int_enum_member ::= [documentation] trait* member_name [member_initializer] {
@@ -160,6 +162,8 @@ map ::= [documentation] trait* TOKEN_MAP shape_name [mixins] container_body {
 }
 structure ::= [documentation] trait* TOKEN_STRUCTURE shape_name [resource_reference] [mixins] container_body {
     methods=[trait="" shape_name="" mixins="" body="container_body"]
+    implements="software.amazon.smithy.intellij.psi.SmithyStructureExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyStructureMixin"
 }
 union ::= [documentation] trait* TOKEN_UNION shape_name [mixins] container_body {
     methods=[trait="" shape_name="" mixins="" body="container_body"]
@@ -193,7 +197,7 @@ operation ::= [documentation] trait* TOKEN_OPERATION shape_name [mixins] operati
     implements="software.amazon.smithy.intellij.psi.SmithyOperationExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyOperationMixin"
 }
-operation_body ::= TOKEN_OPEN_BRACE ((operation_member | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
+operation_body ::= TOKEN_OPEN_BRACE ((operation_member | elided_member | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
      methods=[members="operation_member"]
 }
 operation_member ::= operation_input | operation_output | operation_errors {
@@ -240,7 +244,7 @@ resource_member ::= resource_identifiers | resource_create_operation | resource_
     mixin="software.amazon.smithy.intellij.psi.SmithyResourceMemberMixin"
 }
 resource_identifier ::= member_name TOKEN_COLON shape_id {
-    methods=[name_identifier="member_name"]
+    methods=[name_identifier="member_name" declared_target="shape_id"]
     implements="software.amazon.smithy.intellij.psi.SmithyResourceIdentifierExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyResourceIdentifierMixin"
 }
@@ -262,13 +266,20 @@ resource_collection_operations ::= TOKEN_COLLECTION_OPERATIONS TOKEN_COLON TOKEN
 resource_resources ::= TOKEN_RESOURCES TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COLON])* TOKEN_CLOSE_BRACKET {
     methods=[shapes="shape_id"]
 }
-container_body ::= TOKEN_OPEN_BRACE ((container_member | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
-    methods=[members="container_member" incomplete_member=""]
+container_body ::= TOKEN_OPEN_BRACE ((container_member | elided_member | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
+    methods=[container_member="" elided_member="" incomplete_member=""]
+    implements="software.amazon.smithy.intellij.psi.SmithyMemberBodyExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyMemberBodyMixin"
 }
 container_member ::= [documentation] trait* member_name TOKEN_COLON shape_id [member_initializer] {
     methods=[declared_traits="trait" name_identifier="member_name" declared_target="shape_id" initializer="member_initializer"]
     implements="software.amazon.smithy.intellij.psi.SmithyContainerMemberExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyContainerMemberMixin"
+}
+elided_member ::= [documentation] trait* TOKEN_DOLLAR_SIGN member_name [member_initializer] {
+    methods=[declared_traits="trait" name_identifier="member_name" initializer="member_initializer"]
+    implements="software.amazon.smithy.intellij.psi.SmithyElidedMemberExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyElidedMemberMixin"
 }
 member_initializer ::= TOKEN_EQUALS value {
     implements="software.amazon.smithy.intellij.psi.SmithyMemberInitializerExt"
@@ -388,7 +399,6 @@ documentation ::= TOKEN_DOCUMENTATION_LINE+ {
 //Fake rules (for introducing superinterfaces into the AST)
 fake container_shape ::= container_body {
     methods=[body="container_body"]
-    implements="software.amazon.smithy.intellij.psi.SmithyContainerShapeExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyContainerShapeMixin"
 }
 fake keyed_element ::= key {
