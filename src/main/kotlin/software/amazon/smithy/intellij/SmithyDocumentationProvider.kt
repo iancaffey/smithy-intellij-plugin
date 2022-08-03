@@ -20,7 +20,6 @@ import software.amazon.smithy.intellij.index.SmithyAstShapeIndex
 import software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex
 import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyDocumentation
-import software.amazon.smithy.intellij.psi.SmithyDocumentationDefinition
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
 import software.amazon.smithy.intellij.psi.SmithyOperationInput
 import software.amazon.smithy.intellij.psi.SmithyOperationOutput
@@ -45,7 +44,7 @@ fun generateLink(href: String, label: String, key: TextAttributesKey? = null) = 
 /**
  * A [DocumentationProvider] for [Smithy](https://awslabs.github.io/smithy).
  *
- * [SmithyDocumentationDefinition.toDocString] will be converted from [CommonMark](https://spec.commonmark.org/) to HTML when rendered.
+ * Documentation will be converted from [CommonMark](https://spec.commonmark.org/) to HTML when rendered.
  *
  * @author Ian Caffey
  * @since 1.0
@@ -127,7 +126,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             append("</pre></div>")
             val docs = element.findTrait("smithy.api", "documentation")?.value?.asString()?.let {
                 renderDocumentation(it)
-            } ?: element.documentation?.let { generateRenderedDoc(it) }
+            }
             docs?.let { append("<div class='content'>").append(docs).append("</div>") }
             val additionalInfo = mutableMapOf(
                 "Namespace" to element.enclosingShape.namespace,
@@ -190,7 +189,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             append("</pre></div>")
             val docs = element.findTrait("smithy.api", "documentation")?.value?.asString()?.let {
                 renderDocumentation(it)
-            } ?: element.documentation?.let { generateRenderedDoc(it) }
+            }
             docs?.let { append("<div class='content'>").append(docs).append("</div>") }
             val additionalInfo = mutableMapOf("Namespace" to element.namespace)
             element.findTrait("smithy.api", "externalDocumentation")?.let {
@@ -236,7 +235,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
     }
 
     override fun generateRenderedDoc(comment: PsiDocCommentBase) =
-        (comment as? SmithyDocumentationDefinition)?.let { renderDocumentation(it.toDocString()) }
+        (comment as? SmithyDocumentation)?.let { renderDocumentation(it.toDocString()) }
 
     override fun collectDocComments(file: PsiFile, sink: Consumer<in PsiDocCommentBase>) {
         findChildrenOfType(file, SmithyDocumentation::class.java).forEach(sink)

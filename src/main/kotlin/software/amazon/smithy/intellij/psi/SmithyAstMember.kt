@@ -19,9 +19,6 @@ data class SmithyAstMember(
 
     override val declaredTarget = SmithyAstTarget(this, reference.target)
     override val resolvedTarget = declaredTarget
-    override val documentation = reference.traits?.get("smithy.api#documentation")?.let {
-        (it as? SmithyAst.Value.String)?.value?.let { docs -> SmithyAstDocumentation(this, docs) }
-    }
     override val declaredTraits = (reference.traits ?: emptyMap()).entries.map { (key, value) ->
         SmithyAstTrait(this, key, value)
     }

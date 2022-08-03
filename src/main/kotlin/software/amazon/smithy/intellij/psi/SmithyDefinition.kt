@@ -15,7 +15,6 @@ sealed interface SmithyDefinition : SmithyNamedElement, NavigatablePsiElement {
     val declaredTraits: List<@JvmWildcard SmithyTraitDefinition>
     val syntheticTraits: List<@JvmWildcard SmithyTraitDefinition> get() = emptyList()
     val traits: List<SmithyTraitDefinition>
-    val documentation: SmithyDocumentationDefinition?
     fun hasTrait(namespace: String, shapeName: String) = hasTraitIn(traits, namespace, shapeName)
     fun findTrait(namespace: String, shapeName: String) = traits.find {
         it.shapeName == shapeName && it.resolvedNamespace == namespace

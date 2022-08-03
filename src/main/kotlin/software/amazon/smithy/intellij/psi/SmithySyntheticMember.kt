@@ -18,8 +18,7 @@ data class SmithySyntheticMember(
     override val declaredTarget get() = original.declaredTarget
     override val resolvedTarget get() = original.declaredTarget
     override val declaredTraits = emptyList<SmithyTraitDefinition>()
-    override val syntheticTraits = emptyList<SmithyTraitDefinition>()
-    override val documentation get() = original.documentation
+    override val syntheticTraits = original.syntheticTraits
     override fun getName() = original.name
     override fun getNameIdentifier() = id
     override fun getParent() = enclosingShape

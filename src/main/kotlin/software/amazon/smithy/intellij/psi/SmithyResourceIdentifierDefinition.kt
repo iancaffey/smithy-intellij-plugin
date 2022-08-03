@@ -15,5 +15,4 @@ interface SmithyResourceIdentifierDefinition : SmithyElidedMemberTarget {
     override val declaredTraits get() = emptyList<SmithyTraitDefinition>()
     override val syntheticTraits get() = emptyList<SmithyTraitDefinition>()
     override val traits get() = emptyList<SmithyTraitDefinition>()
-    override val documentation: SmithyDocumentationDefinition? get() = null
 }
