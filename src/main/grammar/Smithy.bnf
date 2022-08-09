@@ -75,7 +75,7 @@
         TOKEN_INCOMPLETE_TEXT_BLOCK="regexp:\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))+"
     ]
     implements("^(?!.*element).*")="software.amazon.smithy.intellij.psi.SmithyElement"
-    implements("array|object|container_body|enum_body|int_enum_body|mixins|operation_body|resource_body|resource_identifiers|resource_operations|resource_collection_operations|resource_resources|service_body|service_operations|service_resources|service_errors|service_renames|trait_body")="software.amazon.smithy.intellij.psi.SmithyContainer"
+    implements("array|object|container_body|enum_body|int_enum_body|mixins|operation_body|resource_body|resource_identifiers|resource_operations|resource_collection_operations|resource_resources|service_body|service_operations|service_resources|service_errors|service_renames|applied_trait_body|trait_body")="software.amazon.smithy.intellij.psi.SmithyContainer"
     extends("array|object|primitive")=value
     extends("null|boolean|number|string|text_block|shape_id")=primitive
     extends("symbol|null|boolean|simple_type_name")=id
@@ -293,9 +293,13 @@ mixins ::= TOKEN_WITH TOKEN_OPEN_BRACKET (shape_id [TOKEN_COMMA])* TOKEN_CLOSE_B
 }
 
 //Traits
-applied_trait ::= TOKEN_APPLY (member_id | shape_id) trait {
+applied_trait ::= TOKEN_APPLY (member_id | shape_id) (trait | applied_trait_body) {
+    methods=[trait="" applied_trait_body=""]
     implements="software.amazon.smithy.intellij.psi.SmithyAppliedTraitExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyAppliedTraitMixin"
+}
+applied_trait_body ::= TOKEN_OPEN_BRACE trait* TOKEN_CLOSE_BRACE {
+    methods=[traits="trait"]
 }
 trait ::= TOKEN_AT shape_id [trait_body] {
     methods=[body="trait_body" shape="shape_id"]

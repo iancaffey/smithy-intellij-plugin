@@ -63,8 +63,16 @@ interface SmithyStatement : SmithyElement {
     val typeIdentifier: PsiElement get() = firstChild
 }
 
-interface SmithyAppliedTraitExt : SmithyStatement
-abstract class SmithyAppliedTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyAppliedTrait
+interface SmithyAppliedTraitExt : SmithyStatement {
+    val traits: List<SmithyTrait>
+}
+
+abstract class SmithyAppliedTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyAppliedTrait {
+    override val traits: List<SmithyTrait>
+        get() = getChildOfType(this, SmithyTrait::class.java)?.let { listOf(it) }
+            ?: getChildOfType(this, SmithyAppliedTraitBody::class.java)?.traits
+            ?: emptyList()
+}
 
 abstract class SmithyArrayMixin(node: ASTNode) : SmithyValueImpl(node), SmithyArray {
     override val type = SmithyValueType.ARRAY
@@ -845,12 +853,7 @@ abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyT
     override fun getTextOffset() = shape.textOffset
     override fun getPresentation() = object : ItemPresentation {
         override fun getPresentableText(): String = shapeName
-        override fun getLocationString(): String? = when (val parent = parent) {
-            is SmithyAppliedTrait -> containingFile.name
-            is SmithyDefinition -> parent.name
-            else -> null
-        }
-
+        override fun getLocationString() = parent.let { if (it is SmithyDefinition) it.name else containingFile.name }
         override fun getIcon(unused: Boolean) = getIcon(0)
     }
 

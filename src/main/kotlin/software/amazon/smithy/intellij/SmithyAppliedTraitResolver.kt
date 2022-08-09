@@ -34,7 +34,7 @@ object SmithyAppliedTraitResolver {
                 if (memberId != null && memberId.memberName == memberName
                     && shapeId != null && shapeId.shapeName == shapeName && shapeId.resolvedNamespace == namespace
                 ) {
-                    appliedTraits += it.trait
+                    appliedTraits += it.traits
                 }
             }
         }
@@ -56,7 +56,7 @@ object SmithyAppliedTraitResolver {
             (psi.findFile(file) as? SmithyFile)?.model?.appliedTraits?.forEach {
                 val shapeId = it.shapeId
                 if (shapeId != null && shapeId.shapeName == shapeName && shapeId.resolvedNamespace == namespace) {
-                    appliedTraits += it.trait
+                    appliedTraits += it.traits
                 }
             }
         }
