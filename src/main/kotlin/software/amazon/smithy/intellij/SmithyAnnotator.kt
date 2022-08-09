@@ -44,7 +44,7 @@ import software.amazon.smithy.intellij.psi.SmithyMixins
 import software.amazon.smithy.intellij.psi.SmithyModel
 import software.amazon.smithy.intellij.psi.SmithyNull
 import software.amazon.smithy.intellij.psi.SmithyOperationProperty
-import software.amazon.smithy.intellij.psi.SmithyResourceProperty
+import software.amazon.smithy.intellij.psi.SmithyResourceEntry
 import software.amazon.smithy.intellij.psi.SmithyResourceReference
 import software.amazon.smithy.intellij.psi.SmithyServiceProperty
 import software.amazon.smithy.intellij.psi.SmithyShape
@@ -112,13 +112,14 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
             SmithyTypes.TOKEN_INPUT,
             SmithyTypes.TOKEN_OUTPUT,
         )
-        val resourceProperties = setOf(
+        val resourceEntries = setOf(
             SmithyTypes.TOKEN_COLLECTION_OPERATIONS,
             SmithyTypes.TOKEN_CREATE,
             SmithyTypes.TOKEN_DELETE,
             SmithyTypes.TOKEN_IDENTIFIERS,
             SmithyTypes.TOKEN_LIST,
             SmithyTypes.TOKEN_OPERATIONS,
+            SmithyTypes.TOKEN_PROPERTIES,
             SmithyTypes.TOKEN_PUT,
             SmithyTypes.TOKEN_READ,
             SmithyTypes.TOKEN_RESOURCES,
@@ -136,7 +137,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
             if (element is SmithyMemberName
                 || (element.elementType == SmithyTypes.TOKEN_DOLLAR_SIGN && element.parent is SmithyElidedMember)
                 || (element.elementType in operationProperties && element.parent is SmithyOperationProperty)
-                || (element.elementType in resourceProperties && element.parent is SmithyResourceProperty)
+                || (element.elementType in resourceEntries && element.parent is SmithyResourceEntry)
                 || (element.elementType in serviceProperties && element.parent is SmithyServiceProperty)
             ) {
                 holder.highlight(SmithyColorSettings.SHAPE_MEMBER)

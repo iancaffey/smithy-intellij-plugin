@@ -48,7 +48,10 @@ object SmithyShapeAggregator {
     private fun findDeclaration(member: SmithyElidedMember): SmithyElidedMemberTarget? {
         val shape = member.enclosingShape
         if (hasCycle(shape)) return null
-        shape.resource?.resolve()?.getIdentifier(member.name)?.let { return it }
+        shape.resource?.resolve()?.let { target ->
+            target.getIdentifier(member.name)?.let { return it }
+            target.getProperty(member.name)?.let { return it }
+        }
         var declaration: SmithyMemberDefinition? = null
         shape.mixins.forEach { target ->
             //Note: all mixins _should_ have this trait, but invalid mixins will be ignored here

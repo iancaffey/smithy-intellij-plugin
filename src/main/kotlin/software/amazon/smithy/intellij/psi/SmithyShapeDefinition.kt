@@ -24,9 +24,11 @@ interface SmithyShapeDefinition : SmithyDefinition {
     val namespace: String
     val resource: SmithyShapeTarget? get() = null
     val identifiers: List<@JvmWildcard SmithyResourceIdentifierDefinition> get() = emptyList()
+    val properties: List<@JvmWildcard SmithyResourcePropertyDefinition> get() = emptyList()
     val members: List<SmithyMemberDefinition> get() = getMembers(this)
     val declaredMembers: List<@JvmWildcard SmithyMemberDefinition>
     val mixins: List<@JvmWildcard SmithyShapeTarget>
     fun getIdentifier(name: String): SmithyResourceIdentifierDefinition? = identifiers.find { it.name == name }
     fun getMember(name: String): SmithyMemberDefinition? = members.find { it.name == name }
+    fun getProperty(name: String): SmithyResourcePropertyDefinition? = properties.find { it.name == name }
 }

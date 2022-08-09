@@ -30,6 +30,11 @@ data class SmithyAstShape(
             SmithyAstResourceIdentifier(this, name, SmithyAstTarget(this, reference.target))
         }
     } ?: emptyList()
+    override val properties: List<SmithyAstResourceProperty> = shape.let { it as? SmithyAst.Resource }?.let {
+        it.properties?.entries?.map { (name, reference) ->
+            SmithyAstResourceProperty(this, name, SmithyAstTarget(this, reference.target))
+        }
+    } ?: emptyList()
     override val declaredMembers = shape.let { it as? SmithyAst.ComplexShape }?.let {
         (it.members ?: emptyMap()).entries.map { (memberName, reference) ->
             SmithyAstMember(this, memberName, reference)

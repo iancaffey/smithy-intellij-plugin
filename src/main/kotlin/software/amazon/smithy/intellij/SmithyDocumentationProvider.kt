@@ -24,6 +24,7 @@ import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
 import software.amazon.smithy.intellij.psi.SmithyOperationInput
 import software.amazon.smithy.intellij.psi.SmithyOperationOutput
 import software.amazon.smithy.intellij.psi.SmithyResourceIdentifierDefinition
+import software.amazon.smithy.intellij.psi.SmithyResourcePropertyDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyTraitDefinition
 import java.util.function.Consumer
@@ -87,6 +88,10 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             (element.shape?.href ?: element.shapeId?.href)?.let { append(": $it") }
         }
         is SmithyResourceIdentifierDefinition -> buildString {
+            appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
+            append(": ${element.resolvedTarget.href}")
+        }
+        is SmithyResourcePropertyDefinition -> buildString {
             appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
             append(": ${element.resolvedTarget.href}")
         }
@@ -171,6 +176,19 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             append(renderAdditionalInfo(additionalInfo))
         }
         is SmithyResourceIdentifierDefinition -> buildString {
+            append("<div class='definition'><pre>")
+            append(getQuickNavigateInfo(element, originalElement))
+            append("</pre></div>")
+            val additionalInfo = mutableMapOf(
+                "Namespace" to element.enclosingShape.namespace,
+                "Resource" to element.enclosingShape.href
+            )
+            element.resolve()?.let { target ->
+                additionalInfo["Type"] = getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
+            }
+            append(renderAdditionalInfo(additionalInfo))
+        }
+        is SmithyResourcePropertyDefinition -> buildString {
             append("<div class='definition'><pre>")
             append(getQuickNavigateInfo(element, originalElement))
             append("</pre></div>")

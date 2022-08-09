@@ -76,6 +76,7 @@ TOKEN_INCOMPLETE_TEXT_BLOCK=\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[
   "errors"                           { return TOKEN_ERRORS; }
   "resource"                         { return TOKEN_RESOURCE; }
   "identifiers"                      { return TOKEN_IDENTIFIERS; }
+  "properties"                       { return TOKEN_PROPERTIES; }
   "create"                           { return TOKEN_CREATE; }
   "put"                              { return TOKEN_PUT; }
   "read"                             { return TOKEN_READ; }

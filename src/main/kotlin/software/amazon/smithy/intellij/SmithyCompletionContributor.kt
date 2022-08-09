@@ -120,8 +120,9 @@ private fun addShapes(element: PsiElement, results: CompletionResultSet) {
 private fun addElidedTargetMembers(shape: SmithyShapeDefinition, prefix: String, results: CompletionResultSet) {
     val memberResults = results.withPrefixMatcher(prefix)
     if (SmithyShapeAggregator.hasCycle(shape)) return
-    shape.resource?.resolve()?.identifiers?.forEach {
-        memberResults.addElement(identifierElement(it.name, it.enclosingShape.name))
+    shape.resource?.resolve()?.let { target ->
+        target.identifiers.forEach { memberResults.addElement(identifierElement(it.name, it.enclosingShape.name)) }
+        target.properties.forEach { memberResults.addElement(propertyElement(it.name, it.enclosingShape.name)) }
     }
     val mixinMembers = mutableMapOf<String, String>()
     shape.mixins.forEach { target ->
@@ -189,4 +190,14 @@ private fun memberElement(
         .withPresentableText(memberName)
         .withTypeText(shapeName)
         .withIcon(SmithyIcons.MEMBER)
+}
+
+private fun propertyElement(
+    memberName: String,
+    shapeName: String
+): LookupElementBuilder {
+    return LookupElementBuilder.create(memberName)
+        .withPresentableText(memberName)
+        .withTypeText(shapeName)
+        .withIcon(SmithyIcons.RESOURCE_PROPERTY)
 }

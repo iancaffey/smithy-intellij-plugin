@@ -87,6 +87,7 @@
         <gotoClassContributor implementation="software.amazon.smithy.intellij.SmithyGotoShapeContributor"/>
         <gotoSymbolContributor implementation="software.amazon.smithy.intellij.SmithyGotoIdentifierContributor"/>
         <gotoSymbolContributor implementation="software.amazon.smithy.intellij.SmithyGotoMemberContributor"/>
+        <gotoSymbolContributor implementation="software.amazon.smithy.intellij.SmithyGotoPropertyContributor"/>
         <iconProvider implementation="software.amazon.smithy.intellij.SmithyIconProvider"/>
         <liveTemplateContext implementation="software.amazon.smithy.intellij.SmithyContextType"/>
         <navbar implementation="software.amazon.smithy.intellij.SmithyNavBar"/>

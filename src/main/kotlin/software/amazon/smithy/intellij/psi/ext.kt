@@ -591,45 +591,57 @@ interface SmithyResourceExt : SmithyShape {
 
 abstract class SmithyResourceMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyResource {
     override val identifiers: List<SmithyResourceIdentifier>
-        get() = body.properties.firstNotNullOfOrNull {
+        get() = body.entries.firstNotNullOfOrNull {
             it as? SmithyResourceIdentifiers
         }?.identifiers ?: emptyList()
+    override val properties: List<SmithyResourceProperty>
+        get() = body.entries.firstNotNullOfOrNull {
+            it as? SmithyResourceProperties
+        }?.properties ?: emptyList()
     override val create: SmithyShapeId?
-        get() = body.properties.firstNotNullOfOrNull {
+        get() = body.entries.firstNotNullOfOrNull {
             it as? SmithyResourceCreateOperation
         }?.shapeId
     override val put: SmithyShapeId?
-        get() = body.properties.firstNotNullOfOrNull {
+        get() = body.entries.firstNotNullOfOrNull {
             it as? SmithyResourcePutOperation
         }?.shapeId
     override val read: SmithyShapeId?
-        get() = body.properties.firstNotNullOfOrNull {
+        get() = body.entries.firstNotNullOfOrNull {
             it as? SmithyResourceReadOperation
         }?.shapeId
     override val update: SmithyShapeId?
-        get() = body.properties.firstNotNullOfOrNull {
+        get() = body.entries.firstNotNullOfOrNull {
             it as? SmithyResourceUpdateOperation
         }?.shapeId
     override val delete: SmithyShapeId?
-        get() = body.properties.firstNotNullOfOrNull {
+        get() = body.entries.firstNotNullOfOrNull {
             it as? SmithyResourceDeleteOperation
         }?.shapeId
     override val list: SmithyShapeId?
-        get() = body.properties.firstNotNullOfOrNull {
+        get() = body.entries.firstNotNullOfOrNull {
             it as? SmithyResourceListOperation
         }?.shapeId
     override val operations: List<SmithyShapeId>
-        get() = body.properties.firstNotNullOfOrNull {
+        get() = body.entries.firstNotNullOfOrNull {
             it as? SmithyResourceOperations
         }?.shapes ?: emptyList()
     override val collectionOperations: List<SmithyShapeId>
-        get() = body.properties.firstNotNullOfOrNull {
+        get() = body.entries.firstNotNullOfOrNull {
             it as? SmithyResourceCollectionOperations
         }?.shapes ?: emptyList()
     override val resources: List<SmithyShapeId>
-        get() = body.properties.firstNotNullOfOrNull {
+        get() = body.entries.firstNotNullOfOrNull {
             it as? SmithyResourceResources
         }?.shapes ?: emptyList()
+}
+
+interface SmithyResourceEntryExt : SmithyElement {
+    val enclosingResource: SmithyResource
+}
+
+abstract class SmithyResourceEntryMixin(node: ASTNode) : SmithyPsiElement(node), SmithyResourceEntry {
+    override val enclosingResource: SmithyResource get() = parent.parent as SmithyResource
 }
 
 interface SmithyResourceIdentifierExt : SmithyResourceIdentifierDefinition {
@@ -649,12 +661,21 @@ abstract class SmithyResourceIdentifierMixin(node: ASTNode) : SmithyPsiElement(n
     }
 }
 
-interface SmithyResourcePropertyExt : SmithyElement {
-    val enclosingResource: SmithyResource
+interface SmithyResourcePropertyExt : SmithyResourcePropertyDefinition {
+    override val enclosingShape: SmithyResource
 }
 
 abstract class SmithyResourcePropertyMixin(node: ASTNode) : SmithyPsiElement(node), SmithyResourceProperty {
-    override val enclosingResource: SmithyResource get() = parent.parent as SmithyResource
+    override val enclosingShape: SmithyResource get() = (parent as SmithyResourceProperties).enclosingResource
+    override val resolvedTarget: SmithyShapeId get() = declaredTarget
+    override fun getName(): String = nameIdentifier.text
+    override fun setName(newName: String) = setName<SmithyResourceProperty>(this, newName)
+    override fun getTextOffset() = nameIdentifier.textOffset
+    override fun getPresentation() = object : ItemPresentation {
+        override fun getPresentableText(): String = "$name: ${resolvedTarget.shapeName}"
+        override fun getLocationString() = enclosingShape.shapeName
+        override fun getIcon(unused: Boolean) = getIcon(0)
+    }
 }
 
 abstract class SmithyServiceMixin(node: ASTNode) : SmithyShapeImpl(node), SmithyService

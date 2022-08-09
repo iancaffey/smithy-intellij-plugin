@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <title>Inherited Resource Property</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Inherited-Resource-Property" fill-rule="nonzero">
+            <circle id="Oval" fill-opacity="0.7" fill="#B99BF8" cx="4" cy="6" r="4"></circle>
+            <polygon id="Path" fill="#DB5860"
+                     transform="translate(9.500000, 6.000000) scale(-1, 1) rotate(-180.000000) translate(-9.500000, -6.000000) "
+                     points="10 9 12 9 9.5 12 7 9 9 9 9 0 10 0"></polygon>
+            <path d="M3.2982,5.75124562 C3.2982,6.39723986 3.642893,6.848117 4.221,6.848117 C4.799107,6.848117 5.09976,6.16499459 5.09976,5.74499564 C5.09976,5.31624671 4.84113,4.666249 4.2144,4.666249 C3.58767,4.666249 3.2982,5.10525139 3.2982,5.75124562 Z M3.29976,7.1249297 C3.30456,7.1711796 3.30404,7.796178 3.2982,8.999925 L2.5,8.999925 L2.5,4 L3.2982,4 L3.2982,4.46624883 C3.51991859,4.15541628 3.86371859,4 4.3296,4 C5.02842211,4 5.8,4.36130287 5.8,5.75124562 C5.8,7.1411884 4.89248461,7.5143662 4.3296,7.5143662 C3.95434359,7.5143662 3.61106359,7.384554 3.29976,7.1249297 Z"
+                  id="Shape" fill-opacity="0.7" fill="#231F20"></path>
+        </g>
+    </g>
+</svg>

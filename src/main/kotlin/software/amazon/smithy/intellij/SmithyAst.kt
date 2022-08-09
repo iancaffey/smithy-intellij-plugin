@@ -277,6 +277,7 @@ data class SmithyAst(
 
     data class Resource(
         val identifiers: kotlin.collections.Map<kotlin.String, Reference>? = null,
+        val properties: kotlin.collections.Map<kotlin.String, Reference>? = null,
         val create: Reference? = null,
         val put: Reference? = null,
         val read: Reference? = null,

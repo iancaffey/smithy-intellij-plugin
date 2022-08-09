@@ -9,6 +9,7 @@ import com.intellij.psi.util.PsiTreeUtil.getDeepestFirst
 import software.amazon.smithy.intellij.SmithyIcons
 import software.amazon.smithy.intellij.psi.SmithyElidedMember
 import software.amazon.smithy.intellij.psi.SmithyResourceIdentifierDefinition
+import software.amazon.smithy.intellij.psi.SmithyResourcePropertyDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithySyntheticMember
 
@@ -41,6 +42,7 @@ class SmithyInheritedMemberLineMarkerProvider : RelatedItemLineMarkerProvider() 
                 element.declaration?.let {
                     val (label, icon) = when (it) {
                         is SmithyResourceIdentifierDefinition -> "resource identifier" to SmithyIcons.Gutter.INHERITED_RESOURCE_IDENTIFIER
+                        is SmithyResourcePropertyDefinition -> "resource property" to SmithyIcons.Gutter.INHERITED_RESOURCE_PROPERTY
                         else -> "member" to SmithyIcons.Gutter.INHERITED_MEMBER
                     }
                     result.add(

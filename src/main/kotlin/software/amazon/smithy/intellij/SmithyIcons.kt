@@ -15,6 +15,7 @@ object SmithyIcons {
     val SHAPE = icon("shape")
     val TRAIT = icon("trait")
     val RESOURCE_IDENTIFIER = icon("resourceIdentifier")
+    val RESOURCE_PROPERTY = icon("resourceProperty")
 
     private fun icon(name: String) = IconLoader.getIcon("META-INF/${name}Icon.svg", SmithyIcons.javaClass)
 
@@ -23,6 +24,7 @@ object SmithyIcons {
         val APPLIED_TRAITS = icon("appliedTraits")
         val INHERITED_MEMBER = icon("inheritedMember")
         val INHERITED_RESOURCE_IDENTIFIER = icon("inheritedResourceIdentifier")
+        val INHERITED_RESOURCE_PROPERTY = icon("inheritedResourceProperty")
 
         private fun icon(name: String) = SmithyIcons.icon("${name}Gutter")
 

@@ -7,6 +7,7 @@ package software.amazon.smithy.intellij.psi
  * @since 1.0
  * @see SmithyMemberDefinition
  * @see SmithyResourceIdentifierDefinition
+ * @see SmithyResourcePropertyDefinition
  */
 interface SmithyElidedMemberTarget : SmithyDefinition {
     val enclosingShape: SmithyShapeDefinition

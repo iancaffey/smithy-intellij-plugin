@@ -49,6 +49,7 @@
         TOKEN_ERRORS="errors"
         TOKEN_RESOURCE="resource"
         TOKEN_IDENTIFIERS="identifiers"
+        TOKEN_PROPERTIES="properties"
         TOKEN_CREATE="create"
         TOKEN_PUT="put"
         TOKEN_READ="read"
@@ -75,13 +76,13 @@
         TOKEN_INCOMPLETE_TEXT_BLOCK="regexp:\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))+"
     ]
     implements("^(?!.*element).*")="software.amazon.smithy.intellij.psi.SmithyElement"
-    implements("array|object|container_body|enum_body|int_enum_body|mixins|operation_body|resource_body|resource_identifiers|resource_operations|resource_collection_operations|resource_resources|service_body|service_operations|service_resources|service_errors|service_renames|applied_trait_body|trait_body")="software.amazon.smithy.intellij.psi.SmithyContainer"
+    implements("array|object|container_body|enum_body|int_enum_body|mixins|operation_body|resource_body|resource_identifiers|resource_properties|resource_operations|resource_collection_operations|resource_resources|service_body|service_operations|service_resources|service_errors|service_renames|applied_trait_body|trait_body")="software.amazon.smithy.intellij.psi.SmithyContainer"
     extends("array|object|primitive")=value
     extends("null|boolean|number|string|text_block|shape_id")=primitive
     extends("symbol|null|boolean|simple_type_name")=id
     extends("container_shape|simple_shape|enum|int_enum|service|operation|resource")=shape
     extends("operation_input|operation_output|operation_errors")=operation_property
-    extends("resource_identifiers|resource_create_operation|resource_put_operation|resource_read_operation|resource_update_operation|resource_delete_operation|resource_list_operation|resource_operations|resource_collection_operations|resource_resources")=resource_property
+    extends("resource_identifiers|resource_properties|resource_create_operation|resource_put_operation|resource_read_operation|resource_update_operation|resource_delete_operation|resource_list_operation|resource_operations|resource_collection_operations|resource_resources")=resource_entry
     extends("service_version|service_operations|service_resources|service_errors|service_renames")=service_property
     extends("list|set|map|output|structure|union|input|output")=container_shape
     extends("control|entry|metadata")=keyed_element
@@ -234,14 +235,14 @@ resource ::= [documentation] trait* TOKEN_RESOURCE shape_name [mixins] resource_
     implements="software.amazon.smithy.intellij.psi.SmithyResourceExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyResourceMixin"
 }
-resource_body ::= TOKEN_OPEN_BRACE ((resource_property | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
-    methods=[properties="resource_property" incomplete_member=""]
+resource_body ::= TOKEN_OPEN_BRACE ((resource_entry | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
+    methods=[entries="resource_entry" incomplete_member=""]
 }
-resource_property ::= resource_identifiers | resource_create_operation | resource_put_operation | resource_read_operation
-                      | resource_update_operation | resource_delete_operation | resource_list_operation
-                      | resource_operations | resource_collection_operations | resource_resources {
-    implements="software.amazon.smithy.intellij.psi.SmithyResourcePropertyExt"
-    mixin="software.amazon.smithy.intellij.psi.SmithyResourcePropertyMixin"
+resource_entry ::= resource_identifiers | resource_properties | resource_create_operation | resource_put_operation
+                      | resource_read_operation | resource_update_operation | resource_delete_operation
+                      | resource_list_operation | resource_operations | resource_collection_operations | resource_resources {
+    implements="software.amazon.smithy.intellij.psi.SmithyResourceEntryExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyResourceEntryMixin"
 }
 resource_identifier ::= member_name TOKEN_COLON shape_id {
     methods=[name_identifier="member_name" declared_target="shape_id"]
@@ -250,6 +251,14 @@ resource_identifier ::= member_name TOKEN_COLON shape_id {
 }
 resource_identifiers ::= TOKEN_IDENTIFIERS TOKEN_COLON TOKEN_OPEN_BRACE (resource_identifier [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
     methods=[identifiers="resource_identifier"]
+}
+resource_property ::= member_name TOKEN_COLON shape_id {
+    methods=[name_identifier="member_name" declared_target="shape_id"]
+    implements="software.amazon.smithy.intellij.psi.SmithyResourcePropertyExt"
+    mixin="software.amazon.smithy.intellij.psi.SmithyResourcePropertyMixin"
+}
+resource_properties ::= TOKEN_PROPERTIES TOKEN_COLON TOKEN_OPEN_BRACE (resource_property [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
+    methods=[properties="resource_property"]
 }
 resource_create_operation ::= TOKEN_CREATE TOKEN_COLON shape_id
 resource_put_operation ::= TOKEN_PUT TOKEN_COLON shape_id
@@ -355,8 +364,9 @@ member_name ::= id {methods=[id=""]}
 id ::= symbol | null | boolean | simple_type_name
        | TOKEN_APPLY | TOKEN_USE | TOKEN_LIST | TOKEN_SET | TOKEN_MAP | TOKEN_METADATA | TOKEN_NAMESPACE | TOKEN_STRUCTURE
        | TOKEN_UNION | TOKEN_SERVICE | TOKEN_OPERATION | TOKEN_RESOURCE | TOKEN_VERSION | TOKEN_OPERATIONS | TOKEN_RESOURCES
-       | TOKEN_RENAME | TOKEN_INPUT | TOKEN_OUTPUT | TOKEN_ERRORS | TOKEN_IDENTIFIERS | TOKEN_CREATE | TOKEN_PUT | TOKEN_READ
-       | TOKEN_UPDATE | TOKEN_DELETE | TOKEN_COLLECTION_OPERATIONS | TOKEN_ENUM | TOKEN_INT_ENUM | TOKEN_FOR | TOKEN_WITH {
+       | TOKEN_RENAME | TOKEN_INPUT | TOKEN_OUTPUT | TOKEN_ERRORS | TOKEN_IDENTIFIERS | TOKEN_PROPERTIES | TOKEN_CREATE
+       | TOKEN_PUT | TOKEN_READ | TOKEN_UPDATE | TOKEN_DELETE | TOKEN_COLLECTION_OPERATIONS | TOKEN_ENUM | TOKEN_INT_ENUM
+       | TOKEN_FOR | TOKEN_WITH {
     methods=[null="" boolean=""]
 }
 
