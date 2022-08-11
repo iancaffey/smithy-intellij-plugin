@@ -2,14 +2,48 @@
 
 # Smithy IntelliJ Plugin Changelog
 
-## [1.5.5]
+## [2.0.0]
+
 ### Added
-- Added support for an editor notification when a Smithy file is not located in a source root.
-- Added support for resolving shape references which have been defined multiple times across dependencies (which will ultimately get merged during build time).
-- Added support for treating document shape references (and any nested member/value shape references) as soft (which prevents it being highlighted as an error).
+
+- Added support for IDL 2.0.
+- Added support for merging trait values.
+- Added support for importing shapes within metadata before a namespace has been declared (which will insert the
+  best-guess namespace).
+- Added gutter icons to navigate between externally applied traits and their target shape.
+- Added live template for creating an annotation trait.
+- Added live templates for enum and intEnum shapes.
+- Added inlay hint for the shape name of inline input/output shapes.
+- Added support for annotating unnecessary commas (with a quick fix to remove all commas within the file).
+- Added support for annotating shapes with circular references as errors.
+- Added go-to contributor for resource identifiers and properties.
+
+### Changed
+
+- Updated the create-file action to take into account the Smithy build version as well as guess the expected namespace.
+- Improved code-completion when typing out members in structured traits.
+- Expanded keyword highlighting to include boolean and null literals.
+- Improved quote handling in incomplete strings.
+- Improved default spacing for shape declaration (to enforce whitespace).
 
 ### Fixed
-- Fixed NPE thrown when attempting to index Smithy files without a namespace (e.g. validation files with only a version + metadata).
+
+- Fixed the renaming behavior of member ids to only update the member name.
+
+## [1.5.5]
+
+### Added
+
+- Added support for an editor notification when a Smithy file is not located in a source root.
+- Added support for resolving shape references which have been defined multiple times across dependencies (which will
+  ultimately get merged during build time).
+- Added support for treating document shape references (and any nested member/value shape references) as soft (which
+  prevents it being highlighted as an error).
+
+### Fixed
+
+- Fixed NPE thrown when attempting to index Smithy files without a namespace (e.g. validation files with only a version
+  + metadata).
 
 ## [1.5.4]
 ### Added
