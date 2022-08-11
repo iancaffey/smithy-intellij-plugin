@@ -18,6 +18,24 @@
             <option name="Smithy" value="true"/>
         </context>
     </template>
+    <template name="enum"
+              value="enum $SHAPE_NAME$ {&#10;$END$&#10;}"
+              description="Adds an enum shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
+    <template name="intEnum"
+              value="intEnum $SHAPE_NAME$ {&#10;$END$&#10;}"
+              description="Adds an intEnum shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="Smithy" value="true"/>
+        </context>
+    </template>
     <template name="kvp"
               value="$KEY$: $VALUE$$END$"
               description="Adds a key-value pair"
