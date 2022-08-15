@@ -2,10 +2,12 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.1]
+### Fixed
+- Fixed grammar of IDL 1.0 service shapes.
+
 ## [2.0.0]
-
 ### Added
-
 - Added support for IDL 2.0.
 - Added support for merging trait values.
 - Added support for importing shapes within metadata before a namespace has been declared (which will insert the
@@ -19,7 +21,6 @@
 - Added go-to contributor for resource identifiers and properties.
 
 ### Changed
-
 - Updated the create-file action to take into account the Smithy build version as well as guess the expected namespace.
 - Improved code-completion when typing out members in structured traits.
 - Expanded keyword highlighting to include boolean and null literals.
@@ -27,13 +28,10 @@
 - Improved default spacing for shape declaration (to enforce whitespace).
 
 ### Fixed
-
 - Fixed the renaming behavior of member ids to only update the member name.
 
 ## [1.5.5]
-
 ### Added
-
 - Added support for an editor notification when a Smithy file is not located in a source root.
 - Added support for resolving shape references which have been defined multiple times across dependencies (which will
   ultimately get merged during build time).
@@ -41,7 +39,6 @@
   prevents it being highlighted as an error).
 
 ### Fixed
-
 - Fixed NPE thrown when attempting to index Smithy files without a namespace (e.g. validation files with only a version
   + metadata).
 
