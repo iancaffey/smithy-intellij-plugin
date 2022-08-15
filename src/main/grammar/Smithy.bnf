@@ -178,16 +178,16 @@ service_body ::= TOKEN_OPEN_BRACE ((service_property | incomplete_member) [TOKEN
 }
 service_property ::= service_version | service_operations | service_resources | service_errors | service_renames
 service_version ::= TOKEN_VERSION TOKEN_COLON string
-service_operations ::= TOKEN_OPERATIONS TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COLON])* TOKEN_CLOSE_BRACKET {
+service_operations ::= TOKEN_OPERATIONS TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COMMA])* TOKEN_CLOSE_BRACKET {
     methods=[shapes="shape_id"]
 }
-service_resources ::= TOKEN_RESOURCES TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COLON])* TOKEN_CLOSE_BRACKET {
+service_resources ::= TOKEN_RESOURCES TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COMMA])* TOKEN_CLOSE_BRACKET {
     methods=[shapes="shape_id"]
 }
-service_errors ::= TOKEN_ERRORS TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COLON])* TOKEN_CLOSE_BRACKET {
+service_errors ::= TOKEN_ERRORS TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COMMA])* TOKEN_CLOSE_BRACKET {
     methods=[shapes="shape_id"]
 }
-service_renames ::= TOKEN_RENAME TOKEN_COLON TOKEN_OPEN_BRACE (service_rename [TOKEN_COLON])* TOKEN_CLOSE_BRACE {
+service_renames ::= TOKEN_RENAME TOKEN_COLON TOKEN_OPEN_BRACE (service_rename [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
     methods=[entries="service_rename"]
 }
 service_rename ::= key TOKEN_COLON string {
@@ -266,13 +266,13 @@ resource_read_operation ::= TOKEN_READ TOKEN_COLON shape_id
 resource_update_operation ::= TOKEN_UPDATE TOKEN_COLON shape_id
 resource_delete_operation ::= TOKEN_DELETE TOKEN_COLON shape_id
 resource_list_operation ::= TOKEN_LIST TOKEN_COLON shape_id
-resource_operations ::= TOKEN_OPERATIONS TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COLON])* TOKEN_CLOSE_BRACKET {
+resource_operations ::= TOKEN_OPERATIONS TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COMMA])* TOKEN_CLOSE_BRACKET {
     methods=[shapes="shape_id"]
 }
-resource_collection_operations ::= TOKEN_COLLECTION_OPERATIONS TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COLON])* TOKEN_CLOSE_BRACKET {
+resource_collection_operations ::= TOKEN_COLLECTION_OPERATIONS TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COMMA])* TOKEN_CLOSE_BRACKET {
     methods=[shapes="shape_id"]
 }
-resource_resources ::= TOKEN_RESOURCES TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COLON])* TOKEN_CLOSE_BRACKET {
+resource_resources ::= TOKEN_RESOURCES TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COMMA])* TOKEN_CLOSE_BRACKET {
     methods=[shapes="shape_id"]
 }
 container_body ::= TOKEN_OPEN_BRACE ((container_member | elided_member | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
