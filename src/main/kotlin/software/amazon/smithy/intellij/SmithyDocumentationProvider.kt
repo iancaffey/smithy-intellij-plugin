@@ -102,7 +102,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 }
             }
             appendStyledSpan(this, SmithyColorSettings.KEYWORD, element.type, 1f)
-            append(" ").append(element.href)
+            append(" ").append(element.shapeName)
             element.mixins.takeIf { it.isNotEmpty() }?.let { mixins ->
                 appendLine()
                 appendStyledSpan(this, SmithyColorSettings.KEYWORD, "with", 1f)
