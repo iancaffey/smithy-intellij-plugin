@@ -13,6 +13,8 @@ import software.amazon.smithy.intellij.SmithyIcons
  */
 class SmithySyntheticShape(
     private val enclosing: PsiElement,
+    override val namespace: String,
+    override val shapeName: String,
     override val type: String
 ) : SmithySyntheticElement(), SmithyShapeDefinition {
     private val id = let {
@@ -21,9 +23,7 @@ class SmithySyntheticShape(
             override fun getParent() = it
         }
     }
-    override val namespace = "smithy.api"
-    override val shapeName = "Unit"
-    override val shapeId = "smithy.api#Unit"
+    override val shapeId = "${namespace}#${shapeName}"
     override val mixins = emptyList<SmithyShapeTarget>()
     override val declaredMembers = emptyList<SmithyMemberDefinition>()
     override val declaredTraits = emptyList<SmithyTraitDefinition>()
@@ -37,10 +37,11 @@ class SmithySyntheticShape(
 
 data class SmithySyntheticShapeTarget(
     val member: SmithyMemberDefinition,
+    val namespace: String,
+    override val shapeName: String,
     val type: String
 ) : SmithySyntheticElement(), SmithyShapeTarget {
-    val shape = SmithySyntheticShape(member, type)
-    override val shapeName = shape.name
+    val shape = SmithySyntheticShape(member, namespace, shapeName, type)
     override val declaredNamespace = shape.namespace
     override val resolvedNamespace = shape.namespace
     override fun getName() = shapeName

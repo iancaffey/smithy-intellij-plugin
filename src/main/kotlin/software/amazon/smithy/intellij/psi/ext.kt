@@ -64,10 +64,12 @@ interface SmithyStatement : SmithyElement {
 }
 
 interface SmithyAppliedTraitExt : SmithyStatement {
+    val target: SmithyDefinition?
     val traits: List<SmithyTrait>
 }
 
 abstract class SmithyAppliedTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyAppliedTrait {
+    override val target get() = memberId?.resolve() ?: shapeId?.resolve()
     override val traits: List<SmithyTrait>
         get() = getChildOfType(this, SmithyTrait::class.java)?.let { listOf(it) }
             ?: getChildOfType(this, SmithyAppliedTraitBody::class.java)?.traits
@@ -211,7 +213,7 @@ interface SmithyEnumMemberExt : SmithyNamedElement, SmithyMemberDefinition {
 
 abstract class SmithyEnumMemberMixin(node: ASTNode) : SmithyPsiElement(node), SmithyEnumMember {
     private var _syntheticTraits: List<SmithyTraitDefinition>? = null
-    override val declaredTarget = SmithySyntheticShapeTarget(this, "string")
+    override val declaredTarget = SmithySyntheticShapeTarget(this, "smithy.api", "Unit", "string")
     override val resolvedTarget = declaredTarget
     override val enclosingShape: SmithyEnum get() = getParentOfType(this, SmithyEnum::class.java)!!
     override val syntheticTraits: List<SmithyTraitDefinition>
@@ -304,7 +306,7 @@ interface SmithyIntEnumMemberExt : SmithyNamedElement, SmithyMemberDefinition {
 
 abstract class SmithyIntEnumMemberMixin(node: ASTNode) : SmithyPsiElement(node), SmithyIntEnumMember {
     private var _syntheticTraits: List<SmithyTraitDefinition>? = null
-    override val declaredTarget = SmithySyntheticShapeTarget(this, "integer")
+    override val declaredTarget = SmithySyntheticShapeTarget(this, "smithy.api", "Unit", "integer")
     override val resolvedTarget = declaredTarget
     override val enclosingShape: SmithyIntEnum get() = getParentOfType(this, SmithyIntEnum::class.java)!!
     override val syntheticTraits: List<SmithyTraitDefinition>
@@ -376,6 +378,7 @@ abstract class SmithyMemberBodyMixin(node: ASTNode) : SmithyPsiElement(node), Sm
 interface SmithyMemberIdExt : SmithyElement {
     val memberName: String
     val reference: SmithyMemberReference
+    fun resolve() = reference.resolve()
 }
 
 abstract class SmithyMemberIdMixin(node: ASTNode) : SmithyPsiElement(node), SmithyMemberId {
@@ -489,8 +492,8 @@ abstract class SmithyObjectMixin(node: ASTNode) : SmithyValueImpl(node), SmithyO
 }
 
 interface SmithyOperationExt : SmithyShape {
-    val input: SmithyOperationInput?
-    val output: SmithyOperationOutput?
+    override val input: SmithyOperationInput?
+    override val output: SmithyOperationOutput?
     val errors: SmithyOperationErrors?
 }
 
@@ -522,15 +525,32 @@ abstract class SmithyOperationErrorsMixin(node: ASTNode) : SmithyOperationProper
     override fun getNameIdentifier(): PsiElement = findChildByType(SmithyTypes.TOKEN_ERRORS)!!
 }
 
-interface SmithyOperationInputExt : SmithyOperationPropertyExt
-
-abstract class SmithyOperationInputMixin(node: ASTNode) : SmithyOperationPropertyImpl(node), SmithyOperationInput {
-    override fun getNameIdentifier(): PsiElement = findChildByType(SmithyTypes.TOKEN_INPUT)!!
+interface SmithyOperationInputExt : SmithyOperationPropertyExt, SmithyShapeTarget {
+    val target: SmithyShapeTarget
 }
 
-interface SmithyOperationOutputExt : SmithyOperationPropertyExt
+abstract class SmithyOperationInputMixin(node: ASTNode) : SmithyOperationPropertyImpl(node), SmithyOperationInput {
+    override val target: SmithyShapeTarget get() = shapeId ?: shape!!
+    override val href get() = target.href
+    override val shapeName get() = target.shapeName
+    override val declaredNamespace get() = target.declaredNamespace
+    override val resolvedNamespace get() = target.resolvedNamespace
+    override fun getNameIdentifier(): PsiElement = findChildByType(SmithyTypes.TOKEN_INPUT)!!
+    override fun resolve() = target.resolve()
+}
+
+interface SmithyOperationOutputExt : SmithyOperationPropertyExt, SmithyShapeTarget {
+    val target: SmithyShapeTarget
+}
+
 abstract class SmithyOperationOutputMixin(node: ASTNode) : SmithyOperationPropertyImpl(node), SmithyOperationOutput {
+    override val target: SmithyShapeTarget get() = shapeId ?: shape!!
+    override val href get() = target.href
+    override val shapeName get() = target.shapeName
+    override val declaredNamespace get() = target.declaredNamespace
+    override val resolvedNamespace get() = target.resolvedNamespace
     override fun getNameIdentifier(): PsiElement = findChildByType(SmithyTypes.TOKEN_OUTPUT)!!
+    override fun resolve() = target.resolve()
 }
 
 interface SmithyOutputExt : SmithyContainerShape, SmithyShapeTarget {
@@ -848,7 +868,9 @@ abstract class SmithyStructureMixin(node: ASTNode) : SmithyContainerShapeImpl(no
     override val resource get() = resourceReference?.shapeId
 }
 
-interface SmithyTraitExt : SmithyTraitDefinition
+interface SmithyTraitExt : SmithyTraitDefinition {
+    val target: SmithyDefinition?
+}
 
 abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyTrait {
     private var parsed = false
@@ -869,6 +891,14 @@ abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyT
     override val shapeName get() = shape.shapeName
     override val declaredNamespace get() = shape.declaredNamespace
     override val resolvedNamespace get() = shape.resolvedNamespace
+    override val target: SmithyDefinition?
+        get() = when (val parent = parent) {
+            is SmithyAppliedTrait -> parent.target
+            is SmithyAppliedTraitBody -> (parent.parent as? SmithyAppliedTrait)?.target
+            is SmithyDefinition -> parent
+            else -> null
+        }
+
     override fun getName() = shapeName
     override fun setName(newName: String) = also { shape.setName(newName) }
     override fun getTextOffset() = shape.textOffset

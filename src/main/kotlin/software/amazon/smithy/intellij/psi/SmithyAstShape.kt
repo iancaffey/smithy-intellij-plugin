@@ -25,6 +25,8 @@ data class SmithyAstShape(
     override val shapeName = parts[1]
     override val namespace = parts[0]
     override val type = shape.type
+    override val input = (shape as? SmithyAst.Operation)?.input?.let { SmithyAstTarget(this, it.target) }
+    override val output = (shape as? SmithyAst.Operation)?.output?.let { SmithyAstTarget(this, it.target) }
     override val identifiers: List<SmithyAstResourceIdentifier> = shape.let { it as? SmithyAst.Resource }?.let {
         it.identifiers?.entries?.map { (name, reference) ->
             SmithyAstResourceIdentifier(this, name, SmithyAstTarget(this, reference.target))

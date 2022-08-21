@@ -8,10 +8,10 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil.getDeepestFirst
 import software.amazon.smithy.intellij.SmithyIcons
 import software.amazon.smithy.intellij.psi.SmithyElidedMember
+import software.amazon.smithy.intellij.psi.SmithyInheritedMember
 import software.amazon.smithy.intellij.psi.SmithyResourceIdentifierDefinition
 import software.amazon.smithy.intellij.psi.SmithyResourcePropertyDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
-import software.amazon.smithy.intellij.psi.SmithySyntheticMember
 
 /**
  * A [LineMarkerProvider] for inherited members of [SmithyShapeDefinition].
@@ -26,9 +26,7 @@ class SmithyInheritedMemberLineMarkerProvider : RelatedItemLineMarkerProvider() 
     ) {
         when (element) {
             is SmithyShapeDefinition -> {
-                val inherited = element.members.mapNotNull {
-                    (it as? SmithySyntheticMember)?.original
-                }
+                val inherited = element.members.mapNotNull { (it as? SmithyInheritedMember)?.original }
                 if (inherited.isNotEmpty()) {
                     result.add(
                         NavigationGutterIconBuilder.create(SmithyIcons.Gutter.INHERITED_MEMBER)

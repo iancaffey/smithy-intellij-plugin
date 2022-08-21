@@ -22,6 +22,8 @@ interface SmithyShapeDefinition : SmithyDefinition {
     val shapeId: String
     val shapeName: String
     val namespace: String
+    val input: SmithyShapeTarget? get() = null
+    val output: SmithyShapeTarget? get() = null
     val resource: SmithyShapeTarget? get() = null
     val identifiers: List<@JvmWildcard SmithyResourceIdentifierDefinition> get() = emptyList()
     val properties: List<@JvmWildcard SmithyResourcePropertyDefinition> get() = emptyList()

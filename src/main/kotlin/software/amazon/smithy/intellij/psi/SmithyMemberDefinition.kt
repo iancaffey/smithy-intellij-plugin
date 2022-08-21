@@ -12,6 +12,7 @@ import software.amazon.smithy.intellij.SmithyShapeAggregator.getTraits
  * @see SmithyContainerMember
  * @see SmithyElidedMember
  * @see SmithyEnumMember
+ * @see SmithyInheritedMember
  * @see SmithyIntEnumMember
  * @see SmithySyntheticMember
  */

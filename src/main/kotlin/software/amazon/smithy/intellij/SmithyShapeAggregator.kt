@@ -6,9 +6,9 @@ import com.intellij.psi.util.PsiModificationTracker
 import software.amazon.smithy.intellij.psi.SmithyDefinition
 import software.amazon.smithy.intellij.psi.SmithyElidedMember
 import software.amazon.smithy.intellij.psi.SmithyElidedMemberTarget
+import software.amazon.smithy.intellij.psi.SmithyInheritedMember
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
-import software.amazon.smithy.intellij.psi.SmithySyntheticMember
 import software.amazon.smithy.intellij.psi.SmithySyntheticTrait
 import software.amazon.smithy.intellij.psi.SmithySyntheticValue
 import software.amazon.smithy.intellij.psi.SmithyTraitDefinition
@@ -75,7 +75,7 @@ object SmithyShapeAggregator {
                 //locating inherited traits (so we only need to introduce new members from mixins here)
                 members[inheritedMember.name] = declaredMembers.find {
                     it.name == inheritedMember.name
-                } ?: SmithySyntheticMember(shape, inheritedMember)
+                } ?: SmithyInheritedMember(shape, inheritedMember)
             }
         }
         declaredMembers.forEach { if (it.name !in members) members[it.name] = it }
@@ -134,7 +134,7 @@ object SmithyShapeAggregator {
         //Declared members inherit from the last mixin member (since re-declared members supersede the previous member)
         val explicitTraits = listOf(member.syntheticTraits, member.declaredTraits, member.appliedTraits).flatten()
         val inheritedTraits = when (member) {
-            is SmithySyntheticMember -> collectTraits(member.original)
+            is SmithyInheritedMember -> collectTraits(member.original)
             else -> member.enclosingShape.mixins.mapNotNull {
                 it.resolve()?.getMember(member.name)
             }.lastOrNull()?.traits ?: emptyList()
