@@ -84,7 +84,9 @@ data class SmithyKeyReference(val key: SmithyKey) : SmithyReference(key, soft = 
         }
 
     override fun isSoft() = ref.let {
-        it == null || it.enclosing?.reference?.isSoft ?: it.trait.shape.reference.isSoft
+        it == null || (it.enclosing?.reference ?: it.trait.shape.reference).let { enclosing ->
+            enclosing.isSoft || enclosing.resolve()?.type == "document"
+        }
     }
 
     override fun getAbsoluteRange(): TextRange = myElement.textRange
@@ -154,7 +156,7 @@ private data class ById(val shapeId: SmithyShapeId) : SmithyShapeReference(shape
     override fun resolve(): SmithyShapeDefinition? = getCachedValue(shapeId, resolver(shapeId))
 }
 
-private data class ByValue(val value: SmithyValue) : SmithyShapeReference(value, soft = false) {
+private data class ByValue(val value: SmithyValue) : SmithyShapeReference(value, soft = value !is SmithyShapeId) {
     companion object {
         private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
         private fun resolver(ref: Ref) = CachedValueProvider {
@@ -179,10 +181,6 @@ private data class ByValue(val value: SmithyValue) : SmithyShapeReference(value,
             }
             return _ref
         }
-
-    override fun isSoft() = ref.let {
-        it == null || it.path != null && getDefinitions(it.shapeId).firstOrNull()?.type == "document"
-    }
 
     override fun getAbsoluteRange(): TextRange = myElement.textRange
     override fun resolve() = ref?.let { getCachedValue(it, resolver(it)) }
