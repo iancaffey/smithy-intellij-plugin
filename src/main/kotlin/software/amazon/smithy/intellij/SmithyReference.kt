@@ -12,17 +12,21 @@ import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import software.amazon.smithy.intellij.SmithyShapeResolver.getDefinitions
 import software.amazon.smithy.intellij.psi.SmithyArray
+import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyDefinition
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
 import software.amazon.smithy.intellij.psi.SmithyMemberId
+import software.amazon.smithy.intellij.psi.SmithyMemberInitializer
+import software.amazon.smithy.intellij.psi.SmithyMetadata
 import software.amazon.smithy.intellij.psi.SmithyObject
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 import software.amazon.smithy.intellij.psi.SmithyShapeTarget
 import software.amazon.smithy.intellij.psi.SmithySyntheticElement
 import software.amazon.smithy.intellij.psi.SmithySyntheticMember
+import software.amazon.smithy.intellij.psi.SmithySyntheticShapeTarget
 import software.amazon.smithy.intellij.psi.SmithyTrait
 import software.amazon.smithy.intellij.psi.SmithyTraitBody
 import software.amazon.smithy.intellij.psi.SmithyValue
@@ -68,16 +72,23 @@ data class SmithyKeyReference(val key: SmithyKey) : SmithyReference(key, soft = 
                                 "output" -> (ref.trait.target as? SmithyShapeDefinition)?.output
                                 else -> null
                             }
-                            if (target != null) return@let SmithySyntheticMember(parent, ref.memberName, target)
+                            if (target != null) return@let SmithySyntheticMember(parent, ref.memberName).apply {
+                                declaredTarget = target
+                            }
                         }
                         "smithy.api#ExampleError" -> {
                             if (ref.memberName == "content") {
                                 val target = ref.enclosing?.fields?.get("shapeId") as? SmithyShapeTarget
-                                if (target != null) return@let SmithySyntheticMember(parent, ref.memberName, target)
+                                if (target != null) return@let SmithySyntheticMember(parent, ref.memberName).apply {
+                                    declaredTarget = target
+                                }
                             }
                         }
                     }
-                    it.getMember(if (parent.type == "map") "value" else ref.memberName)
+                    //Note: nested members within documents are also considered documents
+                    if (it.type == "document") SmithySyntheticMember(it, ref.memberName).apply {
+                        declaredTarget = SmithySyntheticShapeTarget(this, "smithy.api", "Document", "document")
+                    } else it.getMember(if (parent.type == "map") "value" else ref.memberName)
                 }, dependencies
             )
         }
@@ -181,35 +192,36 @@ private data class ByValue(val value: SmithyValue) : SmithyShapeReference(value,
         private val dependencies = listOf(PsiModificationTracker.MODIFICATION_COUNT)
         private fun resolver(ref: Ref) = CachedValueProvider {
             CachedValueProvider.Result.create(
-                (ref.path ?: ValuePath.EMPTY).resolve(ref.enclosingTrait, ref.shapeId),
+                when (val parent = ref.parent) {
+                    is SmithyArray -> {
+                        val enclosing = parent.reference.resolve()
+                        if (enclosing?.type == "document") enclosing else enclosing?.getMember("member")?.resolve()
+                    }
+                    is SmithyEntry -> parent.key.reference.resolve()?.resolve()
+                    is SmithyMemberInitializer -> {
+                        val member = parent.enclosingMember
+                        val enclosingShape = member.enclosingShape
+                        //Note: enum/intEnum members _technically_ target smithy.api#Unit, but for the purposes of shape
+                        //references, the enum values will refer to the parent enum shape
+                        if (enclosingShape.type.let { it == "enum" || it == "intEnum" }) enclosingShape else member.resolve()
+                    }
+                    is SmithyTraitBody -> ref.enclosingTrait?.resolve()
+                    else -> null //control + key + metadata
+                },
                 dependencies
             )
         }
     }
 
-    //Note: since the reference depends on the parent PSI context, we need to manually keep track of any project PSI
-    //modifications, to refresh the internal reference context (but also cache it since this is called very frequently
-    //when displaying annotations and documentation in the editor as code is being browsed)
-    private val modificationTracker = value.project.getService(PsiModificationTracker::class.java)
-    private var _ref: Ref? = null
-    private var lastModCount: Long? = null
-    private val ref: Ref?
-        get() {
-            modificationTracker.modificationCount.takeIf { it != lastModCount }?.let { modCount ->
-                _ref = when (value.parent) {
-                    is SmithyKey -> null //the parent SmithyKey references the member while this value would resolve to the type of the member which conflicts when hovering the key
-                    else -> getParentOfType(value, SmithyTrait::class.java)?.let { trait ->
-                        Ref(value, trait, trait.shape, ValuePath.buildTo(value))
-                    }
-                }
-                lastModCount = modCount
-            }
-            return _ref
+    override fun isSoft() = value.parent.let { it is SmithyKey || it is SmithyControl || it is SmithyMetadata }
+            || getParentOfType(value, SmithyTrait::class.java) == null
+
+    override fun getAbsoluteRange(): TextRange = myElement.textRange
+    override fun resolve(): SmithyShapeDefinition? =
+        Ref(value, value.parent, getParentOfType(value, SmithyTrait::class.java)).let {
+            getCachedValue(it, resolver(it))
         }
 
-    override fun isSoft() = ref == null
-    override fun getAbsoluteRange(): TextRange = myElement.textRange
-    override fun resolve() = ref?.let { getCachedValue(it, resolver(it)) }
     override fun handleElementRename(newElementName: String): SmithyValue {
         val textRange = value.textRange
         val document = FileDocumentManager.getInstance().getDocument(value.containingFile.virtualFile)
@@ -221,67 +233,10 @@ private data class ByValue(val value: SmithyValue) : SmithyShapeReference(value,
     //Note: the path from the enclosing trait to the value can change (e.g. if the enclosing field is renamed), so
     //this PsiElement serves as the representative context for the CachedValue computation (with a well-formed equals/hashCode)
     private data class Ref(
-        val value: SmithyValue, val enclosingTrait: SmithyTrait, val shapeId: SmithyShapeId, val path: ValuePath?
+        val value: SmithyValue,
+        val enclosingElement: PsiElement,
+        val enclosingTrait: SmithyTrait?
     ) : SmithySyntheticElement() {
-        override fun getParent() = enclosingTrait
-    }
-}
-
-/**
- * A path to a value within a [SmithyShapeDefinition].
- *
- * Given a [SmithyShapeId], the [SmithyShapeDefinition] of the target value can be resolved using [resolve].
- *
- * @author Ian Caffey
- * @since 1.0
- */
-data class ValuePath(val path: List<String> = emptyList()) {
-    companion object {
-        val EMPTY = ValuePath()
-        fun buildTo(value: SmithyValue): ValuePath? {
-            val root = getParentOfType(value, SmithyTraitBody::class.java) ?: return null
-            val path = mutableListOf<String>()
-            var current: PsiElement = value.parent
-            while (current != root) {
-                when (current) {
-                    is SmithyEntry -> path += current.name
-                    is SmithyArray -> path += "member"
-                    //Note: SmithyObject do not impact the path
-                }
-                current = current.parent
-            }
-            path.reverse()
-            return if (path.isEmpty()) EMPTY else ValuePath(path)
-        }
-    }
-
-    fun resolve(enclosingTrait: SmithyTrait, shapeId: SmithyShapeId): SmithyShapeDefinition? {
-        val root = shapeId.reference.resolve() ?: return null
-        if (path.isEmpty()) return root
-        //Note: Example$input, Example$output, and ExampleError$content all have specialized type resolution logic
-        //to infer the true operation input/output/error (since they can only be expressed as document in Smithy)
-        if (root.shapeId == "smithy.api#examples") {
-            if (path.size >= 2 && path[0] == "member") {
-                val target = when (path[1]) {
-                    "input" -> (enclosingTrait.target as? SmithyShapeDefinition)?.input?.resolve()
-                    "output" -> (enclosingTrait.target as? SmithyShapeDefinition)?.output?.resolve()
-                    else -> null
-                }
-                if (target != null) return if (path.size == 2) target else traverse(target, path.subList(2, path.size))
-            }
-        }
-        return traverse(root, path)
-    }
-
-    private fun traverse(root: SmithyShapeDefinition, path: List<String>): SmithyShapeDefinition? {
-        var current: SmithyMemberDefinition? = null
-        path.forEach { name ->
-            current = current.let { if (it != null) it.resolve() else root }?.let { next ->
-                //Note: any nested members of document types are inferred to also be documents
-                if (next.type == "document") return next
-                next.getMember(if (next.type == "map") "value" else name)
-            } ?: return null
-        }
-        return current?.resolve()
+        override fun getParent() = enclosingElement
     }
 }

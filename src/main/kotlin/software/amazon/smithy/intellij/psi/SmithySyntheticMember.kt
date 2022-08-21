@@ -11,12 +11,12 @@ package software.amazon.smithy.intellij.psi
 data class SmithySyntheticMember(
     override val enclosingShape: SmithyShapeDefinition,
     val memberName: String,
-    override val declaredTarget: SmithyShapeTarget
 ) : SmithySyntheticElement(), SmithyMemberDefinition {
     private val id = object : SmithySyntheticElement() {
         override fun getText() = name
         override fun getParent() = this@SmithySyntheticMember
     }
+    override lateinit var declaredTarget: SmithyShapeTarget
     override val resolvedTarget get() = declaredTarget
     override val declaredTraits = emptyList<SmithyTraitDefinition>()
     override val syntheticTraits = emptyList<SmithyTraitDefinition>()
