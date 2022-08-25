@@ -76,7 +76,7 @@
         TOKEN_INCOMPLETE_TEXT_BLOCK="regexp:\"\"\"\n((\\['bfnrt/\"\\])|(\\u[0-9A-Fa-f]{4})|(\\?[ !#-\[\]-\U10FFFF])|(\\[\"]{3})|(\\?\r?\n))+"
     ]
     implements("^(?!.*element).*")="software.amazon.smithy.intellij.psi.SmithyElement"
-    implements("array|object|container_body|enum_body|int_enum_body|mixins|operation_body|resource_body|resource_identifiers|resource_properties|resource_operations|resource_collection_operations|resource_resources|service_body|service_operations|service_resources|service_errors|service_renames|applied_trait_body|trait_body")="software.amazon.smithy.intellij.psi.SmithyContainer"
+    implements("array|object|container_body|enum_body|int_enum_body|mixins|operation_body|operation_errors|resource_body|resource_identifiers|resource_properties|resource_operations|resource_collection_operations|resource_resources|service_body|service_operations|service_resources|service_errors|service_renames|applied_trait_body|trait_body")="software.amazon.smithy.intellij.psi.SmithyContainer"
     extends("array|object|primitive")=value
     extends("null|boolean|number|string|text_block|shape_id")=primitive
     extends("symbol|null|boolean|simple_type_name")=id
