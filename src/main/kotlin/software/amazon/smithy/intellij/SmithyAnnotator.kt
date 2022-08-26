@@ -25,6 +25,7 @@ import software.amazon.smithy.intellij.actions.SmithyRemoveMemberQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveMixinQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveResourceReferenceQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveUnusedImportsQuickFix
+import software.amazon.smithy.intellij.psi.SmithyArray
 import software.amazon.smithy.intellij.psi.SmithyBoolean
 import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyElidedMember
@@ -53,6 +54,7 @@ import software.amazon.smithy.intellij.psi.SmithyStatement
 import software.amazon.smithy.intellij.psi.SmithyString
 import software.amazon.smithy.intellij.psi.SmithyTextBlock
 import software.amazon.smithy.intellij.psi.SmithyTrait
+import software.amazon.smithy.intellij.psi.SmithyTraitBody
 import software.amazon.smithy.intellij.psi.SmithyTypes
 import software.amazon.smithy.intellij.psi.SmithyValue
 import java.util.*
@@ -487,12 +489,23 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                                 .create()
                         }
                     } else if (element is SmithyShapeId) {
-                        val enclosingNamespace = (element.containingFile as? SmithyFile)?.model?.namespace
-                        if (target.namespace != enclosingNamespace && target.hasTrait("smithy.api", "private")) {
-                            holder.newAnnotation(
-                                ERROR,
-                                "${element.shapeName} cannot be referenced outside ${target.namespace}"
-                            ).highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL).create()
+                        //Note: these parent checks represent the situations where relationships are not added, so
+                        //private shape access is not validated during build
+                        if (element.parent.let {
+                                //Node values do not introduce relationships
+                                it !is SmithyArray && it !is SmithyEntry && it !is SmithyTraitBody
+                                        //Imports are ignored as all their usages will be annotated
+                                        && it !is SmithyImport
+                                        //Traits are currently ignored (https://github.com/awslabs/smithy/issues/1369)
+                                        && it !is SmithyTrait
+                            }) {
+                            val enclosingNamespace = (element.containingFile as? SmithyFile)?.model?.namespace
+                            if (target.namespace != enclosingNamespace && target.hasTrait("smithy.api", "private")) {
+                                holder.newAnnotation(
+                                    ERROR,
+                                    "${element.shapeName} cannot be referenced outside ${target.namespace}"
+                                ).create()
+                            }
                         }
                         if (target.hasTrait("smithy.api", "deprecated")) {
                             holder.newAnnotation(
