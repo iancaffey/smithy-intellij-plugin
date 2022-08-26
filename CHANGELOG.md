@@ -2,6 +2,13 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.3]
+
+### Changed
+
+- Relaxed private access validation to ignore node values, imports, and traits (and adjusted the highlighting to avoid
+  confusion with missing/unresolved shapes).
+
 ## [2.0.2]
 
 ### Added
