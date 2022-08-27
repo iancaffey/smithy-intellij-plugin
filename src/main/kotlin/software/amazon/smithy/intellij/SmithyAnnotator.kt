@@ -27,12 +27,14 @@ import software.amazon.smithy.intellij.actions.SmithyRemoveResourceReferenceQuic
 import software.amazon.smithy.intellij.actions.SmithyRemoveUnusedImportsQuickFix
 import software.amazon.smithy.intellij.psi.SmithyArray
 import software.amazon.smithy.intellij.psi.SmithyBoolean
+import software.amazon.smithy.intellij.psi.SmithyContainerBody
 import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyElidedMember
 import software.amazon.smithy.intellij.psi.SmithyEntry
 import software.amazon.smithy.intellij.psi.SmithyEnumMember
 import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyIncompleteAppliedTrait
+import software.amazon.smithy.intellij.psi.SmithyIncompleteDefinition
 import software.amazon.smithy.intellij.psi.SmithyIncompleteEntry
 import software.amazon.smithy.intellij.psi.SmithyIncompleteMember
 import software.amazon.smithy.intellij.psi.SmithyIntEnumMember
@@ -58,6 +60,11 @@ import software.amazon.smithy.intellij.psi.SmithyTraitBody
 import software.amazon.smithy.intellij.psi.SmithyTypes
 import software.amazon.smithy.intellij.psi.SmithyValue
 import java.util.*
+import kotlin.String
+import kotlin.also
+import kotlin.let
+import kotlin.takeIf
+import kotlin.to
 
 /**
  * An [Annotator] which provides annotations to [Smithy](https://awslabs.github.io/smithy) model files.
@@ -306,24 +313,35 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
     INCOMPLETE_STRING {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element.elementType == SmithyTypes.TOKEN_INCOMPLETE_STRING) {
-                holder.highlight(ERROR, "Expecting closing quote '\"'")
+                holder.highlight(ERROR, "Expected closing quote '\"'")
             }
             if (element.elementType == SmithyTypes.TOKEN_INCOMPLETE_TEXT_BLOCK) {
-                holder.highlight(ERROR, "Expecting closing quotes '\"\"\"'")
+                holder.highlight(ERROR, "Expected closing quotes '\"\"\"'")
             }
         }
     },
-    INCOMPLETE_TRAIT {
+    INCOMPLETE_DEFINITION {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-            if (element is SmithyIncompleteAppliedTrait) {
-                holder.highlight(ERROR, "Missing trait")
+            if (element is SmithyIncompleteDefinition) {
+                val message = when (element.parent) {
+                    is SmithyContainerBody -> "Expected member declaration"
+                    else -> "Expected shape declaration"
+                }
+                holder.highlight(ERROR, message)
             }
         }
     },
     INCOMPLETE_MEMBER {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element is SmithyIncompleteEntry || element is SmithyIncompleteMember) {
-                holder.highlight(ERROR, "Missing shape id")
+                holder.highlight(ERROR, "Expected shape id")
+            }
+        }
+    },
+    INCOMPLETE_TRAIT {
+        override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+            if (element is SmithyIncompleteAppliedTrait) {
+                holder.highlight(ERROR, "Expected trait")
             }
         }
     },

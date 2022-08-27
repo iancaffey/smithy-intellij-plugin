@@ -89,8 +89,8 @@
 }
 //https://awslabs.github.io/smithy/1.0/spec/core/idl.html
 root ::= [model]
-model ::= control* metadata* [namespace import* (applied_trait | incomplete_applied_trait | shape)*] {
-    methods=[control="" metadata="" namespace="" shape="" imports="import" applied_traits="applied_trait" incomplete_applied_trait=""]
+model ::= control* metadata* [namespace import* (applied_trait | incomplete_applied_trait | shape | incomplete_definition)*] {
+    methods=[control="" metadata="" namespace="" shape="" imports="import" applied_traits="applied_trait" incomplete_applied_trait="" incomplete_definition=""]
     implements="software.amazon.smithy.intellij.psi.SmithyModelExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyModelMixin"
 }
@@ -275,8 +275,8 @@ resource_collection_operations ::= TOKEN_COLLECTION_OPERATIONS TOKEN_COLON TOKEN
 resource_resources ::= TOKEN_RESOURCES TOKEN_COLON TOKEN_OPEN_BRACKET (shape_id [TOKEN_COMMA])* TOKEN_CLOSE_BRACKET {
     methods=[shapes="shape_id"]
 }
-container_body ::= TOKEN_OPEN_BRACE ((container_member | elided_member | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
-    methods=[container_member="" elided_member="" incomplete_member=""]
+container_body ::= TOKEN_OPEN_BRACE ((container_member | elided_member | incomplete_definition | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
+    methods=[container_member="" elided_member="" incomplete_definition="" incomplete_member=""]
     implements="software.amazon.smithy.intellij.psi.SmithyMemberBodyExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyMemberBodyMixin"
 }
@@ -370,12 +370,14 @@ id ::= symbol | null | boolean | simple_type_name
     methods=[null="" boolean=""]
 }
 
-//Incomplete/intermediate elements which allow for a seamless parsing experience when typing out new entries in higher-level nodes
+//Specialized incomplete/intermediate elements which allow for a seamless parsing experience when typing out new entries
+//in higher-level nodes without dealing with custom pin/recoverWhile logic in existing AST nodes (since this requires all code to check if the AST node is valid/complete)
 //Without these "incomplete" members, the entire file would lose its parser state (and all syntax highlighting/annotations) until the member/entry was completed
 incomplete_applied_trait ::= TOKEN_APPLY (member_id | shape_id){
     implements="software.amazon.smithy.intellij.psi.SmithyIncompleteAppliedTraitExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyIncompleteAppliedTraitMixin"
 }
+incomplete_definition ::= [documentation] trait+
 incomplete_member ::= id [TOKEN_COLON]
 incomplete_entry ::= key [TOKEN_COLON]
 
