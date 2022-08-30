@@ -2,6 +2,18 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.4]
+
+### Added
+
+- Added additional intermediate parsing states to better support typing out structure definitions, starting with
+  documentation and/or traits.
+
+### Changed
+
+- Upgraded all index versions to mitigate issues with failed 2.0 IDL/AST parsing of older plugin versions requiring
+  users to invalidate caches.
+
 ## [2.0.3]
 
 ### Changed
