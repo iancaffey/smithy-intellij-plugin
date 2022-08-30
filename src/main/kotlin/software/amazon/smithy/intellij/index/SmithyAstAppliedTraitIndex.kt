@@ -47,7 +47,7 @@ class SmithyAstAppliedTraitIndex : SmithyStringIndex<AppliedTrait>(excludePsi = 
     }
 
     override fun getName() = NAME
-    override fun getVersion() = 0
+    override fun getVersion() = 2
     override fun getValueExternalizer() = object : DataExternalizer<AppliedTrait> {
         override fun read(`in`: DataInput) = SmithyJson.readValue<AppliedTrait>(`in`.readUTF())
         override fun save(out: DataOutput, appliedTrait: AppliedTrait) {

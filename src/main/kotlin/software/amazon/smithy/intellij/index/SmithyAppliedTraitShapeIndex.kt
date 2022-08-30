@@ -27,7 +27,7 @@ class SmithyAppliedTraitShapeIndex : SmithyStringIndex<Void?>(excludeAst = true)
     }
 
     override fun getName() = NAME
-    override fun getVersion() = 0
+    override fun getVersion() = 2
     override fun getValueExternalizer(): VoidDataExternalizer = VoidDataExternalizer.INSTANCE
     override fun process(file: SmithyFile) = file.model?.appliedTraits?.mapNotNull {
         it.shapeId?.let { id -> id.shapeName to null }

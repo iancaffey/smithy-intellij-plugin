@@ -36,7 +36,7 @@ class SmithyAstShapeIndex : SmithyStringIndex<SmithyAstShape>(excludePsi = true)
     }
 
     override fun getName() = NAME
-    override fun getVersion() = 0
+    override fun getVersion() = 2
     override fun getValueExternalizer(): DataExternalizer<SmithyAstShape> = object : DataExternalizer<SmithyAstShape> {
         override fun save(out: DataOutput, value: SmithyAstShape) {
             out.writeUTF(value.shapeId)

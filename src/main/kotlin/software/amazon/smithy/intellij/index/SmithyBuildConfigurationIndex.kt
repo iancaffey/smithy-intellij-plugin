@@ -52,7 +52,7 @@ class SmithyBuildConfigurationIndex : SingleEntryFileBasedIndexExtension<SmithyB
             override fun read(`in`: DataInput) = SmithyJson.readValue<SmithyBuildConfiguration>(`in`.readUTF())
         }
 
-    override fun getVersion() = 0
+    override fun getVersion() = 2
     override fun getInputFilter() = FileBasedIndex.InputFilter { it.name == "smithy-build.json" }
     override fun dependsOnFileContent() = true
     override fun traceKeyHashToVirtualFileMapping() = true

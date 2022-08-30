@@ -45,7 +45,7 @@ class SmithyShapeNameResolutionHintIndex : SmithyStringIndex<ShapeNameResolution
     }
 
     override fun getName() = NAME
-    override fun getVersion() = 0
+    override fun getVersion() = 2
     override fun getValueExternalizer() = object : DataExternalizer<ShapeNameResolutionHint> {
         override fun save(out: DataOutput, hint: ShapeNameResolutionHint) {
             out.writeUTF(hint.shapeName)
