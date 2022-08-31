@@ -2,6 +2,22 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.5]
+
+### Added
+
+- Added support for member shape ids as node values (and improved the styling of documentation links).
+
+### Fixed
+
+- Updated map key target validation to permit enum shapes.
+- Updated shape resolution within metadata to only resolve to prelude shapes (to avoid accidentally resolving to
+  imported shapes or declared shapes within the enclosing file).
+- Removed grammar support for elided members within enum/intEnum shapes.
+- Added a fallback shape reference to id components of shape ids to allow resolving references when hovering the shape
+  name within imports.
+- Extended the private access validation changes to also include member shape ids.
+
 ## [2.0.4]
 
 ### Added
