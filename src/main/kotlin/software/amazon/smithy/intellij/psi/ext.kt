@@ -23,6 +23,7 @@ import software.amazon.smithy.intellij.SmithyFile
 import software.amazon.smithy.intellij.SmithyKeyReference
 import software.amazon.smithy.intellij.SmithyLanguage
 import software.amazon.smithy.intellij.SmithyMemberReference
+import software.amazon.smithy.intellij.SmithyReference
 import software.amazon.smithy.intellij.SmithyShapeAggregator.getDeclaration
 import software.amazon.smithy.intellij.SmithyShapeReference
 import software.amazon.smithy.intellij.SmithyShapeResolver.getNamespace
@@ -64,11 +65,15 @@ interface SmithyStatement : SmithyElement {
 }
 
 interface SmithyAppliedTraitExt : SmithyStatement {
+    val memberId: SmithyMemberId?
+    val shapeId: SmithyShapeId?
     val target: SmithyDefinition?
     val traits: List<SmithyTrait>
 }
 
 abstract class SmithyAppliedTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyAppliedTrait {
+    override val memberId: SmithyMemberId? get() = findChildByClass(SmithyMemberId::class.java)
+    override val shapeId: SmithyShapeId? get() = findChildByClass(SmithyShapeId::class.java)
     override val target get() = memberId?.resolve() ?: shapeId?.resolve()
     override val traits: List<SmithyTrait>
         get() = getChildOfType(this, SmithyTrait::class.java)?.let { listOf(it) }
@@ -76,16 +81,23 @@ abstract class SmithyAppliedTraitMixin(node: ASTNode) : SmithyPsiElement(node), 
             ?: emptyList()
 }
 
+interface SmithyArrayExt : SmithyValue {
+    override val reference: SmithyShapeReference
+}
+
 abstract class SmithyArrayMixin(node: ASTNode) : SmithyValueImpl(node), SmithyArray {
     override val type = SmithyValueType.ARRAY
+    override val reference by lazy { SmithyShapeReference(this) }
 }
 
 interface SmithyBooleanExt : SmithyPrimitive {
+    override val reference: SmithyShapeReference
     override fun asBoolean(): Boolean
 }
 
 abstract class SmithyBooleanMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyBoolean {
     override val type = SmithyValueType.BOOLEAN
+    override val reference by lazy { SmithyShapeReference(this) }
     override fun asBoolean() = text.toBoolean()
 }
 
@@ -375,15 +387,16 @@ abstract class SmithyMemberBodyMixin(node: ASTNode) : SmithyPsiElement(node), Sm
         get() = getChildrenOfTypeAsList(this, SmithyMemberDefinition::class.java)
 }
 
-interface SmithyMemberIdExt : SmithyElement {
+interface SmithyMemberIdExt : SmithyCharSequence {
+    override val reference: SmithyMemberReference
     val memberName: String
-    val reference: SmithyMemberReference
     fun resolve() = reference.resolve()
 }
 
 abstract class SmithyMemberIdMixin(node: ASTNode) : SmithyPsiElement(node), SmithyMemberId {
     override val memberName: String get() = member.text
     override val reference by lazy { SmithyMemberReference(this) }
+    override fun asString() = shapeId.asString()?.let { "$it$$memberName" } ?: memberName
 }
 
 interface SmithyMemberInitializerExt : SmithyElement {
@@ -454,11 +467,17 @@ abstract class SmithyNamespaceIdMixin(node: ASTNode) : SmithyPsiElement(node), S
     override fun toString() = id
 }
 
+interface SmithyNullExt : SmithyPrimitive {
+    override val reference: SmithyShapeReference
+}
+
 abstract class SmithyNullMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyNull {
     override val type = SmithyValueType.NULL
+    override val reference by lazy { SmithyShapeReference(this) }
 }
 
 interface SmithyNumberExt : SmithyPrimitive {
+    override val reference: SmithyShapeReference
     fun byteValue(): Byte = bigDecimalValue().byteValueExact()
     fun shortValue(): Short = bigDecimalValue().shortValueExact()
     fun intValue(): Int = bigDecimalValue().intValueExact()
@@ -466,14 +485,18 @@ interface SmithyNumberExt : SmithyPrimitive {
     fun doubleValue(): Double = bigDecimalValue().toDouble()
     fun longValue(): Long = bigDecimalValue().longValueExact()
     fun bigDecimalValue(): BigDecimal
-
     fun bigIntegerValue(): BigInteger = bigDecimalValue().toBigIntegerExact()
 }
 
 abstract class SmithyNumberMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyNumber {
     override val type = SmithyValueType.NUMBER
+    override val reference by lazy { SmithyShapeReference(this) }
     override fun asNumber() = bigDecimalValue()
     override fun bigDecimalValue() = BigDecimal(text)
+}
+
+interface SmithyObjectExt : SmithyValue {
+    override val reference: SmithyShapeReference
 }
 
 abstract class SmithyObjectMixin(node: ASTNode) : SmithyValueImpl(node), SmithyObject {
@@ -485,6 +508,7 @@ abstract class SmithyObjectMixin(node: ASTNode) : SmithyValueImpl(node), SmithyO
             value = it
             parsed = true
         }
+    override val reference by lazy { SmithyShapeReference(this) }
 
     override fun subtreeChanged() {
         parsed = false
@@ -756,14 +780,16 @@ abstract class SmithyShapeMixin(node: ASTNode) : SmithyPsiElement(node), SmithyS
 }
 
 interface SmithyShapeIdExt : SmithyCharSequence, SmithyShapeTarget, PsiNamedElement {
+    override val reference: SmithyShapeReference
     val enclosingNamespace: String?
 }
 
 abstract class SmithyShapeIdMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyShapeId {
+    override val reference by lazy { SmithyShapeReference(this) }
     override val shapeName: String get() = id.text
     override val declaredNamespace get() = namespaceId?.id
     override val enclosingNamespace get() = (containingFile as SmithyFile).model?.namespace
-    override val resolvedNamespace: String? get() = declaredNamespace ?: getNamespace(shapeName, containingFile)
+    override val resolvedNamespace: String? get() = declaredNamespace ?: getNamespace(this, shapeName)
     override fun asString() = resolvedNamespace?.let { "$it#$shapeName" } ?: shapeName
     override fun getName() = shapeName
     override fun setName(newName: String) = setName<SmithyShapeId>(this, id, newName)
@@ -817,7 +843,9 @@ interface SmithyCharSequence : SmithyPrimitive {
     val valid: Boolean get() = asString() != null
 }
 
-interface SmithyStringExt : SmithyCharSequence
+interface SmithyStringExt : SmithyCharSequence {
+    override val reference: SmithyShapeReference
+}
 
 abstract class SmithyStringMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyString {
     private var parsed = false
@@ -827,13 +855,16 @@ abstract class SmithyStringMixin(node: ASTNode) : SmithyPrimitiveImpl(node), Smi
             value = it
             parsed = true
         }
+    override val reference by lazy { SmithyShapeReference(this) }
 
     override fun subtreeChanged() {
         parsed = false
     }
 }
 
-interface SmithyTextBlockExt : SmithyCharSequence
+interface SmithyTextBlockExt : SmithyCharSequence {
+    override val reference: SmithyShapeReference
+}
 
 abstract class SmithyTextBlockMixin(node: ASTNode) : SmithyPrimitiveImpl(node), SmithyTextBlock {
     private var parsed = false
@@ -854,6 +885,7 @@ abstract class SmithyTextBlockMixin(node: ASTNode) : SmithyPrimitiveImpl(node), 
             value = it
             parsed = true
         }
+    override val reference by lazy { SmithyShapeReference(this) }
 
     override fun subtreeChanged() {
         parsed = false
@@ -914,7 +946,7 @@ abstract class SmithyTraitMixin(node: ASTNode) : SmithyPsiElement(node), SmithyT
 }
 
 interface SmithyValueExt : SmithyElement, SmithyValueDefinition {
-    val reference: SmithyShapeReference
+    val reference: SmithyReference
 }
 
 abstract class SmithyValueMixin(node: ASTNode) : SmithyPsiElement(node), SmithyValue {

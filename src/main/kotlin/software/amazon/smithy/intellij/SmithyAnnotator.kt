@@ -41,6 +41,7 @@ import software.amazon.smithy.intellij.psi.SmithyIntEnumMember
 import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyMap
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
+import software.amazon.smithy.intellij.psi.SmithyMemberId
 import software.amazon.smithy.intellij.psi.SmithyMemberInitializer
 import software.amazon.smithy.intellij.psi.SmithyMemberName
 import software.amazon.smithy.intellij.psi.SmithyMetadata
@@ -61,11 +62,6 @@ import software.amazon.smithy.intellij.psi.SmithyTraitBody
 import software.amazon.smithy.intellij.psi.SmithyTypes
 import software.amazon.smithy.intellij.psi.SmithyValue
 import java.util.*
-import kotlin.String
-import kotlin.also
-import kotlin.let
-import kotlin.takeIf
-import kotlin.to
 
 /**
  * An [Annotator] which provides annotations to [Smithy](https://awslabs.github.io/smithy) model files.
@@ -515,16 +511,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                                 .create()
                         }
                     } else if (element is SmithyShapeId) {
-                        //Note: these parent checks represent the situations where relationships are not added, so
-                        //private shape access is not validated during build
-                        if (element.parent.let {
-                                //Node values do not introduce relationships
-                                it !is SmithyArray && it !is SmithyEntry && it !is SmithyTraitBody
-                                        //Imports are ignored as all their usages will be annotated
-                                        && it !is SmithyImport
-                                        //Traits are currently ignored (https://github.com/awslabs/smithy/issues/1369)
-                                        && it !is SmithyTrait
-                            }) {
+                        if (requiresPrivateAccessCheck(element.parent)) {
                             val enclosingNamespace = (element.containingFile as? SmithyFile)?.model?.namespace
                             if (target.namespace != enclosingNamespace && target.hasTrait("smithy.api", "private")) {
                                 holder.newAnnotation(
@@ -548,6 +535,18 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                     }
                 }
             }
+        }
+
+        private fun requiresPrivateAccessCheck(element: PsiElement): Boolean {
+            //Note: these parent checks represent the situations where relationships are not added, so
+            //private shape access is not validated during build
+            if (element is SmithyMemberId) return requiresPrivateAccessCheck(element.parent)
+            //Node values do not introduce relationships
+            return element !is SmithyArray && element !is SmithyEntry && element !is SmithyTraitBody
+                    //Imports are ignored as all their usages will be annotated
+                    && element !is SmithyImport
+                    //Traits are currently ignored (https://github.com/awslabs/smithy/issues/1369)
+                    && element !is SmithyTrait
         }
     }
 }
