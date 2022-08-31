@@ -123,8 +123,8 @@ enum ::= [documentation] trait* TOKEN_ENUM shape_name [mixins] enum_body {
     methods=[trait="" shape_name="" mixins="" body="enum_body"]
     mixin="software.amazon.smithy.intellij.psi.SmithyEnumMixin"
 }
-enum_body ::= TOKEN_OPEN_BRACE ((enum_member | elided_member | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
-    methods=[enum_member="" elided_member="" incomplete_member=""]
+enum_body ::= TOKEN_OPEN_BRACE ((enum_member | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
+    methods=[enum_member="" incomplete_member=""]
     implements="software.amazon.smithy.intellij.psi.SmithyMemberBodyExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyMemberBodyMixin"
 }
@@ -138,8 +138,8 @@ int_enum ::= [documentation] trait* TOKEN_INT_ENUM shape_name [mixins] int_enum_
     methods=[trait="" shape_name="" mixins="" body="int_enum_body"]
     mixin="software.amazon.smithy.intellij.psi.SmithyIntEnumMixin"
 }
-int_enum_body ::= TOKEN_OPEN_BRACE ((int_enum_member | elided_member | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
-    methods=[int_enum_member="" elided_member="" incomplete_member=""]
+int_enum_body ::= TOKEN_OPEN_BRACE ((int_enum_member | incomplete_member) [TOKEN_COMMA])* TOKEN_CLOSE_BRACE {
+    methods=[int_enum_member="" incomplete_member=""]
     implements="software.amazon.smithy.intellij.psi.SmithyMemberBodyExt"
     mixin="software.amazon.smithy.intellij.psi.SmithyMemberBodyMixin"
 }
