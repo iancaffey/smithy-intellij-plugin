@@ -398,12 +398,12 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
             }
         }
     },
-    MAP_KEY_STRING_TARGET {
+    MAP_KEY_TARGET {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             if (element is SmithyMemberDefinition && element.name == "key" && element.enclosingShape is SmithyMap) {
                 val target = element.resolve()
-                if (target != null && target.type != "string") {
-                    holder.highlight(ERROR, "'key' must target a string shape")
+                if (target != null && target.type != "string" && target.type != "enum") {
+                    holder.highlight(ERROR, "'key' must target a string or enum shape")
                 }
             }
         }
