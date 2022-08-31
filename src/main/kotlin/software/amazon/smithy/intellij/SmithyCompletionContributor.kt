@@ -154,7 +154,10 @@ private fun shapeElement(
     shapeName: String
 ): LookupElementBuilder {
     val withinMetadata = getParentOfType(element, SmithyMetadata::class.java) != null
-    val importRequired = !withinMetadata && getParentOfType(element, SmithyImport::class.java) == null
+    val hasConflicts = (element.containingFile as? SmithyFile)?.model?.shapes?.any {
+        it.shapeName == shapeName && namespace != it.namespace
+    } == true
+    val importRequired = !withinMetadata && !hasConflicts && getParentOfType(element, SmithyImport::class.java) == null
     val qualifiedName = "$namespace#$shapeName"
     return LookupElementBuilder.create(
         qualifiedName, //used to disambiguate amongst other lookup elements
