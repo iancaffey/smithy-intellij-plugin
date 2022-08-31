@@ -43,6 +43,7 @@ import software.amazon.smithy.intellij.psi.SmithyMap
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
 import software.amazon.smithy.intellij.psi.SmithyMemberInitializer
 import software.amazon.smithy.intellij.psi.SmithyMemberName
+import software.amazon.smithy.intellij.psi.SmithyMetadata
 import software.amazon.smithy.intellij.psi.SmithyMixins
 import software.amazon.smithy.intellij.psi.SmithyModel
 import software.amazon.smithy.intellij.psi.SmithyNull
@@ -423,7 +424,10 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
     },
     IMPORT_OPTIMIZER {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-            if (element is SmithyShapeId && element.parent !is SmithyImport) {
+            if (element is SmithyShapeId
+                && element.parent !is SmithyImport
+                && getParentOfType(element, SmithyMetadata::class.java) == null
+            ) {
                 element.namespaceId?.let { namespaceId ->
                     val conflicts = getParentOfType(element, SmithyModel::class.java)?.shapes?.any {
                         it.name == element.shapeName && it.namespace != namespaceId.id
@@ -500,7 +504,11 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                             holder.newAnnotation(ERROR, "Unresolved shape: ${element.text}")
                                 .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
                                 .also {
-                                    if (element is SmithyShapeId) {
+                                    if (element is SmithyShapeId && getParentOfType(
+                                            element,
+                                            SmithyMetadata::class.java
+                                        ) == null
+                                    ) {
                                         it.withFix(SmithyImportShapeQuickFix(element.shapeName, element.containingFile))
                                     }
                                 }

@@ -20,6 +20,7 @@ import software.amazon.smithy.intellij.psi.SmithyImport
 import software.amazon.smithy.intellij.psi.SmithyIncompleteEntry
 import software.amazon.smithy.intellij.psi.SmithyIncompleteMember
 import software.amazon.smithy.intellij.psi.SmithyMemberId
+import software.amazon.smithy.intellij.psi.SmithyMetadata
 import software.amazon.smithy.intellij.psi.SmithyObject
 import software.amazon.smithy.intellij.psi.SmithyOperationBody
 import software.amazon.smithy.intellij.psi.SmithyResourceBody
@@ -110,10 +111,9 @@ class SmithyCompletionContributor : CompletionContributor() {
 }
 
 private fun addShapes(element: PsiElement, results: CompletionResultSet) {
-    val addImports = getParentOfType(element, SmithyImport::class.java) == null
     SmithyDefinedShapeIdIndex.forEach(element.resolveScope) {
         val (namespace, shapeName) = it.split('#', limit = 2)
-        results.addElement(shapeElement(namespace, shapeName, addImports))
+        results.addElement(shapeElement(element, namespace, shapeName))
     }
 }
 
@@ -148,15 +148,24 @@ private fun addMembers(element: PsiElement, prefix: String, results: CompletionR
     }
 }
 
-private fun shapeElement(namespace: String, shapeName: String, addImports: Boolean): LookupElementBuilder {
+private fun shapeElement(
+    element: PsiElement,
+    namespace: String,
+    shapeName: String
+): LookupElementBuilder {
+    val withinMetadata = getParentOfType(element, SmithyMetadata::class.java) != null
+    val importRequired = !withinMetadata && getParentOfType(element, SmithyImport::class.java) == null
     val qualifiedName = "$namespace#$shapeName"
-    return LookupElementBuilder.create(if (addImports) shapeName else qualifiedName)
+    return LookupElementBuilder.create(
+        qualifiedName, //used to disambiguate amongst other lookup elements
+        if (importRequired || (withinMetadata && namespace == "smithy.api")) shapeName else qualifiedName //the text which is actually inserted
+    )
         .withIcon(SmithyIcons.SHAPE)
         .withPresentableText(shapeName)
         .withLookupString(shapeName)
         .withLookupString(qualifiedName)
         .withTailText("($namespace)")
-        .applyIf(addImports) {
+        .applyIf(importRequired) {
             withInsertHandler { context, _ ->
                 context.file.let { it as? SmithyFile }?.let {
                     val model = it.model ?: return@let

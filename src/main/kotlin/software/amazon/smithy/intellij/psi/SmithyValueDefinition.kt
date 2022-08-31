@@ -93,7 +93,8 @@ interface SmithyValueDefinition : SmithyElement {
                             append(
                                 generateLink(
                                     value,
-                                    if (getNamespace(shapeName, containingFile) != namespace) value else relativeId
+                                    if (getNamespace(this@SmithyValueDefinition, shapeName) != namespace) value
+                                    else relativeId
                                 )
                             )
                             return@buildString
@@ -102,7 +103,8 @@ interface SmithyValueDefinition : SmithyElement {
                         append(
                             generateLink(
                                 value,
-                                if (getNamespace(relativeId, containingFile) != namespace) value else relativeId
+                                if (getNamespace(this@SmithyValueDefinition, relativeId) != namespace) value
+                                else relativeId
                             )
                         )
                         return@buildString

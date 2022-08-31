@@ -1,15 +1,16 @@
 package software.amazon.smithy.intellij
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager.getCachedValue
 import com.intellij.psi.util.PsiModificationTracker
+import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import software.amazon.smithy.intellij.index.SmithyAstShapeIndex
 import software.amazon.smithy.intellij.index.SmithyDefinedShapeIdIndex
 import software.amazon.smithy.intellij.index.SmithyShapeNameResolutionHintIndex
+import software.amazon.smithy.intellij.psi.SmithyMetadata
 import software.amazon.smithy.intellij.psi.SmithyShapeDefinition
 import software.amazon.smithy.intellij.psi.SmithyShapeId
 import software.amazon.smithy.intellij.psi.SmithyTraitDefinition
@@ -59,9 +60,11 @@ object SmithyShapeResolver {
         return definitions
     }
 
-    fun getNamespace(shapeName: String, enclosingFile: PsiFile): String? {
-        val scope = enclosingFile.resolveScope
-        val hint = SmithyShapeNameResolutionHintIndex.getHint(shapeName, enclosingFile)
+    fun getNamespace(element: PsiElement, shapeName: String): String? {
+        //Note: relative shapes within metadata can only refer to prelude shapes (even if imported later on in the file)
+        getParentOfType(element, SmithyMetadata::class.java)?.let { return "smithy.api" }
+        val scope = element.resolveScope
+        val hint = SmithyShapeNameResolutionHintIndex.getHint(shapeName, element.containingFile)
         return when {
             hint == null -> null //Note: only happens when the project hasn't completed indexing
             hint.resolvedNamespace != null -> hint.resolvedNamespace
