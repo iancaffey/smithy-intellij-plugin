@@ -15,6 +15,7 @@ import software.amazon.smithy.intellij.psi.SmithyArray
 import software.amazon.smithy.intellij.psi.SmithyControl
 import software.amazon.smithy.intellij.psi.SmithyDefinition
 import software.amazon.smithy.intellij.psi.SmithyEntry
+import software.amazon.smithy.intellij.psi.SmithyId
 import software.amazon.smithy.intellij.psi.SmithyKey
 import software.amazon.smithy.intellij.psi.SmithyMemberDefinition
 import software.amazon.smithy.intellij.psi.SmithyMemberId
@@ -137,6 +138,18 @@ data class SmithyKeyReference(val key: SmithyKey) : SmithyReference(key, soft = 
     ) : SmithySyntheticElement() {
         override fun getParent() = trait
     }
+}
+
+/**
+ * A [PsiReference] from a [SmithyId] to a [SmithyShapeDefinition] (through its parent [SmithyShapeId]).
+ *
+ * [SmithyKey] from fields within a [SmithyTrait] are resolved to their corresponding nested member.
+ *
+ * @author Ian Caffey
+ * @since 1.0
+ */
+data class SmithyIdReference(val id: SmithyId) : SmithyReference(id, soft = id.parent !is SmithyShapeId) {
+    override fun resolve() = (id.parent as? SmithyShapeId)?.resolve()
 }
 
 /**

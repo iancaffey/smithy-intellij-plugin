@@ -20,6 +20,7 @@ import com.intellij.psi.util.PsiTreeUtil.getChildrenOfTypeAsList
 import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import com.intellij.psi.util.siblings
 import software.amazon.smithy.intellij.SmithyFile
+import software.amazon.smithy.intellij.SmithyIdReference
 import software.amazon.smithy.intellij.SmithyKeyReference
 import software.amazon.smithy.intellij.SmithyLanguage
 import software.amazon.smithy.intellij.SmithyMemberReference
@@ -254,6 +255,10 @@ abstract class SmithyEnumMemberMixin(node: ASTNode) : SmithyPsiElement(node), Sm
     override fun subtreeChanged() {
         _syntheticTraits = null
     }
+}
+
+abstract class SmithyIdMixin(node: ASTNode) : SmithyPsiElement(node), SmithyId {
+    val reference by lazy { SmithyIdReference(this) }
 }
 
 interface SmithyImportExt : SmithyStatement
@@ -855,6 +860,7 @@ abstract class SmithyStringMixin(node: ASTNode) : SmithyPrimitiveImpl(node), Smi
             value = it
             parsed = true
         }
+
     override val reference by lazy { SmithyShapeReference(this) }
 
     override fun subtreeChanged() {
@@ -885,6 +891,7 @@ abstract class SmithyTextBlockMixin(node: ASTNode) : SmithyPrimitiveImpl(node), 
             value = it
             parsed = true
         }
+
     override val reference by lazy { SmithyShapeReference(this) }
 
     override fun subtreeChanged() {

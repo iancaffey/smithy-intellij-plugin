@@ -370,6 +370,7 @@ id ::= symbol | null | boolean | simple_type_name
        | TOKEN_PUT | TOKEN_READ | TOKEN_UPDATE | TOKEN_DELETE | TOKEN_COLLECTION_OPERATIONS | TOKEN_ENUM | TOKEN_INT_ENUM
        | TOKEN_FOR | TOKEN_WITH {
     methods=[null="" boolean=""]
+    mixin="software.amazon.smithy.intellij.psi.SmithyIdMixin"
 }
 
 //Specialized incomplete/intermediate elements which allow for a seamless parsing experience when typing out new entries
