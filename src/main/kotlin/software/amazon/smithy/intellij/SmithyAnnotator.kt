@@ -74,7 +74,7 @@ import java.util.*
 class SmithyAnnotator : Annotator {
     private val annotations = EnumSet.allOf(Annotation::class.java)
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-        val version = (element.containingFile as? SmithyFile)?.let { it.buildConfig?.version }
+        val version = (element.containingFile as? SmithyFile)?.model?.version
         annotations.forEach {
             if ((it.sinceVersion == null || version != null && SmithyVersion.compare(version, it.sinceVersion) >= 0)
                 && (it.untilVersion == null || version != null && SmithyVersion.compare(version, it.untilVersion) <= 0)
