@@ -226,7 +226,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
     },
     UNNECESSARY_COMMAS(sinceVersion = "2.0") {
         override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-            if (element.elementType == SmithyTypes.TOKEN_COMMA) {
+            if (SmithyRemoveCommasQuickFix.isUnnecessaryComma(element)) {
                 holder.newAnnotation(INFORMATION, "Remove unnecessary commas")
                     .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL)
                     .withFix(SmithyRemoveCommasQuickFix)
