@@ -2,6 +2,19 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.6]
+
+### Changed
+
+- Improved shape name code completion to keep qualified shape ids if they would conflict with shape definitions in the
+  enclosing file while imported.
+- Updated the quick fix for unnecessary commas to align with Smithy style guidelines (keeping commas on node values and
+  traits defined on a single line).
+
+### Fixed
+
+- Adjusted the behavior when validating Smithy language features to only use the enclosing model file version.
+
 ## [2.0.5]
 
 ### Added
