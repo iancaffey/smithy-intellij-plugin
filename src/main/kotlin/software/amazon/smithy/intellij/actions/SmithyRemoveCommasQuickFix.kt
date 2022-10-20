@@ -28,7 +28,7 @@ object SmithyRemoveCommasQuickFix : BaseIntentionAction() {
         if (element.elementType != SmithyTypes.TOKEN_COMMA) return false
         val parent = getParentOfType(element, SmithyValue::class.java)
             ?: getParentOfType(element, SmithyTraitBody::class.java)
-            ?: return true
+            ?: element.parent
         val document = element.containingFile.viewProvider.document
         return document.getLineNumber(parent.textOffset) != document.getLineNumber(parent.textOffset + parent.textLength)
     }
