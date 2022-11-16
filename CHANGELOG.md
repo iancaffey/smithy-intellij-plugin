@@ -2,6 +2,13 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.7]
+
+### Fixed
+
+- Added support for renaming all shape reference variants.
+- Extended Smithy IDL grammar to support horizontal tabs within strings and text blocks.
+
 ## [2.0.6]
 
 ### Changed
