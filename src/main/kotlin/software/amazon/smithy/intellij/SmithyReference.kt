@@ -48,6 +48,8 @@ sealed class SmithyReference(element: PsiElement, soft: Boolean) : PsiReferenceB
         return range
     }
 
+    override fun handleElementRename(newElementName: String) = element.also { it.rename(newElementName) }
+
     abstract override fun resolve(): SmithyDefinition?
 }
 
@@ -77,6 +79,7 @@ data class SmithyKeyReference(val key: SmithyKey) : SmithyReference(key, soft = 
                                 declaredTarget = target
                             }
                         }
+
                         "smithy.api#ExampleError" -> {
                             if (ref.memberName == "content") {
                                 val target = ref.enclosing?.fields?.get("shapeId") as? SmithyShapeTarget
@@ -123,13 +126,6 @@ data class SmithyKeyReference(val key: SmithyKey) : SmithyReference(key, soft = 
 
     override fun getAbsoluteRange(): TextRange = myElement.textRange
     override fun resolve() = ref?.let { getCachedValue(it, resolver(it)) }
-    override fun handleElementRename(newElementName: String): SmithyKey {
-        val textRange = key.textRange
-        val document = FileDocumentManager.getInstance().getDocument(key.containingFile.virtualFile)
-        document!!.replaceString(textRange.startOffset, textRange.endOffset, newElementName)
-        PsiDocumentManager.getInstance(key.project).commitDocument(document)
-        return key
-    }
 
     //Note: the path from the enclosing trait to the value can change (e.g. if the enclosing field is renamed), so
     //this PsiElement serves as the representative context for the CachedValue computation (with a well-formed equals/hashCode)
@@ -164,13 +160,7 @@ data class SmithyMemberReference(val id: SmithyMemberId) : SmithyReference(id, s
     override fun isSoft() = id.shapeId.reference.isSoft
     override fun getAbsoluteRange(): TextRange = id.member.textRange
     override fun resolve() = id.shapeId.reference.resolve()?.getMember(id.memberName)
-    override fun handleElementRename(newElementName: String): SmithyMemberId {
-        val textRange = id.member.textRange
-        val document = FileDocumentManager.getInstance().getDocument(id.containingFile.virtualFile)
-        document!!.replaceString(textRange.startOffset, textRange.endOffset, newElementName)
-        PsiDocumentManager.getInstance(id.project).commitDocument(document)
-        return id
-    }
+    override fun handleElementRename(newElementName: String) = id.rename(newElementName) { it.member }
 }
 
 /**
@@ -196,7 +186,6 @@ private data class ById(val shapeId: SmithyShapeId) : SmithyShapeReference(shape
     }
 
     override fun getAbsoluteRange(): TextRange = myElement.textRange
-    override fun handleElementRename(newElementName: String): PsiElement = shapeId.setName(newElementName)
     override fun resolve(): SmithyShapeDefinition? = getCachedValue(shapeId, resolver(shapeId))
 }
 
@@ -210,6 +199,7 @@ private data class ByValue(val value: SmithyValue) : SmithyShapeReference(value,
                         val enclosing = parent.reference.resolve()
                         if (enclosing?.type == "document") enclosing else enclosing?.getMember("member")?.resolve()
                     }
+
                     is SmithyEntry -> parent.key.reference.resolve()?.resolve()
                     is SmithyMemberInitializer -> {
                         val member = parent.enclosingMember
@@ -218,6 +208,7 @@ private data class ByValue(val value: SmithyValue) : SmithyShapeReference(value,
                         //references, the enum values will refer to the parent enum shape
                         if (enclosingShape.type.let { it == "enum" || it == "intEnum" }) enclosingShape else member.resolve()
                     }
+
                     is SmithyTraitBody -> ref.enclosingTrait?.resolve()
                     else -> null //control + key + metadata
                 },
@@ -235,14 +226,6 @@ private data class ByValue(val value: SmithyValue) : SmithyShapeReference(value,
             getCachedValue(it, resolver(it))
         }
 
-    override fun handleElementRename(newElementName: String): SmithyValue {
-        val textRange = value.textRange
-        val document = FileDocumentManager.getInstance().getDocument(value.containingFile.virtualFile)
-        document!!.replaceString(textRange.startOffset, textRange.endOffset, newElementName)
-        PsiDocumentManager.getInstance(value.project).commitDocument(document)
-        return value
-    }
-
     //Note: the path from the enclosing trait to the value can change (e.g. if the enclosing field is renamed), so
     //this PsiElement serves as the representative context for the CachedValue computation (with a well-formed equals/hashCode)
     private data class Ref(
@@ -252,4 +235,12 @@ private data class ByValue(val value: SmithyValue) : SmithyShapeReference(value,
     ) : SmithySyntheticElement() {
         override fun getParent() = enclosingElement
     }
+}
+
+private fun <T : PsiElement> T.rename(name: String, target: (T) -> PsiElement = { it }) = also {
+    val element = target(this)
+    val textRange = element.textRange
+    val document = FileDocumentManager.getInstance().getDocument(containingFile.virtualFile)
+    document!!.replaceString(textRange.startOffset, textRange.endOffset, name)
+    PsiDocumentManager.getInstance(project).commitDocument(document)
 }
