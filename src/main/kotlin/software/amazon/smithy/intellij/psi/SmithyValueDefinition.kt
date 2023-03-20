@@ -1,5 +1,6 @@
 package software.amazon.smithy.intellij.psi
 
+import com.google.common.html.HtmlEscapers
 import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.appendStyledSpan
 import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.getStyledSpan
 import software.amazon.smithy.intellij.SmithyColorSettings
@@ -33,6 +34,7 @@ interface SmithyValueDefinition : SmithyElement {
                 values[it].equivalentTo(otherValues[it])
             }
         }
+
         SmithyValueType.BOOLEAN -> asBoolean() == other.asBoolean()
         SmithyValueType.NULL -> true
         SmithyValueType.NUMBER -> asNumber() == other.asNumber()
@@ -44,6 +46,7 @@ interface SmithyValueDefinition : SmithyElement {
                 otherValue != null && value.equivalentTo(otherValue)
             }
         }
+
         SmithyValueType.STRING -> asString() == other.asString()
     }
 
@@ -53,6 +56,7 @@ interface SmithyValueDefinition : SmithyElement {
         type == SmithyValueType.ARRAY -> SmithySyntheticValue.Array(listOf(values, other.values).flatten().map {
             SmithySyntheticValue.from(it)
         })
+
         else -> null
     }
 
@@ -66,6 +70,7 @@ interface SmithyValueDefinition : SmithyElement {
                 }
                 append("]")
             }
+
             SmithyValueType.BOOLEAN -> appendStyledSpan(this, SmithyColorSettings.KEYWORD, asBoolean().toString(), 1f)
             SmithyValueType.NULL -> appendStyledSpan(this, SmithyColorSettings.KEYWORD, "null", 1f)
             SmithyValueType.NUMBER -> appendStyledSpan(
@@ -74,6 +79,7 @@ interface SmithyValueDefinition : SmithyElement {
                 asNumber()?.toPlainString() ?: "NaN",
                 1f
             )
+
             SmithyValueType.OBJECT -> {
                 append("{")
                 fields.onEachIndexed { i, (key, value) ->
@@ -84,6 +90,7 @@ interface SmithyValueDefinition : SmithyElement {
                 }
                 append("}")
             }
+
             SmithyValueType.STRING -> {
                 val value = asString()
                 if (value != null && "#" in value) {
@@ -116,7 +123,7 @@ interface SmithyValueDefinition : SmithyElement {
                 appendStyledSpan(
                     this,
                     SmithyColorSettings.STRING,
-                    SmithyJson.writeValueAsString(value),
+                    HtmlEscapers.htmlEscaper().escape(SmithyJson.writeValueAsString(value)),
                     1f
                 )
             }
