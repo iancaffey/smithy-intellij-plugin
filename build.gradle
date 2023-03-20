@@ -9,7 +9,7 @@ plugins {
 apply plugin: 'org.jetbrains.changelog'
 
 group 'software.amazon.smithy'
-version '2.0.7'
+version '2.0.8'
 
 repositories {
     mavenCentral()

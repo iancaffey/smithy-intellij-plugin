@@ -2,6 +2,13 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.8]
+
+### Fixed
+
+- Added HTML escaping to avoid rendering issues when displaying values (e.g. default/enum values) with reserved
+  characters in documentation windows.
+
 ## [2.0.7]
 
 ### Fixed
