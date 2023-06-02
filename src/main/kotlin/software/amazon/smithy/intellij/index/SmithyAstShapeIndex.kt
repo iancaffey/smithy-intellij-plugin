@@ -36,16 +36,21 @@ class SmithyAstShapeIndex : SmithyStringIndex<SmithyAstShape>(excludePsi = true)
     }
 
     override fun getName() = NAME
-    override fun getVersion() = 2
+    override fun getVersion() = 3
     override fun getValueExternalizer(): DataExternalizer<SmithyAstShape> = object : DataExternalizer<SmithyAstShape> {
         override fun save(out: DataOutput, value: SmithyAstShape) {
             out.writeUTF(value.shapeId)
-            out.writeUTF(SmithyJson.writeValueAsString(value.shape))
+            val json = SmithyJson.writeValueAsString(value.shape)
+            out.writeInt(json.length)
+            out.writeChars(json)
         }
 
         override fun read(`in`: DataInput): SmithyAstShape {
             val shapeId = `in`.readUTF()
-            val shape = SmithyJson.readValue<SmithyAst.Shape>(`in`.readUTF())
+            val length = `in`.readInt()
+            val chars = CharArray(length)
+            (0 until length).forEach { i -> chars[i] = `in`.readChar() }
+            val shape = SmithyJson.readValue<SmithyAst.Shape>(String(chars))
             return SmithyAstShape(shapeId, shape)
         }
     }
