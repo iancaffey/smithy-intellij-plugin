@@ -75,6 +75,8 @@
         <defaultTemplatePropertiesProvider
                 implementation="software.amazon.smithy.intellij.SmithyTemplatePropertiesProvider"/>
         <editorNotificationProvider
+                implementation="software.amazon.smithy.intellij.SmithyMissingPreludeNotificationProvider"/>
+        <editorNotificationProvider
                 implementation="software.amazon.smithy.intellij.SmithyMissingSourceRootNotificationProvider"/>
         <enterHandlerDelegate implementation="software.amazon.smithy.intellij.SmithyDocumentationEnterHandler"/>
         <fileBasedIndex implementation="software.amazon.smithy.intellij.index.SmithyAppliedTraitMemberIndex"/>
