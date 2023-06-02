@@ -2,6 +2,13 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.10]
+
+### Fixed
+
+- Fixed infinite re-indexing when attempting to cache AST files from Smithy dependencies when individual shapes exceeded
+  65kb
+
 ## [2.0.9]
 
 ### Added
