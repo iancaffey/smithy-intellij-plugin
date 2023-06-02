@@ -2,6 +2,13 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.9]
+
+### Added
+
+- Added a notification when the Smithy prelude cannot be found to offer better assistance with project setup issues.
+- Enhanced source root handling in Gradle projects by directly adding the source directories to the build script.
+
 ## [2.0.8]
 
 ### Fixed
