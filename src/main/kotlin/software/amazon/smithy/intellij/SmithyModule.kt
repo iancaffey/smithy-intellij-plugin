@@ -18,6 +18,15 @@ import software.amazon.smithy.intellij.index.SmithyBuildConfigurationIndex
  * @since 1.0
  */
 object SmithyModule {
+    fun findGradleBuildFile(module: Module) = module.rootManager.contentRoots.firstNotNullOfOrNull {
+        //Looks for standard build files first, but still supports non-standard if necessary
+        it.children.first { child -> child.name == "build.gradle" || child.name == "build.gradle.kts" }
+            ?: it.children.first { child ->
+                !child.isDirectory && child.name != ".gradle" && !child.name.startsWith("settings")
+                        && (child.name.endsWith(".gradle") || child.name.endsWith(".gradle.kts"))
+            }
+    }
+
     fun inferSourceRoot(file: VirtualFile, contentRoot: ContentEntry): VirtualFile? {
         val root = contentRoot.file ?: return null
         val path = root.toNioPath()
