@@ -48,7 +48,10 @@ class SmithyFormattingModelBuilder : FormattingModelBuilder {
             //Space before container bodies (to add separation from the shape name or traits for inline I/O)
             .before(
                 TokenSet.create(
-                    SmithyTypes.CONTAINER_BODY, SmithyTypes.ENUM_BODY, SmithyTypes.INT_ENUM_BODY
+                    SmithyTypes.CONTAINER_BODY,
+                    SmithyTypes.ENUM_BODY,
+                    SmithyTypes.INT_ENUM_BODY,
+                    SmithyTypes.MEMBER_INITIALIZER
                 )
             ).spaces(1)
             //Space after : and ,
