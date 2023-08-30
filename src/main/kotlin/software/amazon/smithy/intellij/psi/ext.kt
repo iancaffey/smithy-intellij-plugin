@@ -468,7 +468,7 @@ interface SmithyNamespaceIdExt : SmithyElement {
 }
 
 abstract class SmithyNamespaceIdMixin(node: ASTNode) : SmithyPsiElement(node), SmithyNamespaceId {
-    override val id = parts.joinToString(".") { it.text }
+    override val id get() = parts.joinToString(".") { it.text }
     override fun toString() = id
 }
 
@@ -838,6 +838,7 @@ private fun parseInnerText(text: String, start: Int = 0, end: Int = text.length 
                 }
                 append(unicode.toChar()).also { i += 6 }
             }
+
             else -> return null //invalid string (unknown escape sequence)
         }
     }
