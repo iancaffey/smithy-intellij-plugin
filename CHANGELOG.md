@@ -2,6 +2,17 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.11]
+
+### Changed
+
+- Improving formatting of members with initializers, to force a space between the member name and the start of the
+  initializer.
+
+### Fixed
+
+- Removed eager caching of Smithy model namespace declarations, to correctly react to updating the namespace of a file.
+
 ## [2.0.10]
 
 ### Fixed
