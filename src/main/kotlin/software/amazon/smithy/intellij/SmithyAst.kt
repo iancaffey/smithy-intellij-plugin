@@ -263,7 +263,7 @@ data class SmithyAst(
     }
 
     data class Service(
-        val version: kotlin.String,
+        val version: kotlin.String? = null,
         val operations: kotlin.collections.List<Reference>? = null,
         val resources: kotlin.collections.List<Reference>? = null,
         val errors: kotlin.collections.List<Reference>? = null,
