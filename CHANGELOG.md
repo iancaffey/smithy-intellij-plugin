@@ -2,6 +2,13 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.12]
+
+### Fixed
+
+- Fixed parsing of service shapes in JSON AST without a version property.
+- Fixed parsing of trait values in JSON AST with a "null" node value.
+
 ## [2.0.11]
 
 ### Changed
@@ -153,7 +160,7 @@
 ### Fixed
 
 - Fixed NPE thrown when attempting to index Smithy files without a namespace (e.g. validation files with only a version
-  + metadata).
+    + metadata).
 
 ## [1.5.4]
 
