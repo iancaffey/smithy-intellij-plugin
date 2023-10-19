@@ -359,6 +359,8 @@ data class SmithyAst(
         }
 
         class Deserializer : StdDeserializer<Value>(Value::class.java) {
+            override fun getNullValue(): Value = Null
+
             override fun deserialize(parser: JsonParser, ctxt: DeserializationContext) =
                 convert(parser.readValueAsTree())
 
