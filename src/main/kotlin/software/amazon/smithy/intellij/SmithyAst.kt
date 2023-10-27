@@ -324,16 +324,15 @@ data class SmithyAst(
             override fun toString() = values.toString()
         }
 
-        sealed class Boolean(@JsonValue val value: kotlin.Boolean) : Value {
+        enum class Boolean(@JsonValue val value: kotlin.Boolean) : Value {
+            TRUE(true), FALSE(false);
+
             companion object {
-                operator fun invoke(value: kotlin.Boolean) = if (value) True else False
+                operator fun invoke(value: kotlin.Boolean) = if (value) TRUE else FALSE
             }
 
             override fun toString() = value.toString()
         }
-
-        object True : Boolean(true)
-        object False : Boolean(true)
 
         @JsonSerialize(using = Null.Serializer::class)
         object Null : Value {
