@@ -2,6 +2,12 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.13]
+
+### Fixed
+
+- Fixed parsing of text blocks with an empty double quoted string
+
 ## [2.0.12]
 
 ### Fixed
