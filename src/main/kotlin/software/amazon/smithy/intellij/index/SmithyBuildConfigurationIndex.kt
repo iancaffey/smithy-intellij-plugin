@@ -46,13 +46,22 @@ class SmithyBuildConfigurationIndex : SingleEntryFileBasedIndexExtension<SmithyB
 
     override fun getValueExternalizer(): DataExternalizer<SmithyBuildConfiguration> =
         object : DataExternalizer<SmithyBuildConfiguration> {
-            override fun save(out: DataOutput, config: SmithyBuildConfiguration) =
-                out.writeUTF(SmithyJson.writeValueAsString(config))
+            override fun save(out: DataOutput, config: SmithyBuildConfiguration) {
+                val bytes = SmithyJson.writeValueAsBytes(config)
+                // First write the size so #read knows how many bytes it's reading
+                out.writeInt(bytes.size)
+                out.write(bytes)
+            }
 
-            override fun read(`in`: DataInput) = SmithyJson.readValue<SmithyBuildConfiguration>(`in`.readUTF())
+            override fun read(`in`: DataInput): SmithyBuildConfiguration {
+                // First 4 bytes are the size of the value, written by #save
+                val bytes = ByteArray(`in`.readInt())
+                `in`.readFully(bytes)
+                return SmithyJson.readValue<SmithyBuildConfiguration>(bytes)
+            }
         }
 
-    override fun getVersion() = 2
+    override fun getVersion() = 3
     override fun getInputFilter() = FileBasedIndex.InputFilter { it.name == "smithy-build.json" }
     override fun dependsOnFileContent() = true
     override fun traceKeyHashToVirtualFileMapping() = true
