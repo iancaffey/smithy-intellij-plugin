@@ -2,11 +2,17 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.14]
+
+### Fixed
+
+- Fixed indexing of large smithy-build.json files.
+
 ## [2.0.13]
 
 ### Fixed
 
-- Fixed parsing of text blocks with an empty double quoted string
+- Fixed parsing of text blocks with an empty double-quoted string.
 
 ## [2.0.12]
 
