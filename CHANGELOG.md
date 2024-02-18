@@ -2,6 +2,12 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.15]
+
+### Fixed
+
+- Fixed rename refactoring to retain the namespace in qualified shape references and imports.
+
 ## [2.0.14]
 
 ### Fixed
