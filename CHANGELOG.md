@@ -2,6 +2,12 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.16]
+
+### Changed
+
+- Removed usages of deprecated HtmlSyntaxInfoUtil API which are scheduled for removal.
+
 ## [2.0.15]
 
 ### Fixed
