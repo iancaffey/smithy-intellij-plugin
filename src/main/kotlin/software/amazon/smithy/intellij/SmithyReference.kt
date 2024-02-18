@@ -4,6 +4,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.util.CachedValueProvider
@@ -239,8 +240,12 @@ private data class ByValue(val value: SmithyValue) : SmithyShapeReference(value,
 
 private fun <T : PsiElement> T.rename(name: String, target: (T) -> PsiElement = { it }) = also {
     val element = target(this)
-    val textRange = element.textRange
-    val document = FileDocumentManager.getInstance().getDocument(containingFile.virtualFile)
-    document!!.replaceString(textRange.startOffset, textRange.endOffset, name)
-    PsiDocumentManager.getInstance(project).commitDocument(document)
+    if (element is PsiNamedElement) {
+        element.setName(name)
+    } else {
+        val textRange = element.textRange
+        val document = FileDocumentManager.getInstance().getDocument(containingFile.virtualFile)
+        document!!.replaceString(textRange.startOffset, textRange.endOffset, name)
+        PsiDocumentManager.getInstance(project).commitDocument(document)
+    }
 }
