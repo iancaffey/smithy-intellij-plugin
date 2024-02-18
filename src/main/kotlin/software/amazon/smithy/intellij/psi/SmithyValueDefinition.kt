@@ -2,7 +2,6 @@ package software.amazon.smithy.intellij.psi
 
 import com.google.common.html.HtmlEscapers
 import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.appendStyledSpan
-import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.getStyledSpan
 import software.amazon.smithy.intellij.SmithyColorSettings
 import software.amazon.smithy.intellij.SmithyJson
 import software.amazon.smithy.intellij.SmithyShapeResolver.getNamespace
@@ -104,7 +103,11 @@ interface SmithyValueDefinition : SmithyElement {
                                     "${
                                         if (getNamespace(this@SmithyValueDefinition, shapeName) != namespace)
                                             "$namespace#$shapeName" else shapeName
-                                    }$${getStyledSpan(SmithyColorSettings.SHAPE_MEMBER, memberName, 1f)}"
+                                    }$${
+                                        buildString {
+                                            appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, memberName, 1f)
+                                        }
+                                    }"
                                 )
                             )
                             return@buildString

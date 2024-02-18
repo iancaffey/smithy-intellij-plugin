@@ -1,7 +1,7 @@
 package software.amazon.smithy.intellij.psi
 
 import com.intellij.openapi.editor.HighlighterColors
-import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.getStyledSpan
+import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.appendStyledSpan
 import software.amazon.smithy.intellij.generateLink
 
 /**
@@ -20,7 +20,7 @@ interface SmithyShapeTarget : SmithyElement {
             val namespace = resolvedNamespace
             append(
                 if (namespace != null) generateLink("${namespace}#${shapeName}", label)
-                else getStyledSpan(HighlighterColors.TEXT, label, 1f)
+                else buildString { appendStyledSpan(this, HighlighterColors.TEXT, label, 1f) }
             )
         }
     val shapeName: String

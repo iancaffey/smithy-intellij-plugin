@@ -7,7 +7,6 @@ import com.intellij.openapi.editor.HighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.appendStyledSpan
-import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.getStyledSpan
 import com.intellij.psi.PsiDocCommentBase
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -37,7 +36,10 @@ fun generateLink(href: String, label: String, key: TextAttributesKey? = null) = 
     createHyperlink(
         this,
         href,
-        if (key != null) getStyledSpan(key, label, 1f) else getStyledSpan(linkAttributes, label, 1f),
+        buildString {
+            if (key != null) appendStyledSpan(this, key, label, 1f)
+            else appendStyledSpan(this, linkAttributes, label, 1f)
+        },
         true
     )
 }
@@ -72,6 +74,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                     appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
                     element.enumValue?.let { append(" = ").append(it.toDocString()) }
                 }
+
                 else -> {
                     appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
                     element.resolvedTarget?.let { target -> append(": ${target.href}") }
@@ -79,22 +82,27 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 }
             }
         }
+
         is SmithyOperationInput -> buildString {
             appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
             (element.shape?.href ?: element.shapeId?.href)?.let { append(": $it") }
         }
+
         is SmithyOperationOutput -> buildString {
             appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
             (element.shape?.href ?: element.shapeId?.href)?.let { append(": $it") }
         }
+
         is SmithyResourceIdentifierDefinition -> buildString {
             appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
             append(": ${element.resolvedTarget.href}")
         }
+
         is SmithyResourcePropertyDefinition -> buildString {
             appendStyledSpan(this, SmithyColorSettings.SHAPE_MEMBER, element.name, 1f)
             append(": ${element.resolvedTarget.href}")
         }
+
         is SmithyShapeDefinition -> buildString {
             element.traits.forEach {
                 if (it.shapeName !in quickNavigateIgnoredTraitNames || it.resolvedNamespace != "smithy.api") {
@@ -120,6 +128,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 append("]")
             }
         }
+
         is SmithyTraitDefinition -> element.toDocString()
         is SmithyControl -> when (element.name) {
             "version" -> "Defines the version of the Smithy IDL to use for a model file."
@@ -127,6 +136,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             "operationOutputSuffix" -> "Defines the suffix to use for inline operation output shapes."
             else -> null
         }?.let { renderDocumentation(it) }
+
         else -> null
     }
 
@@ -144,7 +154,9 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 "Parent" to element.enclosingShape.href
             )
             element.resolve()?.let { target ->
-                additionalInfo["Type"] = getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
+                additionalInfo["Type"] = buildString {
+                    appendStyledSpan(this, SmithyColorSettings.KEYWORD, target.type, 1f)
+                }
             }
             element.defaultValue?.let { additionalInfo["Default value"] = it.toDocString() }
             element.enumValue?.let { additionalInfo["Value"] = it.toDocString() }
@@ -155,6 +167,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             }
             append(renderAdditionalInfo(additionalInfo))
         }
+
         is SmithyOperationInput -> buildString {
             append("<div class='definition'><pre>")
             append(getQuickNavigateInfo(element, originalElement))
@@ -164,10 +177,13 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 "Parent" to element.enclosingShape.href
             )
             (element.shape ?: element.shapeId?.resolve())?.let { target ->
-                additionalInfo["Type"] = getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
+                additionalInfo["Type"] = buildString {
+                    appendStyledSpan(this, SmithyColorSettings.KEYWORD, target.type, 1f)
+                }
             }
             append(renderAdditionalInfo(additionalInfo))
         }
+
         is SmithyOperationOutput -> buildString {
             append("<div class='definition'><pre>")
             append(getQuickNavigateInfo(element, originalElement))
@@ -177,10 +193,13 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 "Parent" to element.enclosingShape.href
             )
             (element.shape ?: element.shapeId?.resolve())?.let { target ->
-                additionalInfo["Type"] = getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
+                additionalInfo["Type"] = buildString {
+                    appendStyledSpan(this, SmithyColorSettings.KEYWORD, target.type, 1f)
+                }
             }
             append(renderAdditionalInfo(additionalInfo))
         }
+
         is SmithyResourceIdentifierDefinition -> buildString {
             append("<div class='definition'><pre>")
             append(getQuickNavigateInfo(element, originalElement))
@@ -190,10 +209,13 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 "Resource" to element.enclosingShape.href
             )
             element.resolve()?.let { target ->
-                additionalInfo["Type"] = getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
+                additionalInfo["Type"] = buildString {
+                    appendStyledSpan(this, SmithyColorSettings.KEYWORD, target.type, 1f)
+                }
             }
             append(renderAdditionalInfo(additionalInfo))
         }
+
         is SmithyResourcePropertyDefinition -> buildString {
             append("<div class='definition'><pre>")
             append(getQuickNavigateInfo(element, originalElement))
@@ -203,10 +225,13 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
                 "Resource" to element.enclosingShape.href
             )
             element.resolve()?.let { target ->
-                additionalInfo["Type"] = getStyledSpan(SmithyColorSettings.KEYWORD, target.type, 1f)
+                additionalInfo["Type"] = buildString {
+                    appendStyledSpan(this, SmithyColorSettings.KEYWORD, target.type, 1f)
+                }
             }
             append(renderAdditionalInfo(additionalInfo))
         }
+
         is SmithyShapeDefinition -> buildString {
             append("<div class='definition'><pre>")
             append(getQuickNavigateInfo(element, originalElement))
@@ -223,6 +248,7 @@ class SmithyDocumentationProvider : AbstractDocumentationProvider() {
             }
             append(renderAdditionalInfo(additionalInfo))
         }
+
         else -> getQuickNavigateInfo(element, originalElement)
     }
 

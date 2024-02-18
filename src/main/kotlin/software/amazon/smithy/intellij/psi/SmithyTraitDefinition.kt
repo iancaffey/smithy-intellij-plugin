@@ -1,7 +1,6 @@
 package software.amazon.smithy.intellij.psi
 
 import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.appendStyledSpan
-import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil.getStyledSpan
 import com.intellij.psi.NavigatablePsiElement
 import com.intellij.psi.PsiNamedElement
 import software.amazon.smithy.intellij.SmithyColorSettings
@@ -20,7 +19,7 @@ interface SmithyTraitDefinition : SmithyElement, NavigatablePsiElement, PsiNamed
     val href: String
         get() = resolvedNamespace?.let { namespace ->
             generateLink("${namespace}#${shapeName}", "@$shapeName", SmithyColorSettings.TRAIT_NAME)
-        } ?: getStyledSpan(SmithyColorSettings.TRAIT_NAME, "@$shapeName", 1f)
+        } ?: buildString { appendStyledSpan(this, SmithyColorSettings.TRAIT_NAME, "@$shapeName", 1f) }
 
     val shapeName: String
     val declaredNamespace: String?
