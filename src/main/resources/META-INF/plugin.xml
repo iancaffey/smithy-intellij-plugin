@@ -93,5 +93,7 @@
         <iconProvider implementation="software.amazon.smithy.intellij.SmithyIconProvider"/>
         <liveTemplateContext implementation="software.amazon.smithy.intellij.SmithyContextType"/>
         <navbar implementation="software.amazon.smithy.intellij.SmithyNavBar"/>
+        <spellchecker.support language="Smithy"
+                              implementationClass="software.amazon.smithy.intellij.SmithySpellcheckingStrategy"/>
     </extensions>
 </idea-plugin>
