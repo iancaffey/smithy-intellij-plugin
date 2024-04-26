@@ -2,6 +2,12 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.17]
+
+### Added
+
+- Added spell checking support.
+
 ## [2.0.16]
 
 ### Changed
