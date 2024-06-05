@@ -90,6 +90,7 @@ class SmithyCompletionContributor : CompletionContributor() {
                                 "identifiers",
                                 "list",
                                 "operations",
+                                "properties",
                                 "put",
                                 "read",
                                 "resources",
