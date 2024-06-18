@@ -8,7 +8,9 @@ import com.intellij.formatting.SpacingBuilder
 import com.intellij.formatting.Wrap
 import com.intellij.formatting.WrapType
 import com.intellij.lang.ASTNode
+import com.intellij.openapi.editor.Document
 import com.intellij.psi.PsiComment
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.TokenType
 import com.intellij.psi.formatter.common.AbstractBlock
 import com.intellij.psi.tree.TokenSet
@@ -25,7 +27,7 @@ import software.amazon.smithy.intellij.psi.SmithyTraitBody
  * @author Ian Caffey
  * @since 1.0
  */
-class SmithyBlock constructor(
+class SmithyBlock(
     node: ASTNode,
     private val spacingBuilder: SpacingBuilder,
     private val parent: SmithyBlock? = null,
@@ -44,7 +46,8 @@ class SmithyBlock constructor(
     override fun getChildIndent(): Indent = childIndent
     override fun getSpacing(child1: Block?, child2: Block) = spacingBuilder.getSpacing(this, child1, child2)
     override fun buildChildren(): List<SmithyBlock> {
-        return node.getChildren(TokenSet.forAllMatching { it != TokenType.WHITE_SPACE }).map {
+        val children = node.getChildren(TokenSet.forAllMatching { it != TokenType.WHITE_SPACE })
+        return children.map {
             //Note: all children elements (besides top-level containers within trait body) will be indented
             //      Trait body containers are not indented as it would seem to doubly indent elements
             val requiresIndent = node.psi is SmithyContainer && it.psi.let { psi ->
@@ -54,9 +57,28 @@ class SmithyBlock constructor(
             val closingBrace = node.psi is SmithyContainer && SmithyBraceMatcher.PAIRS.any { pair ->
                 it.elementType == pair.rightBraceType
             }
-            if (requiresIndent) SmithyBlock(it, spacingBuilder, this, childIndent, childWrap, childAlignment)
+            if (requiresIndent) SmithyBlock(it, spacingBuilder, this, childIndent, childWrap, alignment(children, it))
             else if (closingBrace) SmithyBlock(it, spacingBuilder, this, wrap = childWrap)
             else SmithyBlock(it, spacingBuilder, this)
         }
+    }
+
+    private fun alignment(children: Array<ASTNode>, current: ASTNode): Alignment? {
+        val inherit = current.psi is SmithyContainer
+                && node.psi is SmithyContainer
+                && children.count { c -> c.psi is SmithyContainer } == 1
+                && onSameLines(node, current)
+        return if (inherit) alignment else childAlignment
+    }
+
+    private fun onSameLines(parent: ASTNode, child: ASTNode): Boolean {
+        val documentManager = PsiDocumentManager.getInstance(node.psi.project)
+        val document = documentManager.getDocument(node.psi.containingFile) ?: return false
+        return onSameLine(document, parent.startOffset, child.startOffset)
+                && onSameLine(document, parent.startOffset + parent.textLength, child.startOffset + child.textLength)
+    }
+
+    private fun onSameLine(document: Document, first: Int, second: Int): Boolean {
+        return document.getLineNumber(first) == document.getLineNumber(second)
     }
 }
