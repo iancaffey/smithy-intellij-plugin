@@ -42,16 +42,16 @@ class SmithyFormattingModelBuilder : FormattingModelBuilder {
         val codeStyleSettings = formattingContext.codeStyleSettings
         val spacingBuilder = SpacingBuilder(codeStyleSettings, SmithyLanguage)
             //No extra spaces within array/object literal
-            .afterInside(SmithyTypes.TOKEN_OPEN_BRACE, SmithyTypes.OBJECT).none()
-            .beforeInside(SmithyTypes.TOKEN_CLOSE_BRACE, SmithyTypes.OBJECT).none()
-            .afterInside(SmithyTypes.TOKEN_OPEN_BRACKET, SmithyTypes.ARRAY).none()
-            .beforeInside(SmithyTypes.TOKEN_CLOSE_BRACKET, SmithyTypes.ARRAY).none()
+            .afterInside(SmithyTypes.TOKEN_OPEN_BRACE, SmithyTypes.OBJECT).spacing(0, 0, 0, true, 0)
+            .beforeInside(SmithyTypes.TOKEN_CLOSE_BRACE, SmithyTypes.OBJECT).spacing(0, 0, 0, true, 0)
+            .afterInside(SmithyTypes.TOKEN_OPEN_BRACKET, SmithyTypes.ARRAY).spacing(0, 0, 0, true, 0)
+            .beforeInside(SmithyTypes.TOKEN_CLOSE_BRACKET, SmithyTypes.ARRAY).spacing(0, 0, 0, true, 0)
             //No extra spaces within trait body
-            .afterInside(SmithyTypes.TOKEN_OPEN_PAREN, SmithyTypes.TRAIT_BODY).none()
-            .beforeInside(SmithyTypes.TOKEN_CLOSE_PAREN, SmithyTypes.TRAIT_BODY).none()
-            //Single space within other braces (e.g. inline i/o, resource/operation members)
-            .after(SmithyTypes.TOKEN_OPEN_BRACE).spaces(1)
-            .before(SmithyTypes.TOKEN_CLOSE_BRACE).spaces(1)
+            .afterInside(SmithyTypes.TOKEN_OPEN_PAREN, SmithyTypes.TRAIT_BODY).spacing(0, 0, 0, true, 0)
+            .beforeInside(SmithyTypes.TOKEN_CLOSE_PAREN, SmithyTypes.TRAIT_BODY).spacing(0, 0, 0, true, 0)
+            //Allow single space within other braces (e.g. inline i/o, resource/operation members)
+            .after(SmithyTypes.TOKEN_OPEN_BRACE).spacing(0, 1, 0, true, 0)
+            .before(SmithyTypes.TOKEN_CLOSE_BRACE).spacing(0, 1, 0, true, 0)
             //No extra spaces around $
             .around(SmithyTypes.TOKEN_DOLLAR_SIGN).none()
             //No extra spaces before :
