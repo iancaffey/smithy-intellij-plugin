@@ -2,6 +2,16 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.18]
+
+### Changed
+
+- Improved formatters handling of extra whitespace.
+
+### Fixed
+
+- Fixed identifier grammar to permit identifiers starting with an underscore followed by a number.
+
 ## [2.0.17]
 
 ### Added
