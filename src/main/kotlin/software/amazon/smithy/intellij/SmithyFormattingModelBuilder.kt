@@ -49,9 +49,14 @@ class SmithyFormattingModelBuilder : FormattingModelBuilder {
             //No extra spaces within trait body
             .afterInside(SmithyTypes.TOKEN_OPEN_PAREN, SmithyTypes.TRAIT_BODY).spacing(0, 0, 0, true, 0)
             .beforeInside(SmithyTypes.TOKEN_CLOSE_PAREN, SmithyTypes.TRAIT_BODY).spacing(0, 0, 0, true, 0)
-            //Allow single space within other braces (e.g. inline i/o, resource/operation members)
-            .after(SmithyTypes.TOKEN_OPEN_BRACE).spacing(0, 1, 0, true, 0)
-            .before(SmithyTypes.TOKEN_CLOSE_BRACE).spacing(0, 1, 0, true, 0)
+            //No extra spaces within container bodies
+            .afterInside(SmithyTypes.TOKEN_OPEN_BRACE, SmithyTypes.CONTAINER_BODY).spacing(0, 0, 0, true, 0)
+            .beforeInside(SmithyTypes.TOKEN_CLOSE_BRACE, SmithyTypes.CONTAINER_BODY).spacing(0, 0, 0, true, 0)
+            //Force single space within other braces (e.g. inline i/o, resource/operation members)
+            .afterInside(SmithyTypes.TOKEN_OPEN_BRACE, TokenSet.forAllMatching { it != SmithyTypes.CONTAINER_BODY })
+            .spacing(1, 1, 0, true, 0)
+            .beforeInside(SmithyTypes.TOKEN_CLOSE_BRACE, TokenSet.forAllMatching { it != SmithyTypes.CONTAINER_BODY })
+            .spacing(1, 1, 0, true, 0)
             //No extra spaces around $
             .around(SmithyTypes.TOKEN_DOLLAR_SIGN).none()
             //No extra spaces before :
