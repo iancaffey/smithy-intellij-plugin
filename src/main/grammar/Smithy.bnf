@@ -61,7 +61,7 @@
         TOKEN_NULL="null"
         TOKEN_BOOLEAN="regexp:true|false"
         TOKEN_SIMPLE_TYPE_NAME="regexp:blob|boolean|document|string|byte|short|integer|long|float|double|bigInteger|bigDecimal|timestamp"
-        TOKEN_SYMBOL="regexp:_*[A-Za-z][A-Za-z0-9_]*"
+        TOKEN_SYMBOL="regexp:((_+[A-Za-z0-9])|[A-Za-z])[A-Za-z0-9_]*"
         //Literals
         TOKEN_NUMBER="regexp:-?(0|([1-9][0-9]*))(\.[0-9]+)?(e[+-]?[0-9]+)?"
         //Note: both string and text_block regex here permit invalid escape sequences to later on annotate them as errors
