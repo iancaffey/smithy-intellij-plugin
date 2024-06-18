@@ -94,6 +94,34 @@ class SmithyFormattingModelBuilder : FormattingModelBuilder {
             ).blankLines(1)
             //Line break after all traits
             .after(TOKENS_REQUIRING_TRAILING_NEW_LINE).lineBreakInCode()
+            //No empty lines around members
+            .around(
+                TokenSet.create(
+                    SmithyTypes.CONTAINER_MEMBER,
+                    SmithyTypes.ENUM_MEMBER,
+                    SmithyTypes.INT_ENUM_MEMBER,
+                    SmithyTypes.OPERATION_INPUT,
+                    SmithyTypes.OPERATION_OUTPUT,
+                    SmithyTypes.OPERATION_ERRORS,
+                    SmithyTypes.RESOURCE_COLLECTION_OPERATIONS,
+                    SmithyTypes.RESOURCE_CREATE_OPERATION,
+                    SmithyTypes.RESOURCE_DELETE_OPERATION,
+                    SmithyTypes.RESOURCE_COLLECTION_OPERATIONS,
+                    SmithyTypes.RESOURCE_IDENTIFIERS,
+                    SmithyTypes.RESOURCE_LIST_OPERATION,
+                    SmithyTypes.RESOURCE_OPERATIONS,
+                    SmithyTypes.RESOURCE_PROPERTIES,
+                    SmithyTypes.RESOURCE_PUT_OPERATION,
+                    SmithyTypes.RESOURCE_READ_OPERATION,
+                    SmithyTypes.RESOURCE_RESOURCES,
+                    SmithyTypes.RESOURCE_UPDATE_OPERATION,
+                    SmithyTypes.SERVICE_ERRORS,
+                    SmithyTypes.SERVICE_OPERATIONS,
+                    SmithyTypes.SERVICE_RENAMES,
+                    SmithyTypes.SERVICE_RESOURCES,
+                    SmithyTypes.SERVICE_VERSION
+                )
+            ).spacing(0, 0, 0, true, 0)
         return FormattingModelProvider.createFormattingModelForPsiFile(
             formattingContext.containingFile, SmithyBlock(formattingContext.node, spacingBuilder), codeStyleSettings
         )
