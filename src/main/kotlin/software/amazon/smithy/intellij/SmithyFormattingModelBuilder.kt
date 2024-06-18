@@ -41,9 +41,17 @@ class SmithyFormattingModelBuilder : FormattingModelBuilder {
     override fun createModel(formattingContext: FormattingContext): FormattingModel {
         val codeStyleSettings = formattingContext.codeStyleSettings
         val spacingBuilder = SpacingBuilder(codeStyleSettings, SmithyLanguage)
-            //No extra spaces within braces
-            .before(TokenSet.forAllMatching { SmithyBraceMatcher.PAIRS.any { p -> it == p.rightBraceType } }).none()
-            .after(TokenSet.forAllMatching { SmithyBraceMatcher.PAIRS.any { p -> it == p.leftBraceType } }).none()
+            //No extra spaces within array/object literal
+            .afterInside(SmithyTypes.TOKEN_OPEN_BRACE, SmithyTypes.OBJECT).none()
+            .beforeInside(SmithyTypes.TOKEN_CLOSE_BRACE, SmithyTypes.OBJECT).none()
+            .afterInside(SmithyTypes.TOKEN_OPEN_BRACKET, SmithyTypes.ARRAY).none()
+            .beforeInside(SmithyTypes.TOKEN_CLOSE_BRACKET, SmithyTypes.ARRAY).none()
+            //No extra spaces within trait body
+            .afterInside(SmithyTypes.TOKEN_OPEN_PAREN, SmithyTypes.TRAIT_BODY).none()
+            .beforeInside(SmithyTypes.TOKEN_CLOSE_PAREN, SmithyTypes.TRAIT_BODY).none()
+            //Single space within other braces (e.g. inline i/o, resource/operation members)
+            .after(SmithyTypes.TOKEN_OPEN_BRACE).spaces(1)
+            .before(SmithyTypes.TOKEN_CLOSE_BRACE).spaces(1)
             //No extra spaces around $
             .around(SmithyTypes.TOKEN_DOLLAR_SIGN).none()
             //No extra spaces before :
