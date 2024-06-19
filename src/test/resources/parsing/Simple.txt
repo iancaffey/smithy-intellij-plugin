@@ -1,0 +1,45 @@
+Smithy File(0,72)
+  $version: "2"
+
+namespace a.b.c
+
+structure MyCoolShape {
+    id: String
+}(0,72)
+    version(0,13)
+      PsiElement($)('$')(0,1)
+      version(1,8)
+        version(1,8)
+          PsiElement(version)('version')(1,8)
+      PsiElement(:)(':')(8,9)
+      "2"(10,13)
+        PsiElement(TOKEN_STRING)('"2"')(10,13)
+    namespace a.b.c(15,30)
+      PsiElement(namespace)('namespace')(15,24)
+      a.b.c(25,30)
+        a(25,26)
+          PsiElement(TOKEN_SYMBOL)('a')(25,26)
+        PsiElement(.)('.')(26,27)
+        b(27,28)
+          PsiElement(TOKEN_SYMBOL)('b')(27,28)
+        PsiElement(.)('.')(28,29)
+        c(29,30)
+          PsiElement(TOKEN_SYMBOL)('c')(29,30)
+    MyCoolShape(32,72)
+      PsiElement(structure)('structure')(32,41)
+      MyCoolShape(42,53)
+        MyCoolShape(42,53)
+          PsiElement(TOKEN_SYMBOL)('MyCoolShape')(42,53)
+      {
+    id: String
+}(54,72)
+        PsiElement({)('{')(54,55)
+        id(60,70)
+          id(60,62)
+            id(60,62)
+              PsiElement(TOKEN_SYMBOL)('id')(60,62)
+          PsiElement(:)(':')(62,63)
+          String(64,70)
+            String(64,70)
+              PsiElement(TOKEN_SYMBOL)('String')(64,70)
+        PsiElement(})('}')(71,72)

@@ -1,0 +1,866 @@
+Smithy File(0,2587)
+  $version: "2"
+
+namespace example.weather
+
+/// Provides weather forecasts.
+@paginated(inputToken: "nextToken", outputToken: "nextToken", pageSize: "pageSize")
+service Weather {
+    version: "2006-03-01"
+    resources: [
+        City
+    ]
+    operations: [
+        GetCurrentTime
+    ]
+}
+
+resource City {
+    identifiers: { cityId: CityId }
+    properties: { coordinates: CityCoordinates }
+    read: GetCity
+    list: ListCities
+    resources: [
+        Forecast
+    ]
+}
+
+resource Forecast {
+    identifiers: { cityId: CityId }
+    properties: { chanceOfRain: Float }
+    read: GetForecast
+}
+
+// "pattern" is a trait.
+@pattern("^[A-Za-z0-9 ]+$")
+string CityId
+
+@readonly
+operation GetCity {
+    input := for City {
+        // "cityId" provides the identifier for the resource and
+        // has to be marked as required.
+        @required
+        $cityId
+    }
+
+    output := for City {
+        // "required" is used on output to indicate if the service
+        // will always provide a value for the member.
+        // "notProperty" indicates that top-level input member "name"
+        // is not bound to any resource property.
+        @required
+        @notProperty
+        name: String
+
+        @required
+        $coordinates
+    }
+
+    errors: [
+        NoSuchResource
+    ]
+}
+
+// This structure is nested within GetCityOutput.
+structure CityCoordinates {
+    @required
+    latitude: Float
+
+    @required
+    longitude: Float
+}
+
+// "error" is a trait that is used to specialize
+// a structure as an error.
+@error("client")
+structure NoSuchResource {
+    @required
+    resourceType: String
+}
+
+// The paginated trait indicates that the operation may
+// return truncated results.
+@readonly
+@paginated(items: "items")
+operation ListCities {
+    input := {
+        nextToken: String
+        pageSize: Integer
+    }
+
+    output := {
+        nextToken: String
+
+        @required
+        items: CitySummaries
+    }
+}
+
+// CitySummaries is a list of CitySummary structures.
+list CitySummaries {
+    member: CitySummary
+}
+
+// CitySummary contains a reference to a City.
+@references([
+    {
+        resource: City
+    }
+])
+structure CitySummary {
+    @required
+    cityId: CityId
+
+    @required
+    name: String
+}
+
+@readonly
+operation GetCurrentTime {
+    output := {
+        @required
+        time: Timestamp
+    }
+}
+
+@readonly
+operation GetForecast {
+    input := for Forecast {
+        // "cityId" provides the only identifier for the resource since
+        // a Forecast doesn't have its own.
+        @required
+        $cityId
+    }
+
+    output := for Forecast {
+        $chanceOfRain
+    }
+}(0,2587)
+    version(0,13)
+      PsiElement($)('$')(0,1)
+      version(1,8)
+        version(1,8)
+          PsiElement(version)('version')(1,8)
+      PsiElement(:)(':')(8,9)
+      "2"(10,13)
+        PsiElement(TOKEN_STRING)('"2"')(10,13)
+    namespace example.weather(15,40)
+      PsiElement(namespace)('namespace')(15,24)
+      example.weather(25,40)
+        example(25,32)
+          PsiElement(TOKEN_SYMBOL)('example')(25,32)
+        PsiElement(.)('.')(32,33)
+        weather(33,40)
+          PsiElement(TOKEN_SYMBOL)('weather')(33,40)
+    Weather(42,286)
+      /// Provides weather forecasts.(42,73)
+        PsiElement(TOKEN_DOCUMENTATION_LINE)('/// Provides weather forecasts.')(42,73)
+      paginated(74,157)
+        PsiElement(@)('@')(74,75)
+        paginated(75,84)
+          paginated(75,84)
+            PsiElement(TOKEN_SYMBOL)('paginated')(75,84)
+        (inputToken: "nextToken", outputToken: "nextToken", pageSize: "pageSize")(84,157)
+          PsiElement(()('(')(84,85)
+          inputToken(85,108)
+            inputToken(85,95)
+              inputToken(85,95)
+                PsiElement(TOKEN_SYMBOL)('inputToken')(85,95)
+            PsiElement(:)(':')(95,96)
+            "nextToken"(97,108)
+              PsiElement(TOKEN_STRING)('"nextToken"')(97,108)
+          PsiElement(,)(',')(108,109)
+          outputToken(110,134)
+            outputToken(110,121)
+              outputToken(110,121)
+                PsiElement(TOKEN_SYMBOL)('outputToken')(110,121)
+            PsiElement(:)(':')(121,122)
+            "nextToken"(123,134)
+              PsiElement(TOKEN_STRING)('"nextToken"')(123,134)
+          PsiElement(,)(',')(134,135)
+          pageSize(136,156)
+            pageSize(136,144)
+              pageSize(136,144)
+                PsiElement(TOKEN_SYMBOL)('pageSize')(136,144)
+            PsiElement(:)(':')(144,145)
+            "pageSize"(146,156)
+              PsiElement(TOKEN_STRING)('"pageSize"')(146,156)
+          PsiElement())(')')(156,157)
+      PsiElement(service)('service')(158,165)
+      Weather(166,173)
+        Weather(166,173)
+          PsiElement(TOKEN_SYMBOL)('Weather')(166,173)
+      {
+    version: "2006-03-01"
+    resources: [
+        City
+    ]
+    operations: [
+        GetCurrentTime
+    ]
+}(174,286)
+        PsiElement({)('{')(174,175)
+        version: "2006-03-01"(180,201)
+          PsiElement(version)('version')(180,187)
+          PsiElement(:)(':')(187,188)
+          "2006-03-01"(189,201)
+            PsiElement(TOKEN_STRING)('"2006-03-01"')(189,201)
+        resources: [
+        City
+    ](206,237)
+          PsiElement(resources)('resources')(206,215)
+          PsiElement(:)(':')(215,216)
+          PsiElement([)('[')(217,218)
+          City(227,231)
+            City(227,231)
+              PsiElement(TOKEN_SYMBOL)('City')(227,231)
+          PsiElement(])(']')(236,237)
+        operations: [
+        GetCurrentTime
+    ](242,284)
+          PsiElement(operations)('operations')(242,252)
+          PsiElement(:)(':')(252,253)
+          PsiElement([)('[')(254,255)
+          GetCurrentTime(264,278)
+            GetCurrentTime(264,278)
+              PsiElement(TOKEN_SYMBOL)('GetCurrentTime')(264,278)
+          PsiElement(])(']')(283,284)
+        PsiElement(})('}')(285,286)
+    City(288,469)
+      PsiElement(resource)('resource')(288,296)
+      City(297,301)
+        City(297,301)
+          PsiElement(TOKEN_SYMBOL)('City')(297,301)
+      {
+    identifiers: { cityId: CityId }
+    properties: { coordinates: CityCoordinates }
+    read: GetCity
+    list: ListCities
+    resources: [
+        Forecast
+    ]
+}(302,469)
+        PsiElement({)('{')(302,303)
+        identifiers: { cityId: CityId }(308,339)
+          PsiElement(identifiers)('identifiers')(308,319)
+          PsiElement(:)(':')(319,320)
+          PsiElement({)('{')(321,322)
+          cityId(323,337)
+            cityId(323,329)
+              cityId(323,329)
+                PsiElement(TOKEN_SYMBOL)('cityId')(323,329)
+            PsiElement(:)(':')(329,330)
+            CityId(331,337)
+              CityId(331,337)
+                PsiElement(TOKEN_SYMBOL)('CityId')(331,337)
+          PsiElement(})('}')(338,339)
+        properties: { coordinates: CityCoordinates }(344,388)
+          PsiElement(properties)('properties')(344,354)
+          PsiElement(:)(':')(354,355)
+          PsiElement({)('{')(356,357)
+          coordinates(358,386)
+            coordinates(358,369)
+              coordinates(358,369)
+                PsiElement(TOKEN_SYMBOL)('coordinates')(358,369)
+            PsiElement(:)(':')(369,370)
+            CityCoordinates(371,386)
+              CityCoordinates(371,386)
+                PsiElement(TOKEN_SYMBOL)('CityCoordinates')(371,386)
+          PsiElement(})('}')(387,388)
+        read: GetCity(393,406)
+          PsiElement(read)('read')(393,397)
+          PsiElement(:)(':')(397,398)
+          GetCity(399,406)
+            GetCity(399,406)
+              PsiElement(TOKEN_SYMBOL)('GetCity')(399,406)
+        list: ListCities(411,427)
+          PsiElement(list)('list')(411,415)
+          PsiElement(:)(':')(415,416)
+          ListCities(417,427)
+            ListCities(417,427)
+              PsiElement(TOKEN_SYMBOL)('ListCities')(417,427)
+        resources: [
+        Forecast
+    ](432,467)
+          PsiElement(resources)('resources')(432,441)
+          PsiElement(:)(':')(441,442)
+          PsiElement([)('[')(443,444)
+          Forecast(453,461)
+            Forecast(453,461)
+              PsiElement(TOKEN_SYMBOL)('Forecast')(453,461)
+          PsiElement(])(']')(466,467)
+        PsiElement(})('}')(468,469)
+    Forecast(471,590)
+      PsiElement(resource)('resource')(471,479)
+      Forecast(480,488)
+        Forecast(480,488)
+          PsiElement(TOKEN_SYMBOL)('Forecast')(480,488)
+      {
+    identifiers: { cityId: CityId }
+    properties: { chanceOfRain: Float }
+    read: GetForecast
+}(489,590)
+        PsiElement({)('{')(489,490)
+        identifiers: { cityId: CityId }(495,526)
+          PsiElement(identifiers)('identifiers')(495,506)
+          PsiElement(:)(':')(506,507)
+          PsiElement({)('{')(508,509)
+          cityId(510,524)
+            cityId(510,516)
+              cityId(510,516)
+                PsiElement(TOKEN_SYMBOL)('cityId')(510,516)
+            PsiElement(:)(':')(516,517)
+            CityId(518,524)
+              CityId(518,524)
+                PsiElement(TOKEN_SYMBOL)('CityId')(518,524)
+          PsiElement(})('}')(525,526)
+        properties: { chanceOfRain: Float }(531,566)
+          PsiElement(properties)('properties')(531,541)
+          PsiElement(:)(':')(541,542)
+          PsiElement({)('{')(543,544)
+          chanceOfRain(545,564)
+            chanceOfRain(545,557)
+              chanceOfRain(545,557)
+                PsiElement(TOKEN_SYMBOL)('chanceOfRain')(545,557)
+            PsiElement(:)(':')(557,558)
+            Float(559,564)
+              Float(559,564)
+                PsiElement(TOKEN_SYMBOL)('Float')(559,564)
+          PsiElement(})('}')(565,566)
+        read: GetForecast(571,588)
+          PsiElement(read)('read')(571,575)
+          PsiElement(:)(':')(575,576)
+          GetForecast(577,588)
+            GetForecast(577,588)
+              PsiElement(TOKEN_SYMBOL)('GetForecast')(577,588)
+        PsiElement(})('}')(589,590)
+    PsiComment(TOKEN_LINE_COMMENT)('// "pattern" is a trait.')(592,616)
+    CityId(617,658)
+      pattern(617,644)
+        PsiElement(@)('@')(617,618)
+        pattern(618,625)
+          pattern(618,625)
+            PsiElement(TOKEN_SYMBOL)('pattern')(618,625)
+        ("^[A-Za-z0-9 ]+$")(625,644)
+          PsiElement(()('(')(625,626)
+          "^[A-Za-z0-9 ]+$"(626,643)
+            PsiElement(TOKEN_STRING)('"^[A-Za-z0-9 ]+$"')(626,643)
+          PsiElement())(')')(643,644)
+      string(645,651)
+        PsiElement(TOKEN_SIMPLE_TYPE_NAME)('string')(645,651)
+      CityId(652,658)
+        CityId(652,658)
+          PsiElement(TOKEN_SYMBOL)('CityId')(652,658)
+    GetCity(660,1279)
+      readonly(660,669)
+        PsiElement(@)('@')(660,661)
+        readonly(661,669)
+          readonly(661,669)
+            PsiElement(TOKEN_SYMBOL)('readonly')(661,669)
+      PsiElement(operation)('operation')(670,679)
+      GetCity(680,687)
+        GetCity(680,687)
+          PsiElement(TOKEN_SYMBOL)('GetCity')(680,687)
+      {
+    input := for City {
+        // "cityId" provides the identifier for the resource and
+        // has to be marked as required.
+        @required
+        $cityId
+    }
+
+    output := for City {
+        // "required" is used on output to indicate if the service
+        // will always provide a value for the member.
+        // "notProperty" indicates that top-level input member "name"
+        // is not bound to any resource property.
+        @required
+        @notProperty
+        name: String
+
+        @required
+        $coordinates
+    }
+
+    errors: [
+        NoSuchResource
+    ]
+}(688,1279)
+        PsiElement({)('{')(688,689)
+        input(694,859)
+          PsiElement(input)('input')(694,699)
+          PsiElement(:=)(':=')(700,702)
+          GetCityInput(703,859)
+            for City(703,711)
+              PsiElement(for)('for')(703,706)
+              City(707,711)
+                City(707,711)
+                  PsiElement(TOKEN_SYMBOL)('City')(707,711)
+            {
+        // "cityId" provides the identifier for the resource and
+        // has to be marked as required.
+        @required
+        $cityId
+    }(712,859)
+              PsiElement({)('{')(712,713)
+              PsiComment(TOKEN_LINE_COMMENT)('// "cityId" provides the identifier for the resource and')(722,778)
+              PsiComment(TOKEN_LINE_COMMENT)('// has to be marked as required.')(787,819)
+              cityId(828,853)
+                required(828,837)
+                  PsiElement(@)('@')(828,829)
+                  required(829,837)
+                    required(829,837)
+                      PsiElement(TOKEN_SYMBOL)('required')(829,837)
+                PsiElement($)('$')(846,847)
+                cityId(847,853)
+                  cityId(847,853)
+                    PsiElement(TOKEN_SYMBOL)('cityId')(847,853)
+              PsiElement(})('}')(858,859)
+        output(865,1233)
+          PsiElement(output)('output')(865,871)
+          PsiElement(:=)(':=')(872,874)
+          GetCityOutput(875,1233)
+            for City(875,883)
+              PsiElement(for)('for')(875,878)
+              City(879,883)
+                City(879,883)
+                  PsiElement(TOKEN_SYMBOL)('City')(879,883)
+            {
+        // "required" is used on output to indicate if the service
+        // will always provide a value for the member.
+        // "notProperty" indicates that top-level input member "name"
+        // is not bound to any resource property.
+        @required
+        @notProperty
+        name: String
+
+        @required
+        $coordinates
+    }(884,1233)
+              PsiElement({)('{')(884,885)
+              PsiComment(TOKEN_LINE_COMMENT)('// "required" is used on output to indicate if the service')(894,952)
+              PsiComment(TOKEN_LINE_COMMENT)('// will always provide a value for the member.')(961,1007)
+              PsiComment(TOKEN_LINE_COMMENT)('// "notProperty" indicates that top-level input member "name"')(1016,1077)
+              PsiComment(TOKEN_LINE_COMMENT)('// is not bound to any resource property.')(1086,1127)
+              name(1136,1187)
+                required(1136,1145)
+                  PsiElement(@)('@')(1136,1137)
+                  required(1137,1145)
+                    required(1137,1145)
+                      PsiElement(TOKEN_SYMBOL)('required')(1137,1145)
+                notProperty(1154,1166)
+                  PsiElement(@)('@')(1154,1155)
+                  notProperty(1155,1166)
+                    notProperty(1155,1166)
+                      PsiElement(TOKEN_SYMBOL)('notProperty')(1155,1166)
+                name(1175,1179)
+                  name(1175,1179)
+                    PsiElement(TOKEN_SYMBOL)('name')(1175,1179)
+                PsiElement(:)(':')(1179,1180)
+                String(1181,1187)
+                  String(1181,1187)
+                    PsiElement(TOKEN_SYMBOL)('String')(1181,1187)
+              coordinates(1197,1227)
+                required(1197,1206)
+                  PsiElement(@)('@')(1197,1198)
+                  required(1198,1206)
+                    required(1198,1206)
+                      PsiElement(TOKEN_SYMBOL)('required')(1198,1206)
+                PsiElement($)('$')(1215,1216)
+                coordinates(1216,1227)
+                  coordinates(1216,1227)
+                    PsiElement(TOKEN_SYMBOL)('coordinates')(1216,1227)
+              PsiElement(})('}')(1232,1233)
+        errors(1239,1277)
+          PsiElement(errors)('errors')(1239,1245)
+          PsiElement(:)(':')(1245,1246)
+          PsiElement([)('[')(1247,1248)
+          NoSuchResource(1257,1271)
+            NoSuchResource(1257,1271)
+              PsiElement(TOKEN_SYMBOL)('NoSuchResource')(1257,1271)
+          PsiElement(])(']')(1276,1277)
+        PsiElement(})('}')(1278,1279)
+    PsiComment(TOKEN_LINE_COMMENT)('// This structure is nested within GetCityOutput.')(1281,1330)
+    CityCoordinates(1331,1430)
+      PsiElement(structure)('structure')(1331,1340)
+      CityCoordinates(1341,1356)
+        CityCoordinates(1341,1356)
+          PsiElement(TOKEN_SYMBOL)('CityCoordinates')(1341,1356)
+      {
+    @required
+    latitude: Float
+
+    @required
+    longitude: Float
+}(1357,1430)
+        PsiElement({)('{')(1357,1358)
+        latitude(1363,1392)
+          required(1363,1372)
+            PsiElement(@)('@')(1363,1364)
+            required(1364,1372)
+              required(1364,1372)
+                PsiElement(TOKEN_SYMBOL)('required')(1364,1372)
+          latitude(1377,1385)
+            latitude(1377,1385)
+              PsiElement(TOKEN_SYMBOL)('latitude')(1377,1385)
+          PsiElement(:)(':')(1385,1386)
+          Float(1387,1392)
+            Float(1387,1392)
+              PsiElement(TOKEN_SYMBOL)('Float')(1387,1392)
+        longitude(1398,1428)
+          required(1398,1407)
+            PsiElement(@)('@')(1398,1399)
+            required(1399,1407)
+              required(1399,1407)
+                PsiElement(TOKEN_SYMBOL)('required')(1399,1407)
+          longitude(1412,1421)
+            longitude(1412,1421)
+              PsiElement(TOKEN_SYMBOL)('longitude')(1412,1421)
+          PsiElement(:)(':')(1421,1422)
+          Float(1423,1428)
+            Float(1423,1428)
+              PsiElement(TOKEN_SYMBOL)('Float')(1423,1428)
+        PsiElement(})('}')(1429,1430)
+    PsiComment(TOKEN_LINE_COMMENT)('// "error" is a trait that is used to specialize')(1432,1480)
+    PsiComment(TOKEN_LINE_COMMENT)('// a structure as an error.')(1481,1508)
+    NoSuchResource(1509,1593)
+      error(1509,1525)
+        PsiElement(@)('@')(1509,1510)
+        error(1510,1515)
+          error(1510,1515)
+            PsiElement(TOKEN_SYMBOL)('error')(1510,1515)
+        ("client")(1515,1525)
+          PsiElement(()('(')(1515,1516)
+          "client"(1516,1524)
+            PsiElement(TOKEN_STRING)('"client"')(1516,1524)
+          PsiElement())(')')(1524,1525)
+      PsiElement(structure)('structure')(1526,1535)
+      NoSuchResource(1536,1550)
+        NoSuchResource(1536,1550)
+          PsiElement(TOKEN_SYMBOL)('NoSuchResource')(1536,1550)
+      {
+    @required
+    resourceType: String
+}(1551,1593)
+        PsiElement({)('{')(1551,1552)
+        resourceType(1557,1591)
+          required(1557,1566)
+            PsiElement(@)('@')(1557,1558)
+            required(1558,1566)
+              required(1558,1566)
+                PsiElement(TOKEN_SYMBOL)('required')(1558,1566)
+          resourceType(1571,1583)
+            resourceType(1571,1583)
+              PsiElement(TOKEN_SYMBOL)('resourceType')(1571,1583)
+          PsiElement(:)(':')(1583,1584)
+          String(1585,1591)
+            String(1585,1591)
+              PsiElement(TOKEN_SYMBOL)('String')(1585,1591)
+        PsiElement(})('}')(1592,1593)
+    PsiComment(TOKEN_LINE_COMMENT)('// The paginated trait indicates that the operation may')(1595,1650)
+    PsiComment(TOKEN_LINE_COMMENT)('// return truncated results.')(1651,1679)
+    ListCities(1680,1911)
+      readonly(1680,1689)
+        PsiElement(@)('@')(1680,1681)
+        readonly(1681,1689)
+          readonly(1681,1689)
+            PsiElement(TOKEN_SYMBOL)('readonly')(1681,1689)
+      paginated(1690,1716)
+        PsiElement(@)('@')(1690,1691)
+        paginated(1691,1700)
+          paginated(1691,1700)
+            PsiElement(TOKEN_SYMBOL)('paginated')(1691,1700)
+        (items: "items")(1700,1716)
+          PsiElement(()('(')(1700,1701)
+          items(1701,1715)
+            items(1701,1706)
+              items(1701,1706)
+                PsiElement(TOKEN_SYMBOL)('items')(1701,1706)
+            PsiElement(:)(':')(1706,1707)
+            "items"(1708,1715)
+              PsiElement(TOKEN_STRING)('"items"')(1708,1715)
+          PsiElement())(')')(1715,1716)
+      PsiElement(operation)('operation')(1717,1726)
+      ListCities(1727,1737)
+        ListCities(1727,1737)
+          PsiElement(TOKEN_SYMBOL)('ListCities')(1727,1737)
+      {
+    input := {
+        nextToken: String
+        pageSize: Integer
+    }
+
+    output := {
+        nextToken: String
+
+        @required
+        items: CitySummaries
+    }
+}(1738,1911)
+        PsiElement({)('{')(1738,1739)
+        input(1744,1812)
+          PsiElement(input)('input')(1744,1749)
+          PsiElement(:=)(':=')(1750,1752)
+          ListCitiesInput(1753,1812)
+            {
+        nextToken: String
+        pageSize: Integer
+    }(1753,1812)
+              PsiElement({)('{')(1753,1754)
+              nextToken(1763,1780)
+                nextToken(1763,1772)
+                  nextToken(1763,1772)
+                    PsiElement(TOKEN_SYMBOL)('nextToken')(1763,1772)
+                PsiElement(:)(':')(1772,1773)
+                String(1774,1780)
+                  String(1774,1780)
+                    PsiElement(TOKEN_SYMBOL)('String')(1774,1780)
+              pageSize(1789,1806)
+                pageSize(1789,1797)
+                  pageSize(1789,1797)
+                    PsiElement(TOKEN_SYMBOL)('pageSize')(1789,1797)
+                PsiElement(:)(':')(1797,1798)
+                Integer(1799,1806)
+                  Integer(1799,1806)
+                    PsiElement(TOKEN_SYMBOL)('Integer')(1799,1806)
+              PsiElement(})('}')(1811,1812)
+        output(1818,1909)
+          PsiElement(output)('output')(1818,1824)
+          PsiElement(:=)(':=')(1825,1827)
+          ListCitiesOutput(1828,1909)
+            {
+        nextToken: String
+
+        @required
+        items: CitySummaries
+    }(1828,1909)
+              PsiElement({)('{')(1828,1829)
+              nextToken(1838,1855)
+                nextToken(1838,1847)
+                  nextToken(1838,1847)
+                    PsiElement(TOKEN_SYMBOL)('nextToken')(1838,1847)
+                PsiElement(:)(':')(1847,1848)
+                String(1849,1855)
+                  String(1849,1855)
+                    PsiElement(TOKEN_SYMBOL)('String')(1849,1855)
+              items(1865,1903)
+                required(1865,1874)
+                  PsiElement(@)('@')(1865,1866)
+                  required(1866,1874)
+                    required(1866,1874)
+                      PsiElement(TOKEN_SYMBOL)('required')(1866,1874)
+                items(1883,1888)
+                  items(1883,1888)
+                    PsiElement(TOKEN_SYMBOL)('items')(1883,1888)
+                PsiElement(:)(':')(1888,1889)
+                CitySummaries(1890,1903)
+                  CitySummaries(1890,1903)
+                    PsiElement(TOKEN_SYMBOL)('CitySummaries')(1890,1903)
+              PsiElement(})('}')(1908,1909)
+        PsiElement(})('}')(1910,1911)
+    PsiComment(TOKEN_LINE_COMMENT)('// CitySummaries is a list of CitySummary structures.')(1913,1966)
+    CitySummaries(1967,2013)
+      PsiElement(list)('list')(1967,1971)
+      CitySummaries(1972,1985)
+        CitySummaries(1972,1985)
+          PsiElement(TOKEN_SYMBOL)('CitySummaries')(1972,1985)
+      {
+    member: CitySummary
+}(1986,2013)
+        PsiElement({)('{')(1986,1987)
+        member(1992,2011)
+          member(1992,1998)
+            member(1992,1998)
+              PsiElement(TOKEN_SYMBOL)('member')(1992,1998)
+          PsiElement(:)(':')(1998,1999)
+          CitySummary(2000,2011)
+            CitySummary(2000,2011)
+              PsiElement(TOKEN_SYMBOL)('CitySummary')(2000,2011)
+        PsiElement(})('}')(2012,2013)
+    PsiComment(TOKEN_LINE_COMMENT)('// CitySummary contains a reference to a City.')(2015,2061)
+    CitySummary(2062,2204)
+      references(2062,2113)
+        PsiElement(@)('@')(2062,2063)
+        references(2063,2073)
+          references(2063,2073)
+            PsiElement(TOKEN_SYMBOL)('references')(2063,2073)
+        ([
+    {
+        resource: City
+    }
+])(2073,2113)
+          PsiElement(()('(')(2073,2074)
+          [
+    {
+        resource: City
+    }
+](2074,2112)
+            PsiElement([)('[')(2074,2075)
+            {
+        resource: City
+    }(2080,2110)
+              PsiElement({)('{')(2080,2081)
+              resource(2090,2104)
+                resource(2090,2098)
+                  resource(2090,2098)
+                    PsiElement(resource)('resource')(2090,2098)
+                PsiElement(:)(':')(2098,2099)
+                City(2100,2104)
+                  City(2100,2104)
+                    PsiElement(TOKEN_SYMBOL)('City')(2100,2104)
+              PsiElement(})('}')(2109,2110)
+            PsiElement(])(']')(2111,2112)
+          PsiElement())(')')(2112,2113)
+      PsiElement(structure)('structure')(2114,2123)
+      CitySummary(2124,2135)
+        CitySummary(2124,2135)
+          PsiElement(TOKEN_SYMBOL)('CitySummary')(2124,2135)
+      {
+    @required
+    cityId: CityId
+
+    @required
+    name: String
+}(2136,2204)
+        PsiElement({)('{')(2136,2137)
+        cityId(2142,2170)
+          required(2142,2151)
+            PsiElement(@)('@')(2142,2143)
+            required(2143,2151)
+              required(2143,2151)
+                PsiElement(TOKEN_SYMBOL)('required')(2143,2151)
+          cityId(2156,2162)
+            cityId(2156,2162)
+              PsiElement(TOKEN_SYMBOL)('cityId')(2156,2162)
+          PsiElement(:)(':')(2162,2163)
+          CityId(2164,2170)
+            CityId(2164,2170)
+              PsiElement(TOKEN_SYMBOL)('CityId')(2164,2170)
+        name(2176,2202)
+          required(2176,2185)
+            PsiElement(@)('@')(2176,2177)
+            required(2177,2185)
+              required(2177,2185)
+                PsiElement(TOKEN_SYMBOL)('required')(2177,2185)
+          name(2190,2194)
+            name(2190,2194)
+              PsiElement(TOKEN_SYMBOL)('name')(2190,2194)
+          PsiElement(:)(':')(2194,2195)
+          String(2196,2202)
+            String(2196,2202)
+              PsiElement(TOKEN_SYMBOL)('String')(2196,2202)
+        PsiElement(})('}')(2203,2204)
+    GetCurrentTime(2206,2308)
+      readonly(2206,2215)
+        PsiElement(@)('@')(2206,2207)
+        readonly(2207,2215)
+          readonly(2207,2215)
+            PsiElement(TOKEN_SYMBOL)('readonly')(2207,2215)
+      PsiElement(operation)('operation')(2216,2225)
+      GetCurrentTime(2226,2240)
+        GetCurrentTime(2226,2240)
+          PsiElement(TOKEN_SYMBOL)('GetCurrentTime')(2226,2240)
+      {
+    output := {
+        @required
+        time: Timestamp
+    }
+}(2241,2308)
+        PsiElement({)('{')(2241,2242)
+        output(2247,2306)
+          PsiElement(output)('output')(2247,2253)
+          PsiElement(:=)(':=')(2254,2256)
+          GetCurrentTimeOutput(2257,2306)
+            {
+        @required
+        time: Timestamp
+    }(2257,2306)
+              PsiElement({)('{')(2257,2258)
+              time(2267,2300)
+                required(2267,2276)
+                  PsiElement(@)('@')(2267,2268)
+                  required(2268,2276)
+                    required(2268,2276)
+                      PsiElement(TOKEN_SYMBOL)('required')(2268,2276)
+                time(2285,2289)
+                  time(2285,2289)
+                    PsiElement(TOKEN_SYMBOL)('time')(2285,2289)
+                PsiElement(:)(':')(2289,2290)
+                Timestamp(2291,2300)
+                  Timestamp(2291,2300)
+                    PsiElement(TOKEN_SYMBOL)('Timestamp')(2291,2300)
+              PsiElement(})('}')(2305,2306)
+        PsiElement(})('}')(2307,2308)
+    GetForecast(2310,2587)
+      readonly(2310,2319)
+        PsiElement(@)('@')(2310,2311)
+        readonly(2311,2319)
+          readonly(2311,2319)
+            PsiElement(TOKEN_SYMBOL)('readonly')(2311,2319)
+      PsiElement(operation)('operation')(2320,2329)
+      GetForecast(2330,2341)
+        GetForecast(2330,2341)
+          PsiElement(TOKEN_SYMBOL)('GetForecast')(2330,2341)
+      {
+    input := for Forecast {
+        // "cityId" provides the only identifier for the resource since
+        // a Forecast doesn't have its own.
+        @required
+        $cityId
+    }
+
+    output := for Forecast {
+        $chanceOfRain
+    }
+}(2342,2587)
+        PsiElement({)('{')(2342,2343)
+        input(2348,2527)
+          PsiElement(input)('input')(2348,2353)
+          PsiElement(:=)(':=')(2354,2356)
+          GetForecastInput(2357,2527)
+            for Forecast(2357,2369)
+              PsiElement(for)('for')(2357,2360)
+              Forecast(2361,2369)
+                Forecast(2361,2369)
+                  PsiElement(TOKEN_SYMBOL)('Forecast')(2361,2369)
+            {
+        // "cityId" provides the only identifier for the resource since
+        // a Forecast doesn't have its own.
+        @required
+        $cityId
+    }(2370,2527)
+              PsiElement({)('{')(2370,2371)
+              PsiComment(TOKEN_LINE_COMMENT)('// "cityId" provides the only identifier for the resource since')(2380,2443)
+              PsiComment(TOKEN_LINE_COMMENT)('// a Forecast doesn't have its own.')(2452,2487)
+              cityId(2496,2521)
+                required(2496,2505)
+                  PsiElement(@)('@')(2496,2497)
+                  required(2497,2505)
+                    required(2497,2505)
+                      PsiElement(TOKEN_SYMBOL)('required')(2497,2505)
+                PsiElement($)('$')(2514,2515)
+                cityId(2515,2521)
+                  cityId(2515,2521)
+                    PsiElement(TOKEN_SYMBOL)('cityId')(2515,2521)
+              PsiElement(})('}')(2526,2527)
+        output(2533,2585)
+          PsiElement(output)('output')(2533,2539)
+          PsiElement(:=)(':=')(2540,2542)
+          GetForecastOutput(2543,2585)
+            for Forecast(2543,2555)
+              PsiElement(for)('for')(2543,2546)
+              Forecast(2547,2555)
+                Forecast(2547,2555)
+                  PsiElement(TOKEN_SYMBOL)('Forecast')(2547,2555)
+            {
+        $chanceOfRain
+    }(2556,2585)
+              PsiElement({)('{')(2556,2557)
+              chanceOfRain(2566,2579)
+                PsiElement($)('$')(2566,2567)
+                chanceOfRain(2567,2579)
+                  chanceOfRain(2567,2579)
+                    PsiElement(TOKEN_SYMBOL)('chanceOfRain')(2567,2579)
+              PsiElement(})('}')(2584,2585)
+        PsiElement(})('}')(2586,2587)

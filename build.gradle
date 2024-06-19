@@ -1,9 +1,10 @@
 plugins {
     id 'idea'
+    id 'jacoco'
     id 'org.jetbrains.intellij' version '1.3.1'
     id 'org.jetbrains.changelog' version '1.3.1'
     id 'org.jetbrains.grammarkit' version '2021.1.3'
-    id 'org.jetbrains.kotlin.jvm' version '1.6.10'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.22'
 }
 
 apply plugin: 'org.jetbrains.changelog'
@@ -19,6 +20,19 @@ sourceSets {
     main.java.srcDirs 'src/main/gen'
 }
 
+test.finalizedBy jacocoTestReport
+jacocoTestReport {
+    dependsOn test
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: ['**/psi/impl/**'])
+        }))
+    }
+    doLast {
+        println("Coverage Report: file://${reports.html.outputLocation.file("index.html").get()}")
+    }
+}
+
 idea {
     module {
         generatedSourceDirs += file('src/main/gen')
@@ -27,8 +41,9 @@ idea {
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
-    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.13.3'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.17.1'
+    testImplementation 'junit:junit:4.13.2'
 }
 
 intellij {
