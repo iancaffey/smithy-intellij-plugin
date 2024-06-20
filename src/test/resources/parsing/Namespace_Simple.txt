@@ -1,0 +1,17 @@
+Smithy File(0,32)
+  $version: "2"
+
+namespace example(0,32)
+    version(0,13)
+      PsiElement($)('$')(0,1)
+      version(1,8)
+        version(1,8)
+          PsiElement(version)('version')(1,8)
+      PsiElement(:)(':')(8,9)
+      "2"(10,13)
+        PsiElement(TOKEN_STRING)('"2"')(10,13)
+    namespace example(15,32)
+      PsiElement(namespace)('namespace')(15,24)
+      example(25,32)
+        example(25,32)
+          PsiElement(TOKEN_SYMBOL)('example')(25,32)

@@ -16,7 +16,25 @@ class SmithyParserTest : ParsingTestCase("parsing", "smithy", SmithyParserDefini
     fun testEmpty() = doTest(true)
 
     @Test
-    fun testNamespaceWithUnderscoreFollowedByNumber() = doTest(true)
+    fun testNamespace_InvalidEmpty() = doTest(true)
+
+    @Test
+    fun testNamespace_InvalidEmptyId() = doTest(true)
+
+    @Test
+    fun testNamespace_InvalidNumeric() = doTest(true)
+
+    @Test
+    fun testNamespace_InvalidUnderscore() = doTest(true)
+
+    @Test
+    fun testNamespace_MultiPart() = doTest(true)
+
+    @Test
+    fun testNamespace_Simple() = doTest(true)
+
+    @Test
+    fun testNamespace_UnderscoreFollowedByNumber() = doTest(true)
 
     @Test
     fun testSimple() = doTest(true)
