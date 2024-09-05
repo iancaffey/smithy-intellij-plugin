@@ -6,6 +6,7 @@ import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.lang.annotation.HighlightSeverity.ERROR
 import com.intellij.lang.annotation.HighlightSeverity.INFORMATION
+import com.intellij.lang.annotation.HighlightSeverity.WARNING
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiComment
@@ -15,7 +16,6 @@ import com.intellij.psi.util.PsiTreeUtil.getParentOfType
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.nextLeaf
 import com.intellij.psi.util.nextLeafs
-import com.intellij.psi.util.siblings
 import software.amazon.smithy.intellij.actions.SmithyImportShapeQuickFix
 import software.amazon.smithy.intellij.actions.SmithyOptimizeShapeIdQuickFix
 import software.amazon.smithy.intellij.actions.SmithyRemoveCommasQuickFix
@@ -198,28 +198,6 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                 val trailingWhiteSpace = element.nextLeafs.takeWhile { it is PsiComment || it is PsiWhiteSpace }
                 if (trailingWhiteSpace.none { it.textContains('\n') }) {
                     holder.highlight(ERROR, "Expecting trailing line break '\\n'")
-                }
-            }
-        }
-    },
-    MISSING_COMMA(untilVersion = "1.0") {
-        val tokensRequiringCommaDelimiter = setOf(
-            SmithyTypes.CONTAINER_MEMBER,
-            SmithyTypes.ENTRY,
-            SmithyTypes.ENUM_MEMBER,
-            SmithyTypes.INT_ENUM_MEMBER,
-            SmithyTypes.VALUE
-        )
-
-        override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-            val type = element.elementType
-            if (type in tokensRequiringCommaDelimiter) {
-                val nextComma = element.siblings(withSelf = false).indexOfFirst {
-                    it.elementType == SmithyTypes.TOKEN_COMMA
-                }
-                val nextSibling = element.siblings(withSelf = false).indexOfFirst { it.elementType == type }
-                if (nextSibling != -1 && (nextComma == -1 || nextSibling < nextComma)) {
-                    holder.highlight(ERROR, "Expecting trailing comma ','")
                 }
             }
         }
@@ -486,6 +464,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                             .create()
                     }
                 }
+
                 is SmithyMemberReference -> {
                     if (!reference.isSoft && reference.resolve() == null) {
                         holder.newAnnotation(ERROR, "Unresolved member: ${reference.id.text}")
@@ -493,6 +472,7 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                             .create()
                     }
                 }
+
                 is SmithyShapeReference -> {
                     val target = reference.resolve()
                     if (target == null) {
@@ -522,13 +502,13 @@ private enum class Annotation(val sinceVersion: String? = null, val untilVersion
                         }
                         if (target.hasTrait("smithy.api", "deprecated")) {
                             holder.newAnnotation(
-                                HighlightSeverity.WARNING,
+                                WARNING,
                                 "${element.shapeName} is marked as @deprecated and could be removed in the future"
                             ).highlightType(ProblemHighlightType.LIKE_DEPRECATED).create()
                         }
                         if (target.hasTrait("smithy.api", "unstable")) {
                             holder.newAnnotation(
-                                HighlightSeverity.WARNING,
+                                WARNING,
                                 "${element.shapeName} is marked as @unstable and could change in the future"
                             ).highlightType(ProblemHighlightType.WARNING).create()
                         }
