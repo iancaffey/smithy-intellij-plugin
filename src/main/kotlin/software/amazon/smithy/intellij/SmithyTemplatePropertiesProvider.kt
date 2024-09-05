@@ -14,7 +14,7 @@ import java.util.*
  */
 class SmithyTemplatePropertiesProvider : DefaultTemplatePropertiesProvider {
     override fun fillProperties(dir: PsiDirectory, props: Properties) {
-        props["SMITHY_VERSION"] = findDefaultVersion(dir) ?: "1.0"
+        props["SMITHY_VERSION"] = findDefaultVersion(dir) ?: "2"
         (findDefaultNamespace(dir) ?: dir.parentDirectory?.let { findDefaultNamespace(it) })?.let {
             props["SMITHY_NAMESPACE"] = it
         }
