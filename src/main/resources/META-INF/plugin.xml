@@ -91,7 +91,14 @@
         <gotoSymbolContributor implementation="software.amazon.smithy.intellij.SmithyGotoMemberContributor"/>
         <gotoSymbolContributor implementation="software.amazon.smithy.intellij.SmithyGotoPropertyContributor"/>
         <iconProvider implementation="software.amazon.smithy.intellij.SmithyIconProvider"/>
-        <liveTemplateContext implementation="software.amazon.smithy.intellij.SmithyContextType"/>
+        <liveTemplateContext
+                implementation="software.amazon.smithy.intellij.templates.SmithyImportSectionContextType"/>
+        <liveTemplateContext
+                implementation="software.amazon.smithy.intellij.templates.SmithyMetadataSectionOutsideMetadataContextType"/>
+        <liveTemplateContext
+                implementation="software.amazon.smithy.intellij.templates.SmithyNamespaceSectionWithoutNamespaceContextType"/>
+        <liveTemplateContext
+                implementation="software.amazon.smithy.intellij.templates.SmithyShapeSectionOutsideShapeContextType"/>
         <navbar implementation="software.amazon.smithy.intellij.SmithyNavBar"/>
         <spellchecker.support language="Smithy"
                               implementationClass="software.amazon.smithy.intellij.SmithySpellcheckingStrategy"/>

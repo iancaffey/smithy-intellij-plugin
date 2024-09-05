@@ -5,7 +5,7 @@
               toReformat="true">
         <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
         <context>
-            <option name="Smithy" value="true"/>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
         </context>
     </template>
     <template name="apply"
@@ -15,7 +15,70 @@
         <variable name="SHAPE_ID" expression="" defaultValue="" alwaysStopAt="true"/>
         <variable name="TRAIT_SHAPE_ID" expression="" defaultValue="" alwaysStopAt="true"/>
         <context>
-            <option name="Smithy" value="true"/>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
+        </context>
+    </template>
+    <template name="bigDecimal"
+              value="bigDecimal $SHAPE_NAME$$END$"
+              description="Adds a bigDecimal shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
+        </context>
+    </template>
+    <template name="bigInteger"
+              value="bigInteger $SHAPE_NAME$$END$"
+              description="Adds a bigInteger shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
+        </context>
+    </template>
+    <template name="blob"
+              value="blob $SHAPE_NAME$$END$"
+              description="Adds a blob shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
+        </context>
+    </template>
+    <template name="boolean"
+              value="boolean $SHAPE_NAME$$END$"
+              description="Adds a boolean shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
+        </context>
+    </template>
+    <template name="byte"
+              value="byte $SHAPE_NAME$$END$"
+              description="Adds a byte shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
+        </context>
+    </template>
+    <template name="document"
+              value="document $SHAPE_NAME$$END$"
+              description="Adds a document shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
+        </context>
+    </template>
+    <template name="double"
+              value="double $SHAPE_NAME$$END$"
+              description="Adds a double shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
         </context>
     </template>
     <template name="enum"
@@ -24,7 +87,25 @@
               toReformat="true">
         <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
         <context>
-            <option name="Smithy" value="true"/>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
+        </context>
+    </template>
+    <template name="float"
+              value="float $SHAPE_NAME$$END$"
+              description="Adds a float shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
+        </context>
+    </template>
+    <template name="integer"
+              value="integer $SHAPE_NAME$$END$"
+              description="Adds an integer shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
         </context>
     </template>
     <template name="intEnum"
@@ -33,17 +114,7 @@
               toReformat="true">
         <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
         <context>
-            <option name="Smithy" value="true"/>
-        </context>
-    </template>
-    <template name="kvp"
-              value="$KEY$: $VALUE$$END$"
-              description="Adds a key-value pair"
-              toReformat="true">
-        <variable name="KEY" expression="" defaultValue="" alwaysStopAt="true"/>
-        <variable name="VALUE" expression="" defaultValue="" alwaysStopAt="true"/>
-        <context>
-            <option name="Smithy" value="true"/>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
         </context>
     </template>
     <template name="list"
@@ -53,7 +124,16 @@
         <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
         <variable name="MEMBER_SHAPE_ID" expression="" defaultValue="" alwaysStopAt="true"/>
         <context>
-            <option name="Smithy" value="true"/>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
+        </context>
+    </template>
+    <template name="long"
+              value="long $SHAPE_NAME$$END$"
+              description="Adds a long shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
         </context>
     </template>
     <template name="map"
@@ -64,7 +144,7 @@
         <variable name="KEY_SHAPE_ID" expression="" defaultValue="" alwaysStopAt="true"/>
         <variable name="VALUE_SHAPE_ID" expression="" defaultValue="" alwaysStopAt="true"/>
         <context>
-            <option name="Smithy" value="true"/>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
         </context>
     </template>
     <template name="metadata"
@@ -74,7 +154,7 @@
         <variable name="KEY" expression="" defaultValue="" alwaysStopAt="true"/>
         <variable name="VALUE" expression="" defaultValue="" alwaysStopAt="true"/>
         <context>
-            <option name="Smithy" value="true"/>
+            <option name="SmithyMetadataSectionOutsideMetadata" value="true"/>
         </context>
     </template>
     <template name="namespace"
@@ -83,7 +163,7 @@
               toReformat="true">
         <variable name="VALUE" expression="" defaultValue="" alwaysStopAt="true"/>
         <context>
-            <option name="Smithy" value="true"/>
+            <option name="SmithyNamespaceSectionWithoutNamespace" value="true"/>
         </context>
     </template>
     <template name="operation"
@@ -92,7 +172,7 @@
               toReformat="true">
         <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
         <context>
-            <option name="Smithy" value="true"/>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
         </context>
     </template>
     <template name="resource"
@@ -101,7 +181,7 @@
               toReformat="true">
         <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
         <context>
-            <option name="Smithy" value="true"/>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
         </context>
     </template>
     <template name="service"
@@ -110,30 +190,35 @@
               toReformat="true">
         <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
         <context>
-            <option name="Smithy" value="true"/>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
         </context>
     </template>
     <template name="set"
-              value="set $SHAPE_NAME$ {&#10;member: $MEMBER_SHAPE_ID$&#10;}$END$"
+              value="@uniqueItems&#10;list $SHAPE_NAME$ {&#10;member: $MEMBER_SHAPE_ID$&#10;}$END$"
               description="Adds a set shape"
               toReformat="true">
         <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
         <variable name="MEMBER_SHAPE_ID" expression="" defaultValue="" alwaysStopAt="true"/>
         <context>
-            <option name="Smithy" value="true"/>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
         </context>
     </template>
-    <template name="simple"
-              value="$TYPE_NAME$ $SHAPE_ID$$END$"
-              description="Adds a simple shape"
+    <template name="short"
+              value="short $SHAPE_NAME$$END$"
+              description="Adds a short shape"
               toReformat="true">
-        <variable name="TYPE_NAME"
-                  expression="enum(&quot;bigDecimal&quot;,&quot;bigInteger&quot;,&quot;blob&quot;,&quot;boolean&quot;,&quot;byte&quot;,&quot;document&quot;,&quot;double&quot;,&quot;float&quot;,&quot;integer&quot;,&quot;long&quot;,&quot;short&quot;,&quot;string&quot;,&quot;timestamp&quot;)"
-                  defaultValue=""
-                  alwaysStopAt="true"/>
-        <variable name="SHAPE_ID" expression="" defaultValue="capitalize(TYPE_NAME)" alwaysStopAt="true"/>
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
         <context>
-            <option name="Smithy" value="true"/>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
+        </context>
+    </template>
+    <template name="string"
+              value="string $SHAPE_NAME$$END$"
+              description="Adds a string shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
         </context>
     </template>
     <template name="structure"
@@ -142,7 +227,16 @@
               toReformat="true">
         <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
         <context>
-            <option name="Smithy" value="true"/>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
+        </context>
+    </template>
+    <template name="timestamp"
+              value="timestamp $SHAPE_NAME$$END$"
+              description="Adds a timestamp shape"
+              toReformat="true">
+        <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
         </context>
     </template>
     <template name="union"
@@ -151,7 +245,7 @@
               toReformat="true">
         <variable name="SHAPE_NAME" expression="" defaultValue="" alwaysStopAt="true"/>
         <context>
-            <option name="Smithy" value="true"/>
+            <option name="SmithyShapeSectionOutsideShape" value="true"/>
         </context>
     </template>
     <template name="use"
@@ -160,16 +254,7 @@
               toReformat="true">
         <variable name="SHAPE_ID" expression="" defaultValue="" alwaysStopAt="true"/>
         <context>
-            <option name="Smithy" value="true"/>
-        </context>
-    </template>
-    <template name="version"
-              value="$version: &quot;$VERSION$&quot;$END$"
-              description="Sets version"
-              toReformat="true">
-        <variable name="VERSION" expression="" defaultValue="1.0" alwaysStopAt="true"/>
-        <context>
-            <option name="Smithy" value="true"/>
+            <option name="SmithyImportSection" value="true"/>
         </context>
     </template>
 </templateSet>
