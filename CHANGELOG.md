@@ -2,6 +2,15 @@
 
 # Smithy IntelliJ Plugin Changelog
 
+## [2.0.19]
+
+### Changed
+
+- Updated to latest Smithy branding
+- Updated default IDL version for new files to "2"
+- Removed missing commas validator for IDL v1 files as it's not enforced by smithy-build
+- Improved how live templates are enabled to avoid prompting users to generate invalid Smithy
+
 ## [2.0.18]
 
 ### Changed
